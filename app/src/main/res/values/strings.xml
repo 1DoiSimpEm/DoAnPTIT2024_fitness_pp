@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">FitnessApp</string>
+    <string name="login_in">Login In</string>
+    <string name="welcome">Welcome</string>
+    <string name="username_or_email">Username or email</string>
+    <string name="you_have_just_signed_up_for_the_best_fitness_app_in_the_world_let_s_get_started">You have just signed up for the best fitness app in the world. Let\'s get started!</string>
+    <string name="enter_your_email">Enter your email</string>
+    <string name="password">Password</string>
+    <string name="enter_your_password">Enter your password</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="create_account">Create Account</string>
+    <string name="let_s_start">Let\'s Start!</string>
+    <string name="email">Email</string>
+    <string name="name">Name</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+</resources>
