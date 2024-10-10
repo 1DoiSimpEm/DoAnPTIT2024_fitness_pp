@@ -30,4 +30,11 @@
     <string name="how_old_are_you">How old are you?</string>
     <string name="your_age_will_be_used_to_calculate_your_daily_calorie_needs">Your age will be used to calculate your daily calorie needs.</string>
     <string name="years">%1$s years</string>
+    <string name="it_s_time_to_challenge_your_limits">It\'s time to challenge your limits.</string>
+    <string name="workout">Workout</string>
+    <string name="progress_tracking">Progress</string>
+    <string name="nutrition">Nutrition</string>
+    <string name="community">Community</string>
+    <string name="recommended_for_you">Recommended for you</string>
+    <string name="see_all">See all</string>
 </resources>

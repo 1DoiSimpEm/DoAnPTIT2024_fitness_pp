@@ -32,6 +32,7 @@ abstract class ThemeColors {
   val limeGreen: Color = Color(0xFFE2F163)
   val primaryDisable = Color(0xFFC5EED5)
   val primaryDark: Color = Color(0xFFD81F26)
+  val white = Color.White
 
   val button: Color = primary
   val onButton: Color = Color.White

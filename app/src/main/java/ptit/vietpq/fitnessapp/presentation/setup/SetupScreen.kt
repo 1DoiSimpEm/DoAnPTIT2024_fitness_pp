@@ -1,5 +1,6 @@
 package ptit.vietpq.fitnessapp.presentation.setup
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,11 +40,18 @@ fun SetupRoute() {
 fun SetupScreen(
     modifier: Modifier = Modifier,
 ) {
-    var step by remember { mutableStateOf(0) }
-    var age by remember { mutableStateOf(18) }
-    var weight by remember { mutableStateOf(60) }
-    var height by remember { mutableStateOf(170) }
+    var step by remember { mutableIntStateOf(0) }
+    var age by remember { mutableIntStateOf(18) }
+    var weight by remember { mutableIntStateOf(60) }
+    var height by remember { mutableIntStateOf(170) }
     var isMale by remember { mutableStateOf(true) }
+
+    BackHandler {
+        if (step > 0) {
+            step--
+        }
+    }
+
     Scaffold(
         modifier = modifier,
         containerColor = FitnessTheme.color.black,
