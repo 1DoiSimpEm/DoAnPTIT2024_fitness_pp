@@ -15,4 +15,19 @@
     <string name="confirm_password">Confirm Password</string>
     <string name="login">Login</string>
     <string name="register">Register</string>
+    <string name="don_t_have_an_account">Don\'t have an account?</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="what_s_your_gender">What\'s Your Gender</string>
+    <string name="back">Back</string>
+    <string name="what_you_are_doesn_t_as_important_as_you_are_not_gay_or_whatever_you_can_be_just_be_normal_don_t_be_weird_so_that_you_can_have_your_chance_to_improve_yourself_just_know_that_you_are_a_human">What you are doesn\'t as important as you are not gay or whatever you can be. Just be normal, don\'t be weird so that you can have your chance to improve yourself. Just know that you are a human!</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="continue_">Continue</string>
+    <string name="what_is_your_weight">What Is Your Weight?</string>
+    <string name="just_don_t_be_shy_to_tell_us_your_weight_we_ll_help_you_to_keep_it_in_secret">Just don\'t be shy to tell us your weight. We\'ll help you to keep it in secret.</string>
+    <string name="what_is_your_height">What is your height?</string>
+    <string name="just_don_t_be_shy_to_tell_us_your_height_we_ll_help_you_to_keep_it_in_secret">Just don\'t be shy to tell us your height, we\'ll help you to keep it in secret</string>
+    <string name="how_old_are_you">How old are you?</string>
+    <string name="your_age_will_be_used_to_calculate_your_daily_calorie_needs">Your age will be used to calculate your daily calorie needs.</string>
+    <string name="years">%1$s years</string>
 </resources>

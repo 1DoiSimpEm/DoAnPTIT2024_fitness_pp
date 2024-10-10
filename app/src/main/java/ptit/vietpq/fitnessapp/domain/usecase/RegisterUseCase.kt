@@ -10,8 +10,16 @@ class RegisterUseCase @Inject constructor(
     private val authRepository: AuthRepository,
     private val appCoroutineDispatchers: AppCoroutineDispatchers,
 ) {
-    suspend operator fun invoke(userName: String, password: String): Result<RegisterModel> =
+    suspend operator fun invoke(
+        userName: String,
+        email: String,
+        password: String
+    ): Result<RegisterModel> =
         withContext(appCoroutineDispatchers.io) {
-            authRepository.register(userName, password)
+            authRepository.register(
+                userName = userName,
+                email = email,
+                password = password
+            )
         }
 }

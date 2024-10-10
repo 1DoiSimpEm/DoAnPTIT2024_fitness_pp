@@ -11,13 +11,14 @@ interface AuthService {
     @POST("api/register")
     suspend fun register(
         @Field("username") username: String,
-        @Field("password") password: String
+        @Field("email") email: String,
+        @Field("password") password: String,
     ): RegisterResponse
 
     @FormUrlEncoded
     @POST("api/login")
     suspend fun login(
         @Field("username") username: String,
-        @Field("password") password: String
+        @Field("password") password: String,
     ): LoginResponse
 }

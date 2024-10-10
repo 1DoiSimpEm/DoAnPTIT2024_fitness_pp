@@ -11,14 +11,23 @@ import javax.inject.Inject
 class AuthRepositoryImpl @Inject constructor(
     private val authService: AuthService,
 ) : AuthRepository {
-    override suspend fun register(userName: String, password: String): Result<RegisterModel> = runSuspendCatching {
+    override suspend fun register(
+        userName: String,
+        email: String,
+        password: String
+    ): Result<RegisterModel> =
+        runSuspendCatching {
             authService.register(
                 username = userName,
+                email = email,
                 password = password
             ).asModel()
         }
 
-    override suspend fun login(userName: String, password: String): Result<LoginModel> =
+    override suspend fun login(
+        userName: String,
+        password: String
+    ): Result<LoginModel> =
         runSuspendCatching {
             authService.login(
                 username = userName,

@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -15,11 +16,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -43,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.core.util.PatternsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
@@ -52,7 +54,6 @@ import ptit.vietpq.fitnessapp.extension.toast
 
 @Composable
 fun LoginRoute(
-    modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -67,7 +68,7 @@ fun LoginRoute(
         }
 
         is LoginUiState.Loading -> {
-            CircularProgressIndicator()
+
         }
 
         is LoginUiState.LoginSuccess -> {
@@ -90,7 +91,7 @@ fun LoginRoute(
 @Composable
 fun LoginScreen(
     onLoginClick: (String, String) -> Unit,
-    onRegisterClick: (String, String) -> Unit,
+    onRegisterClick: (String, String, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isRegistering by remember {
@@ -140,7 +141,10 @@ fun LoginScreen(
             AnimatedVisibility(visible = !isRegistering) {
                 LoginForm(
                     innerPadding = innerPadding,
-                    onLoginClick = onLoginClick
+                    onLoginClick = onLoginClick,
+                    onToRegister = {
+                        isRegistering = true
+                    }
                 )
             }
             AnimatedVisibility(visible = isRegistering) {
@@ -156,7 +160,7 @@ fun LoginScreen(
 @Composable
 private fun RegisterForm(
     innerPadding: PaddingValues,
-    onRegisterClick: (String, String) -> Unit,
+    onRegisterClick: (String, String, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var userNameTextState by remember {
@@ -224,8 +228,11 @@ private fun RegisterForm(
                     shape = RoundedCornerShape(48.dp)
                 ),
             onClick = {
-                if (passwordTextState == confirmPasswordTextState) {
-                    onRegisterClick(emailTextState, passwordTextState)
+                if (passwordTextState == confirmPasswordTextState && PatternsCompat.EMAIL_ADDRESS.matcher(
+                        emailTextState
+                    ).matches()
+                ) {
+                    onRegisterClick(userNameTextState, emailTextState, passwordTextState)
                 } else {
                     // Show error
                 }
@@ -250,6 +257,7 @@ private fun RegisterForm(
 private fun LoginForm(
     innerPadding: PaddingValues,
     onLoginClick: (String, String) -> Unit,
+    onToRegister: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var userNameTextState by remember {
@@ -300,6 +308,9 @@ private fun LoginForm(
         Text(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
+                .clickable {
+                    //TODO: Forgot password
+                }
                 .background(FitnessTheme.color.primary)
                 .fillMaxWidth()
                 .padding(top = 8.dp, end = 16.dp, bottom = 8.dp),
@@ -322,7 +333,7 @@ private fun LoginForm(
                 onLoginClick(userNameTextState, passwordTextState)
             },
             colors = ButtonDefaults.buttonColors(
-                containerColor = FitnessTheme.color.neutral1,
+                containerColor = FitnessTheme.color.semiBlack,
                 contentColor = FitnessTheme.color.primary
             )
         ) {
@@ -333,6 +344,26 @@ private fun LoginForm(
                 style = FitnessTheme.typo.button
             )
 
+        }
+        Row(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 16.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.don_t_have_an_account),
+                color = Color.White,
+                style = FitnessTheme.typo.body1
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                modifier = Modifier.clickable {
+                    onToRegister()
+                },
+                text = stringResource(R.string.sign_up),
+                color = FitnessTheme.color.limeGreen,
+                style = FitnessTheme.typo.body1
+            )
         }
     }
 }
@@ -404,5 +435,5 @@ private fun EditTextForm(
 @Preview
 @Composable
 private fun PreviewLoginScreen() {
-    LoginScreen({ _, _ -> }, { _, _ -> })
+    LoginScreen({ _, _ -> }, { _, _, _ -> })
 }

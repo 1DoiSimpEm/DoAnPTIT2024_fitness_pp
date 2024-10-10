@@ -44,6 +44,7 @@ abstract class ThemeColors {
 
   val error: Color = Color(0xFFB9171E)
   val black: Color = Color(0xFF232323)
+  val semiBlack: Color = Color(0xFF373737)
   val neutral1: Color = Color(0xFF161616)
 }
 

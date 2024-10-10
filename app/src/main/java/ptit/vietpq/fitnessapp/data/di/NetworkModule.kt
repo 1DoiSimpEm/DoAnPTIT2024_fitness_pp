@@ -14,7 +14,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
-const val BASE_URL = "https://0938-104-28-254-73.ngrok-free.app/"
+const val BASE_URL = "https://4668-117-4-241-89.ngrok-free.app/"
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)

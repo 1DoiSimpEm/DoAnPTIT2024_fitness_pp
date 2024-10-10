@@ -142,6 +142,7 @@ dependencies {
     // lottie
     implementation(libs.lottie)
 
+    implementation (libs.numberpicker)
 
     implementation(libs.androidx.multidex)
 

@@ -34,10 +34,10 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun register(userName: String, password: String) {
+    fun register(userName: String, email: String, password: String) {
         viewModelScope.launch {
             _uiState.emit(LoginUiState.Loading)
-            registerUseCase(userName, password).fold(
+            registerUseCase(userName, email, password).fold(
                 onSuccess = {
                     _uiState.emit(LoginUiState.RegisterSuccess(it))
                 },

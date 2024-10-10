@@ -7,6 +7,7 @@ import kotlin.contracts.contract
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import retrofit2.HttpException
 
 private const val STOP_TIMEOUT_MILLIS: Long = 5000
 
@@ -29,7 +30,16 @@ val WHILE_UI_SUBSCRIBED: SharingStarted = SharingStarted.WhileSubscribed(STOP_TI
 suspend inline fun <R> runSuspendCatching(block: () -> R): Result<R> {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
   return try {
-    Result.success(block())
+    val result = block()
+    if (result is retrofit2.Response<*>) {
+      if (result.isSuccessful) {
+        Result.success(result)
+      } else {
+        Result.failure(HttpException(result))
+      }
+    } else {
+      Result.success(result)
+    }
   } catch (c: CancellationException) {
     throw c
   } catch (e: Throwable) {
