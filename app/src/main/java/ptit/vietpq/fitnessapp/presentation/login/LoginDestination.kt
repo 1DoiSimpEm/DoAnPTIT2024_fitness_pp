@@ -9,7 +9,9 @@ data object LoginDestination : FitnessNavigationDestination {
   override val destination: String = "login_destination"
 }
 
-fun NavGraphBuilder.loginGraph() =
+fun NavGraphBuilder.loginGraph(
+  onLoginSuccess : () -> Unit
+) =
   composable(route = LoginDestination.route) {
-    LoginRoute()
+    LoginRoute(onLoginSuccess = onLoginSuccess)
   }

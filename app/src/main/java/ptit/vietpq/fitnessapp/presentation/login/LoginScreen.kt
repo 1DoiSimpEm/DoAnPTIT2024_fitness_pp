@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -21,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -41,7 +43,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.util.PatternsCompat
@@ -54,36 +55,40 @@ import ptit.vietpq.fitnessapp.extension.toast
 
 @Composable
 fun LoginRoute(
+    onLoginSuccess: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val uiState: LoginUiState by viewModel.uiState.collectAsStateWithLifecycle()
-    when (uiState) {
-        is LoginUiState.Empty -> {
-            // Do nothing
-        }
-
-        is LoginUiState.Error -> {
-            context.toast((uiState as LoginUiState.Error).message)
-        }
-
-        is LoginUiState.Loading -> {
-
-        }
-
-        is LoginUiState.LoginSuccess -> {
-
-        }
-
-        is LoginUiState.RegisterSuccess -> {
-
-        }
-
+    val eventFlow = viewModel.eventFlow.collectAsStateWithLifecycle(initialValue = LoginState.Empty)
+    var showLoading by remember {
+        mutableStateOf(false)
     }
+    when (val event = eventFlow.value) {
+        is LoginState.LoginSuccess -> {
+            context.toast("Login success")
+            onLoginSuccess()
+            showLoading = false
+        }
+        is LoginState.RegisterSuccess -> {
+            context.toast("Register success")
+            showLoading = false
+        }
+        is LoginState.Error -> {
+            context.toast(event.message)
+            showLoading = false
+        }
 
+        LoginState.Empty -> {
+
+        }
+        LoginState.Loading -> {
+            showLoading = true
+        }
+    }
     LoginScreen(
         onLoginClick = viewModel::login,
         onRegisterClick = viewModel::register,
+        showLoading = showLoading
     )
 }
 
@@ -92,11 +97,13 @@ fun LoginRoute(
 fun LoginScreen(
     onLoginClick: (String, String) -> Unit,
     onRegisterClick: (String, String, String) -> Unit,
+    showLoading: Boolean,
     modifier: Modifier = Modifier,
 ) {
     var isRegistering by remember {
         mutableStateOf(false)
     }
+
     Scaffold(
         modifier = modifier,
         containerColor = FitnessTheme.color.black,
@@ -137,6 +144,16 @@ fun LoginScreen(
             )
         },
         content = { innerPadding ->
+            if (showLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = FitnessTheme.color.limeGreen
+                    )
+                }
+            }
 
             AnimatedVisibility(visible = !isRegistering) {
                 LoginForm(
@@ -155,6 +172,7 @@ fun LoginScreen(
             }
         }
     )
+
 }
 
 @Composable
@@ -430,10 +448,4 @@ private fun EditTextForm(
             visualTransformation = if (!isPassword) VisualTransformation.None else PasswordVisualTransformation(),
         )
     }
-}
-
-@Preview
-@Composable
-private fun PreviewLoginScreen() {
-    LoginScreen({ _, _ -> }, { _, _, _ -> })
 }

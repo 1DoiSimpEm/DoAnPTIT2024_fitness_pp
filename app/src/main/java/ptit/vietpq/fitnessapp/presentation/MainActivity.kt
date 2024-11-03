@@ -5,25 +5,34 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import dagger.hilt.android.AndroidEntryPoint
+import ptit.vietpq.fitnessapp.data.local.sharepref.SharePreferenceProvider
+import ptit.vietpq.fitnessapp.presentation.exercise.ExerciseDestination
+import ptit.vietpq.fitnessapp.presentation.home.HomeDestination
 import ptit.vietpq.fitnessapp.presentation.login.LoginDestination
 import ptit.vietpq.fitnessapp.presentation.main.FitnessApp
-import ptit.vietpq.fitnessapp.ui.theme.FitnessAppTheme
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject lateinit var sharePreferenceProvider: SharePreferenceProvider
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             FitnessApp(
-                startDestination = LoginDestination,
+                startDestination =
+                if(sharePreferenceProvider.isSetupFinished){
+                    HomeDestination
+                }
+                else if (sharePreferenceProvider.accessToken.isEmpty()) {
+                    LoginDestination
+                } else {
+                    ExerciseDestination
+                },
                 modifier = Modifier.fillMaxSize()
             )
         }

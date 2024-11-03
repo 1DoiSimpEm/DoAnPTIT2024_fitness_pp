@@ -19,8 +19,35 @@ class SharePreferenceProvider @Inject constructor(
     val sharedPreferences: SharedPreferences, val moshi: Moshi
 ) {
 
+    var accessToken = ""
+        set(value) {
+            save(ACCESS_TOKEN, value, "")
+            field = value
+        }
+        get() {
+            return get<String>(ACCESS_TOKEN, "").toString()
+        }
+
+    var userName = ""
+        set(value) {
+            save(USER_NAME, value, "")
+            field = value
+        }
+        get() {
+            return get<String>(USER_NAME, "").toString()
+        }
+
+    var isSetupFinished = false
+        set(value) {
+            save("IS_SETUP_FINISHED", value, false)
+            field = value
+        }
+        get() {
+            return get<Boolean>("IS_SETUP_FINISHED", false) ?: false
+        }
+
     @ToJson
-    inline fun <reified T> save(key: String, any: Any) {
+    inline fun <reified T> save(key: String, any: Any, defaultValue: T? = null) {
         val editor = sharedPreferences.edit()
         when (any) {
             is String -> editor.putString(key, any)
@@ -71,5 +98,7 @@ class SharePreferenceProvider @Inject constructor(
 
     companion object {
         const val NAME_SHARE_PREFERENCE = "FitnessAppSharePref"
+        const val ACCESS_TOKEN = "ACCESS_TOKEN"
+        const val USER_NAME = "USER_NAME"
     }
 }

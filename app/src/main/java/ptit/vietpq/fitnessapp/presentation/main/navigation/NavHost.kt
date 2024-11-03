@@ -4,15 +4,20 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import ptit.vietpq.fitnessapp.presentation.login.LoginDestination
+import ptit.vietpq.fitnessapp.presentation.exercise.exerciseGraph
+import ptit.vietpq.fitnessapp.presentation.home.HomeDestination
+import ptit.vietpq.fitnessapp.presentation.home.homeGraph
 import ptit.vietpq.fitnessapp.presentation.login.loginGraph
 import ptit.vietpq.fitnessapp.presentation.main.navigation.destination.FitnessNavigationDestination
+import ptit.vietpq.fitnessapp.presentation.profile.ProfileDestination
+import ptit.vietpq.fitnessapp.presentation.profile.profileGraph
+import ptit.vietpq.fitnessapp.presentation.setup.SetupDestination
+import ptit.vietpq.fitnessapp.presentation.setup.setupGraph
 
 @Composable
-fun QRCodeNavHost(
+fun FitnessNavHost(
     navController: NavHostController,
     startDestination: FitnessNavigationDestination,
     onNavigateToDestination: (FitnessNavigationDestination, String) -> Unit,
@@ -54,6 +59,34 @@ fun QRCodeNavHost(
             )
         },
     ) {
-        loginGraph()
+        loginGraph(
+            onLoginSuccess = {
+                onNavigateToDestinationPopUpTo(
+                    SetupDestination,
+                    SetupDestination.route
+                )
+            }
+        )
+        setupGraph(
+            onSetupCompleted = {
+                onNavigateToDestinationPopUpTo(
+                    HomeDestination,
+                    HomeDestination.route
+                )
+            }
+        )
+        homeGraph(
+            onUserClicked = {
+                onNavigateToDestination(
+                    ProfileDestination,
+                    ProfileDestination.route
+                )
+            }
+        )
+        profileGraph(
+            onBackPressed = onBackClick
+        )
+
+        exerciseGraph()
     }
 }

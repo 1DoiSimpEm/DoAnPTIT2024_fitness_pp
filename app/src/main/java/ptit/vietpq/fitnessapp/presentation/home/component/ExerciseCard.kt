@@ -1,9 +1,9 @@
 package ptit.vietpq.fitnessapp.presentation.home.component
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,29 +25,41 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.ImageLoader
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
+import ptit.vietpq.fitnessapp.data.remote.response.ExerciseResponse
 
 @Composable
 fun ExerciseCard(
+    onItemClicked : (ExerciseResponse) -> Unit,
+    exerciseResponse: ExerciseResponse,
     modifier: Modifier = Modifier,
     isFavorite: Boolean = false,
 ) {
-    val tint by animateColorAsState(if (isFavorite) FitnessTheme.color.limeGreen else FitnessTheme.color.white,
+    val context = LocalContext.current
+    val tint by animateColorAsState(
+        if (isFavorite) FitnessTheme.color.limeGreen else FitnessTheme.color.white,
         label = ""
     )
     Box(
         modifier = modifier
-            .width(250.dp)
-            .padding(16.dp)
+            .padding(8.dp)
             .background(Color(0xFF1E1E1E), shape = RoundedCornerShape(16.dp))
             .border(2.dp, Color.White, RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
+            .clickable {
+                onItemClicked(exerciseResponse)
+            }
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -57,31 +69,30 @@ fun ExerciseCard(
                     .fillMaxWidth()
                     .height(160.dp)
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_progress),
-                    contentDescription = "Exercise Image",
+                AsyncImage(
+                    contentDescription = null,
+                    model = ImageRequest.Builder(context).data(
+                        exerciseResponse.image
+                    ).build(),
+                    imageLoader = ImageLoader(context),
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                    modifier = Modifier.fillMaxSize()
                 )
-
                 Icon(
                     painter = painterResource(id = R.drawable.ic_star), // Star icon resource
                     contentDescription = "Favorite",
                     tint = tint,
-                    modifier = Modifier.run {
-                        size(32.dp)
-                            .padding(8.dp)
-                            .align(Alignment.TopEnd)
-                    }
+                    modifier = Modifier
+                        .size(32.dp)
+                        .padding(8.dp)
+                        .align(Alignment.TopEnd)
                 )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Squat Exercise",
+                text = exerciseResponse.name,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
                 color = Color(0xFFE5FF00), // Light yellow color
@@ -96,7 +107,10 @@ fun ExerciseCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 // Time Icon and Text
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(0.4f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_timer), // Timer icon resource
                         contentDescription = "Timer",
@@ -107,12 +121,17 @@ fun ExerciseCard(
                     Text(
                         text = "12 Minutes",
                         color = Color(0xFFB2B2B2), // Gray text color
-                        fontSize = 14.sp
+                        fontSize = 14.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
                 // Calories Icon and Text
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(0.4f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_fire), // Fire icon resource
                         contentDescription = "Calories",
@@ -123,7 +142,9 @@ fun ExerciseCard(
                     Text(
                         text = "120 Kcal",
                         color = Color(0xFFB2B2B2), // Gray text color
-                        fontSize = 14.sp
+                        fontSize = 14.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
@@ -136,5 +157,15 @@ fun ExerciseCard(
 @Preview
 @Composable
 private fun ExerciseCardPreview() {
-    ExerciseCard()
+    ExerciseCard(
+        onItemClicked = { },
+        ExerciseResponse(
+            name = "Squat Exercise",
+            description = "Squat is a full body exercise that trains primarily the muscles of the thighs, hips and buttocks, quadriceps femoris muscle, hamstrings, as well as strengthening the bones, ligaments and insertion of the tendons throughout the lower body.",
+            videoUrl = "https://www.youtube.com/watch?v=U3Hj5ZCpGzY",
+            image = "https://images.unsplash.com/photo-1619117459660-3b1b3b3b3b3b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyMjIwNzV8MHwxfGFsbHwxf",
+            muscleGroupId = 1,
+            id = 1
+        ),
+    )
 }

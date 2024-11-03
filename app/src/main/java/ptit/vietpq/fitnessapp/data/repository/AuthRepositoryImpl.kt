@@ -2,6 +2,7 @@ package ptit.vietpq.fitnessapp.data.repository
 
 import ptit.vietpq.fitnessapp.core.runSuspendCatching
 import ptit.vietpq.fitnessapp.data.mapper.asModel
+import ptit.vietpq.fitnessapp.data.remote.request.RegisterRequest
 import ptit.vietpq.fitnessapp.data.remote.service.AuthService
 import ptit.vietpq.fitnessapp.domain.model.LoginModel
 import ptit.vietpq.fitnessapp.domain.model.RegisterModel
@@ -18,9 +19,11 @@ class AuthRepositoryImpl @Inject constructor(
     ): Result<RegisterModel> =
         runSuspendCatching {
             authService.register(
-                username = userName,
-                email = email,
-                password = password
+                RegisterRequest(
+                    username = userName,
+                    email = email,
+                    password = password
+                )
             ).asModel()
         }
 
@@ -30,8 +33,8 @@ class AuthRepositoryImpl @Inject constructor(
     ): Result<LoginModel> =
         runSuspendCatching {
             authService.login(
-                username = userName,
-                password = password
+                userName,
+                password
             ).asModel()
         }
 }

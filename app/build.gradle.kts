@@ -145,6 +145,7 @@ dependencies {
     implementation (libs.numberpicker)
 
     implementation(libs.androidx.multidex)
+    implementation(libs.coil.compose)
 
     // Tests
     testImplementation(libs.junit)
@@ -158,6 +159,11 @@ dependencies {
 //  debugImplementation(libs.leakcanary)
 
     lintChecks(libs.slack.compose.lint)
+
+    //ml kit common
+    implementation (libs.pose.detection)
+    implementation (libs.pose.detection.accurate)
+
 
     implementation(libs.flow.bus)
     implementation(libs.zoomable)

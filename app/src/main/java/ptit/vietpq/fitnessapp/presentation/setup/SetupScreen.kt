@@ -2,10 +2,13 @@ package ptit.vietpq.fitnessapp.presentation.setup
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -19,25 +22,65 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
+import ptit.vietpq.fitnessapp.extension.toast
 import ptit.vietpq.fitnessapp.presentation.setup.component.AgePicker
 import ptit.vietpq.fitnessapp.presentation.setup.component.GenderSelection
 import ptit.vietpq.fitnessapp.presentation.setup.component.HeightPicker
 import ptit.vietpq.fitnessapp.presentation.setup.component.WeightPicker
 
 @Composable
-fun SetupRoute() {
-    SetupScreen()
+fun SetupRoute(
+    onSetupComplete: () -> Unit,
+    viewModel: SetupViewModel = hiltViewModel(),
+) {
+    val context = LocalContext.current
+    val state by viewModel.eventFlow.collectAsStateWithLifecycle(initialValue = SetupState.Idle)
+    var isLoading by remember {
+        mutableStateOf(false)
+    }
+    when (state) {
+        SetupState.Error -> {
+            context.toast("Error")
+        }
+
+        SetupState.Loading -> {
+            isLoading = true
+        }
+
+        SetupState.Success -> {
+            context.toast("Success")
+            onSetupComplete()
+        }
+
+        SetupState.Idle -> Unit
+    }
+    SetupScreen(
+        isLoading = isLoading,
+        onUpdateUserInfo = { age, weight, height, isMale ->
+            viewModel.updateUser(age, weight, height, if (isMale) "Male" else "Female", "")
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SetupScreen(
+    isLoading: Boolean,
+    onUpdateUserInfo: (
+        age: Int,
+        weight: Int,
+        height: Int,
+        isMale: Boolean,
+    ) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var step by remember { mutableIntStateOf(0) }
@@ -85,6 +128,16 @@ fun SetupScreen(
             )
         },
         content = { innerPadding ->
+            if (isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = FitnessTheme.color.limeGreen
+                    )
+                }
+            }
             when (step) {
                 0 -> WeightPicker(
                     innerPadding = innerPadding,
@@ -113,20 +166,11 @@ fun SetupScreen(
                 3 -> GenderSelection(
                     innerPadding = innerPadding,
                     onContinueClick = {
-                        step = 4
                         isMale = it
+                        onUpdateUserInfo(age, weight, height, isMale)
                     }
                 )
-
-
             }
         }
     )
-}
-
-
-@Preview
-@Composable
-private fun PreviewSetupScreen() {
-    SetupScreen()
 }

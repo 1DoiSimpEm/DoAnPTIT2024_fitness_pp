@@ -39,6 +39,8 @@ android-gradle = "8.2.2"
 google-dagger-hilt = "2.50"
 
 numberpicker = "1.0.3"
+poseDetection = "18.0.0-beta5"
+poseEstimationCommon = "16.0.0"
 square-okhttp = "4.12.0"
 square-retrofit = "2.9.0"
 moshi = "1.15.0"
@@ -58,7 +60,7 @@ multidex = "2.0.1"
 work-manager-ver = "2.9.1"
 
 
-firebaseCrashlyticsPlugin = "2.9.9"
+fireBbaseCrashlyticsPlugin = "2.9.9"
 firebasePerfPlugin = "1.4.2"
 
 
@@ -70,6 +72,9 @@ espresso-core = { group = "androidx.test.espresso", name = "espresso-core", vers
 
 
 numberpicker = { module = "com.chargemap.compose:numberpicker", version.ref = "numberpicker" }
+pose-detection = { module = "com.google.mlkit:pose-detection", version.ref = "poseDetection" }
+pose-detection-accurate = { module = "com.google.mlkit:pose-detection-accurate", version.ref = "poseDetection" }
+pose-estimation-common = { module = "com.google.mlkit:pose-estimation-common", version.ref = "poseEstimationCommon" }
 ui = { group = "androidx.compose.ui", name = "ui" }
 ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }

@@ -1,5 +1,8 @@
 package ptit.vietpq.fitnessapp.core
 
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.Status
+import kotlinx.coroutines.Dispatchers
 import kotlin.Result
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -7,7 +10,9 @@ import kotlin.contracts.contract
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import retrofit2.Response
 
 private const val STOP_TIMEOUT_MILLIS: Long = 5000
 
@@ -28,21 +33,43 @@ val WHILE_UI_SUBSCRIBED: SharingStarted = SharingStarted.WhileSubscribed(STOP_TI
 @OptIn(ExperimentalContracts::class)
 @Suppress("RedundantSuspendModifier")
 suspend inline fun <R> runSuspendCatching(block: () -> R): Result<R> {
-  contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-  return try {
-    val result = block()
-    if (result is retrofit2.Response<*>) {
-      if (result.isSuccessful) {
-        Result.success(result)
-      } else {
-        Result.failure(HttpException(result))
-      }
-    } else {
-      Result.success(result)
+    contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
+    return try {
+        val result = block()
+        if (result is retrofit2.Response<*>) {
+            if (result.isSuccessful) {
+                Result.success(result)
+            } else {
+                Result.failure(HttpException(result))
+            }
+        } else {
+            Result.success(result)
+        }
+    } catch (c: CancellationException) {
+        throw c
+    } catch (e: Throwable) {
+        Result.failure(e)
     }
-  } catch (c: CancellationException) {
-    throw c
-  } catch (e: Throwable) {
-    Result.failure(e)
-  }
+}
+
+@OptIn(ExperimentalContracts::class)
+suspend fun <T> safeApiCall(apiCall: suspend () -> Response<T>): Result<T> {
+    contract { callsInPlace(apiCall, InvocationKind.AT_MOST_ONCE) }
+    try {
+        val response = apiCall()
+        if (response.isSuccessful) {
+           return Result.success(response.body()!!)
+        } else {
+            return Result.failure(
+                ApiException(
+                    Status(
+                        response.code(),
+                        response.message()
+                    )
+                )
+            )
+        }
+    } catch (e: Exception) {
+        return Result.failure(e)
+    }
 }
