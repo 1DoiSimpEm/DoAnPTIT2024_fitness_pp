@@ -47,4 +47,8 @@
     <string name="help">Help</string>
     <string name="logout">Logout</string>
     <string name="my_profile">My Profile</string>
+    <string name="performing_exercise">Performing Exercise...</string>
+    <string name="switch_camera">Switch Camera</string>
+    <string name="reps">reps</string>
+    <string name="form">Form: %1$s%</string>
 </resources>

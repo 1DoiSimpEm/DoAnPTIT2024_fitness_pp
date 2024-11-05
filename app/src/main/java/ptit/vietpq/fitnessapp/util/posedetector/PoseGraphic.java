@@ -101,101 +101,101 @@ public class PoseGraphic extends GraphicOverlay.Graphic {
           poseClassification.get(i), classificationX, classificationY, classificationTextPaint);
     }
 
-    // Draw all the points
-    for (PoseLandmark landmark : landmarks) {
-      drawPoint(canvas, landmark, whitePaint);
-      if (visualizeZ && rescaleZForVisualization) {
-        zMin = min(zMin, landmark.getPosition3D().getZ());
-        zMax = max(zMax, landmark.getPosition3D().getZ());
-      }
-    }
-
-    PoseLandmark nose = pose.getPoseLandmark(PoseLandmark.NOSE);
-    PoseLandmark lefyEyeInner = pose.getPoseLandmark(PoseLandmark.LEFT_EYE_INNER);
-    PoseLandmark lefyEye = pose.getPoseLandmark(PoseLandmark.LEFT_EYE);
-    PoseLandmark leftEyeOuter = pose.getPoseLandmark(PoseLandmark.LEFT_EYE_OUTER);
-    PoseLandmark rightEyeInner = pose.getPoseLandmark(PoseLandmark.RIGHT_EYE_INNER);
-    PoseLandmark rightEye = pose.getPoseLandmark(PoseLandmark.RIGHT_EYE);
-    PoseLandmark rightEyeOuter = pose.getPoseLandmark(PoseLandmark.RIGHT_EYE_OUTER);
-    PoseLandmark leftEar = pose.getPoseLandmark(PoseLandmark.LEFT_EAR);
-    PoseLandmark rightEar = pose.getPoseLandmark(PoseLandmark.RIGHT_EAR);
-    PoseLandmark leftMouth = pose.getPoseLandmark(PoseLandmark.LEFT_MOUTH);
-    PoseLandmark rightMouth = pose.getPoseLandmark(PoseLandmark.RIGHT_MOUTH);
-
-    PoseLandmark leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER);
-    PoseLandmark rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER);
-    PoseLandmark leftElbow = pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW);
-    PoseLandmark rightElbow = pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW);
-    PoseLandmark leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST);
-    PoseLandmark rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST);
-    PoseLandmark leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP);
-    PoseLandmark rightHip = pose.getPoseLandmark(PoseLandmark.RIGHT_HIP);
-    PoseLandmark leftKnee = pose.getPoseLandmark(PoseLandmark.LEFT_KNEE);
-    PoseLandmark rightKnee = pose.getPoseLandmark(PoseLandmark.RIGHT_KNEE);
-    PoseLandmark leftAnkle = pose.getPoseLandmark(PoseLandmark.LEFT_ANKLE);
-    PoseLandmark rightAnkle = pose.getPoseLandmark(PoseLandmark.RIGHT_ANKLE);
-
-    PoseLandmark leftPinky = pose.getPoseLandmark(PoseLandmark.LEFT_PINKY);
-    PoseLandmark rightPinky = pose.getPoseLandmark(PoseLandmark.RIGHT_PINKY);
-    PoseLandmark leftIndex = pose.getPoseLandmark(PoseLandmark.LEFT_INDEX);
-    PoseLandmark rightIndex = pose.getPoseLandmark(PoseLandmark.RIGHT_INDEX);
-    PoseLandmark leftThumb = pose.getPoseLandmark(PoseLandmark.LEFT_THUMB);
-    PoseLandmark rightThumb = pose.getPoseLandmark(PoseLandmark.RIGHT_THUMB);
-    PoseLandmark leftHeel = pose.getPoseLandmark(PoseLandmark.LEFT_HEEL);
-    PoseLandmark rightHeel = pose.getPoseLandmark(PoseLandmark.RIGHT_HEEL);
-    PoseLandmark leftFootIndex = pose.getPoseLandmark(PoseLandmark.LEFT_FOOT_INDEX);
-    PoseLandmark rightFootIndex = pose.getPoseLandmark(PoseLandmark.RIGHT_FOOT_INDEX);
-
-    // Face
-    drawLine(canvas, nose, lefyEyeInner, whitePaint);
-    drawLine(canvas, lefyEyeInner, lefyEye, whitePaint);
-    drawLine(canvas, lefyEye, leftEyeOuter, whitePaint);
-    drawLine(canvas, leftEyeOuter, leftEar, whitePaint);
-    drawLine(canvas, nose, rightEyeInner, whitePaint);
-    drawLine(canvas, rightEyeInner, rightEye, whitePaint);
-    drawLine(canvas, rightEye, rightEyeOuter, whitePaint);
-    drawLine(canvas, rightEyeOuter, rightEar, whitePaint);
-    drawLine(canvas, leftMouth, rightMouth, whitePaint);
-
-    drawLine(canvas, leftShoulder, rightShoulder, whitePaint);
-    drawLine(canvas, leftHip, rightHip, whitePaint);
-
-    // Left body
-    drawLine(canvas, leftShoulder, leftElbow, leftPaint);
-    drawLine(canvas, leftElbow, leftWrist, leftPaint);
-    drawLine(canvas, leftShoulder, leftHip, leftPaint);
-    drawLine(canvas, leftHip, leftKnee, leftPaint);
-    drawLine(canvas, leftKnee, leftAnkle, leftPaint);
-    drawLine(canvas, leftWrist, leftThumb, leftPaint);
-    drawLine(canvas, leftWrist, leftPinky, leftPaint);
-    drawLine(canvas, leftWrist, leftIndex, leftPaint);
-    drawLine(canvas, leftIndex, leftPinky, leftPaint);
-    drawLine(canvas, leftAnkle, leftHeel, leftPaint);
-    drawLine(canvas, leftHeel, leftFootIndex, leftPaint);
-
-    // Right body
-    drawLine(canvas, rightShoulder, rightElbow, rightPaint);
-    drawLine(canvas, rightElbow, rightWrist, rightPaint);
-    drawLine(canvas, rightShoulder, rightHip, rightPaint);
-    drawLine(canvas, rightHip, rightKnee, rightPaint);
-    drawLine(canvas, rightKnee, rightAnkle, rightPaint);
-    drawLine(canvas, rightWrist, rightThumb, rightPaint);
-    drawLine(canvas, rightWrist, rightPinky, rightPaint);
-    drawLine(canvas, rightWrist, rightIndex, rightPaint);
-    drawLine(canvas, rightIndex, rightPinky, rightPaint);
-    drawLine(canvas, rightAnkle, rightHeel, rightPaint);
-    drawLine(canvas, rightHeel, rightFootIndex, rightPaint);
-
-    // Draw inFrameLikelihood for all points
-    if (showInFrameLikelihood) {
-      for (PoseLandmark landmark : landmarks) {
-        canvas.drawText(
-            String.format(Locale.US, "%.2f", landmark.getInFrameLikelihood()),
-            translateX(landmark.getPosition().x),
-            translateY(landmark.getPosition().y),
-            whitePaint);
-      }
-    }
+//    // Draw all the points
+//    for (PoseLandmark landmark : landmarks) {
+//      drawPoint(canvas, landmark, whitePaint);
+//      if (visualizeZ && rescaleZForVisualization) {
+//        zMin = min(zMin, landmark.getPosition3D().getZ());
+//        zMax = max(zMax, landmark.getPosition3D().getZ());
+//      }
+//    }
+//
+//    PoseLandmark nose = pose.getPoseLandmark(PoseLandmark.NOSE);
+//    PoseLandmark leftEyeInner = pose.getPoseLandmark(PoseLandmark.LEFT_EYE_INNER);
+//    PoseLandmark leftEye = pose.getPoseLandmark(PoseLandmark.LEFT_EYE);
+//    PoseLandmark leftEyeOuter = pose.getPoseLandmark(PoseLandmark.LEFT_EYE_OUTER);
+//    PoseLandmark rightEyeInner = pose.getPoseLandmark(PoseLandmark.RIGHT_EYE_INNER);
+//    PoseLandmark rightEye = pose.getPoseLandmark(PoseLandmark.RIGHT_EYE);
+//    PoseLandmark rightEyeOuter = pose.getPoseLandmark(PoseLandmark.RIGHT_EYE_OUTER);
+//    PoseLandmark leftEar = pose.getPoseLandmark(PoseLandmark.LEFT_EAR);
+//    PoseLandmark rightEar = pose.getPoseLandmark(PoseLandmark.RIGHT_EAR);
+//    PoseLandmark leftMouth = pose.getPoseLandmark(PoseLandmark.LEFT_MOUTH);
+//    PoseLandmark rightMouth = pose.getPoseLandmark(PoseLandmark.RIGHT_MOUTH);
+//
+//    PoseLandmark leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER);
+//    PoseLandmark rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER);
+//    PoseLandmark leftElbow = pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW);
+//    PoseLandmark rightElbow = pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW);
+//    PoseLandmark leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST);
+//    PoseLandmark rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST);
+//    PoseLandmark leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP);
+//    PoseLandmark rightHip = pose.getPoseLandmark(PoseLandmark.RIGHT_HIP);
+//    PoseLandmark leftKnee = pose.getPoseLandmark(PoseLandmark.LEFT_KNEE);
+//    PoseLandmark rightKnee = pose.getPoseLandmark(PoseLandmark.RIGHT_KNEE);
+//    PoseLandmark leftAnkle = pose.getPoseLandmark(PoseLandmark.LEFT_ANKLE);
+//    PoseLandmark rightAnkle = pose.getPoseLandmark(PoseLandmark.RIGHT_ANKLE);
+//
+//    PoseLandmark leftPinky = pose.getPoseLandmark(PoseLandmark.LEFT_PINKY);
+//    PoseLandmark rightPinky = pose.getPoseLandmark(PoseLandmark.RIGHT_PINKY);
+//    PoseLandmark leftIndex = pose.getPoseLandmark(PoseLandmark.LEFT_INDEX);
+//    PoseLandmark rightIndex = pose.getPoseLandmark(PoseLandmark.RIGHT_INDEX);
+//    PoseLandmark leftThumb = pose.getPoseLandmark(PoseLandmark.LEFT_THUMB);
+//    PoseLandmark rightThumb = pose.getPoseLandmark(PoseLandmark.RIGHT_THUMB);
+//    PoseLandmark leftHeel = pose.getPoseLandmark(PoseLandmark.LEFT_HEEL);
+//    PoseLandmark rightHeel = pose.getPoseLandmark(PoseLandmark.RIGHT_HEEL);
+//    PoseLandmark leftFootIndex = pose.getPoseLandmark(PoseLandmark.LEFT_FOOT_INDEX);
+//    PoseLandmark rightFootIndex = pose.getPoseLandmark(PoseLandmark.RIGHT_FOOT_INDEX);
+//
+//    // Face
+//    drawLine(canvas, nose, leftEyeInner, whitePaint);
+//    drawLine(canvas, leftEyeInner, leftEye, whitePaint);
+//    drawLine(canvas, leftEye, leftEyeOuter, whitePaint);
+//    drawLine(canvas, leftEyeOuter, leftEar, whitePaint);
+//    drawLine(canvas, nose, rightEyeInner, whitePaint);
+//    drawLine(canvas, rightEyeInner, rightEye, whitePaint);
+//    drawLine(canvas, rightEye, rightEyeOuter, whitePaint);
+//    drawLine(canvas, rightEyeOuter, rightEar, whitePaint);
+//    drawLine(canvas, leftMouth, rightMouth, whitePaint);
+//
+//    drawLine(canvas, leftShoulder, rightShoulder, whitePaint);
+//    drawLine(canvas, leftHip, rightHip, whitePaint);
+//
+//    // Left body
+//    drawLine(canvas, leftShoulder, leftElbow, leftPaint);
+//    drawLine(canvas, leftElbow, leftWrist, leftPaint);
+//    drawLine(canvas, leftShoulder, leftHip, leftPaint);
+//    drawLine(canvas, leftHip, leftKnee, leftPaint);
+//    drawLine(canvas, leftKnee, leftAnkle, leftPaint);
+//    drawLine(canvas, leftWrist, leftThumb, leftPaint);
+//    drawLine(canvas, leftWrist, leftPinky, leftPaint);
+//    drawLine(canvas, leftWrist, leftIndex, leftPaint);
+//    drawLine(canvas, leftIndex, leftPinky, leftPaint);
+//    drawLine(canvas, leftAnkle, leftHeel, leftPaint);
+//    drawLine(canvas, leftHeel, leftFootIndex, leftPaint);
+//
+//    // Right body
+//    drawLine(canvas, rightShoulder, rightElbow, rightPaint);
+//    drawLine(canvas, rightElbow, rightWrist, rightPaint);
+//    drawLine(canvas, rightShoulder, rightHip, rightPaint);
+//    drawLine(canvas, rightHip, rightKnee, rightPaint);
+//    drawLine(canvas, rightKnee, rightAnkle, rightPaint);
+//    drawLine(canvas, rightWrist, rightThumb, rightPaint);
+//    drawLine(canvas, rightWrist, rightPinky, rightPaint);
+//    drawLine(canvas, rightWrist, rightIndex, rightPaint);
+//    drawLine(canvas, rightIndex, rightPinky, rightPaint);
+//    drawLine(canvas, rightAnkle, rightHeel, rightPaint);
+//    drawLine(canvas, rightHeel, rightFootIndex, rightPaint);
+//
+//    // Draw inFrameLikelihood for all points
+//    if (showInFrameLikelihood) {
+//      for (PoseLandmark landmark : landmarks) {
+//        canvas.drawText(
+//            String.format(Locale.US, "%.2f", landmark.getInFrameLikelihood()),
+//            translateX(landmark.getPosition().x),
+//            translateY(landmark.getPosition().y),
+//            whitePaint);
+//      }
+//    }
   }
 
   void drawPoint(Canvas canvas, PoseLandmark landmark, Paint paint) {

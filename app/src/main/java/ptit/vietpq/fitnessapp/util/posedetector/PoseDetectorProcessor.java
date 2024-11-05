@@ -31,134 +31,155 @@ import com.google.mlkit.vision.pose.PoseDetectorOptionsBase;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import ptit.vietpq.fitnessapp.presentation.exercise.ExerciseStats;
 import ptit.vietpq.fitnessapp.util.GraphicOverlay;
 import ptit.vietpq.fitnessapp.util.VisionProcessorBase;
 import ptit.vietpq.fitnessapp.util.posedetector.classification.PoseClassifierProcessor;
+import timber.log.Timber;
 
-/** A processor to run pose detector. */
+/**
+ * A processor to run pose detector.
+ */
 public class PoseDetectorProcessor
-    extends VisionProcessorBase<PoseDetectorProcessor.PoseWithClassification> {
-  private static final String TAG = "PoseDetectorProcessor";
+        extends VisionProcessorBase<PoseDetectorProcessor.PoseWithClassification> {
+    private static final String TAG = "PoseDetectorProcessor";
 
-  private final PoseDetector detector;
+    private final PoseDetector detector;
 
-  private final boolean showInFrameLikelihood;
-  private final boolean visualizeZ;
-  private final boolean rescaleZForVisualization;
-  private final boolean runClassification;
-  private final boolean isStreamMode;
-  private final Context context;
-  private final Executor classificationExecutor;
+    private final boolean showInFrameLikelihood;
+    private final boolean visualizeZ;
+    private final boolean rescaleZForVisualization;
+    private final boolean runClassification;
+    private final boolean isStreamMode;
+    private final Context context;
+    private final Executor classificationExecutor;
+    private ExerciseUpdate exerciseUpdate;
 
-  private PoseClassifierProcessor poseClassifierProcessor;
-  /** Internal class to hold Pose and classification results. */
-  protected static class PoseWithClassification {
-    private final Pose pose;
-    private final List<String> classificationResult;
+    private PoseClassifierProcessor poseClassifierProcessor;
 
-    public PoseWithClassification(Pose pose, List<String> classificationResult) {
-      this.pose = pose;
-      this.classificationResult = classificationResult;
+    /**
+     * Internal class to hold Pose and classification results.
+     */
+    protected static class PoseWithClassification {
+        private final Pose pose;
+        private final List<String> classificationResult;
+
+        public PoseWithClassification(Pose pose, List<String> classificationResult) {
+            this.pose = pose;
+            this.classificationResult = classificationResult;
+        }
+
+        public Pose getPose() {
+            return pose;
+        }
+
+        public List<String> getClassificationResult() {
+            return classificationResult;
+        }
     }
 
-    public Pose getPose() {
-      return pose;
+    public PoseDetectorProcessor(
+            Context context,
+            PoseDetectorOptionsBase options,
+            boolean showInFrameLikelihood,
+            boolean visualizeZ,
+            boolean rescaleZForVisualization,
+            boolean runClassification,
+            boolean isStreamMode,
+            ExerciseUpdate exerciseUpdate) {
+        super(context);
+        this.showInFrameLikelihood = showInFrameLikelihood;
+        this.visualizeZ = visualizeZ;
+        this.rescaleZForVisualization = rescaleZForVisualization;
+        detector = PoseDetection.getClient(options);
+        this.runClassification = runClassification;
+        this.isStreamMode = isStreamMode;
+        this.context = context;
+        this.exerciseUpdate = exerciseUpdate;
+        classificationExecutor = Executors.newSingleThreadExecutor();
     }
 
-    public List<String> getClassificationResult() {
-      return classificationResult;
+    @Override
+    public void stop() {
+        super.stop();
+        detector.close();
     }
-  }
 
-  public PoseDetectorProcessor(
-      Context context,
-      PoseDetectorOptionsBase options,
-      boolean showInFrameLikelihood,
-      boolean visualizeZ,
-      boolean rescaleZForVisualization,
-      boolean runClassification,
-      boolean isStreamMode) {
-    super(context);
-    this.showInFrameLikelihood = showInFrameLikelihood;
-    this.visualizeZ = visualizeZ;
-    this.rescaleZForVisualization = rescaleZForVisualization;
-    detector = PoseDetection.getClient(options);
-    this.runClassification = runClassification;
-    this.isStreamMode = isStreamMode;
-    this.context = context;
-    classificationExecutor = Executors.newSingleThreadExecutor();
-  }
+    @NonNull
+    @Override
+    protected Task<PoseWithClassification> detectInImage(InputImage image) {
+        return detector
+                .process(image)
+                .continueWith(
+                        classificationExecutor,
+                        task -> {
+                            Pose pose = task.getResult();
+                            List<String> classificationResult = new ArrayList<>();
+                            if (runClassification) {
+                                if (poseClassifierProcessor == null) {
+                                    poseClassifierProcessor = new PoseClassifierProcessor(context, isStreamMode);
+                                }
+                                classificationResult = poseClassifierProcessor.getPoseResult(pose);
+                                ExerciseStats exerciseStats = poseClassifierProcessor.getExerciseStats(pose);
+                                exerciseUpdate.onExerciseUpdate(exerciseStats.getCurrentReps(), exerciseStats.getForm());;
+                            }
+                            return new PoseWithClassification(pose, classificationResult);
+                        });
+    }
 
-  @Override
-  public void stop() {
-    super.stop();
-    detector.close();
-  }
+    @Override
+    protected Task<PoseWithClassification> detectInImage(MlImage image) {
+        return detector
+                .process(image)
+                .continueWith(
+                        classificationExecutor,
+                        task -> {
+                            Pose pose = task.getResult();
+                            List<String> classificationResult = new ArrayList<>();
+                            if (runClassification) {
+                                if (poseClassifierProcessor == null) {
+                                    poseClassifierProcessor = new PoseClassifierProcessor(context, isStreamMode);
+                                }
+                                classificationResult = poseClassifierProcessor.getPoseResult(pose);
+                                ExerciseStats exerciseStats = poseClassifierProcessor.getExerciseStats(pose);
+                                exerciseUpdate.onExerciseUpdate(exerciseStats.getCurrentReps(), exerciseStats.getForm());
+                            }
+                            return new PoseWithClassification(pose, classificationResult);
+                        });
+    }
 
-  @NonNull
-  @Override
-  protected Task<PoseWithClassification> detectInImage(InputImage image) {
-    return detector
-        .process(image)
-        .continueWith(
-            classificationExecutor,
-            task -> {
-              Pose pose = task.getResult();
-              List<String> classificationResult = new ArrayList<>();
-              if (runClassification) {
-                if (poseClassifierProcessor == null) {
-                  poseClassifierProcessor = new PoseClassifierProcessor(context, isStreamMode);
-                }
-                classificationResult = poseClassifierProcessor.getPoseResult(pose);
-              }
-              return new PoseWithClassification(pose, classificationResult);
-            });
-  }
+    @Override
+    protected void onSuccess(
+            @NonNull PoseWithClassification poseWithClassification,
+            @NonNull GraphicOverlay graphicOverlay) {
+        graphicOverlay.add(
+                new PoseGraphic(
+                        graphicOverlay,
+                        poseWithClassification.pose,
+                        showInFrameLikelihood,
+                        visualizeZ,
+                        rescaleZForVisualization,
+                        poseWithClassification.classificationResult
+                )
+        );
+    }
 
-  @Override
-  protected Task<PoseWithClassification> detectInImage(MlImage image) {
-    return detector
-        .process(image)
-        .continueWith(
-            classificationExecutor,
-            task -> {
-              Pose pose = task.getResult();
-              List<String> classificationResult = new ArrayList<>();
-              if (runClassification) {
-                if (poseClassifierProcessor == null) {
-                  poseClassifierProcessor = new PoseClassifierProcessor(context, isStreamMode);
-                }
-                classificationResult = poseClassifierProcessor.getPoseResult(pose);
-              }
-              return new PoseWithClassification(pose, classificationResult);
-            });
-  }
+    @Override
+    protected void onFailure(@NonNull Exception e) {
+        Log.e(TAG, "Pose detection failed!", e);
+    }
 
-  @Override
-  protected void onSuccess(
-      @NonNull PoseWithClassification poseWithClassification,
-      @NonNull GraphicOverlay graphicOverlay) {
-    graphicOverlay.add(
-        new PoseGraphic(
-            graphicOverlay,
-            poseWithClassification.pose,
-            showInFrameLikelihood,
-            visualizeZ,
-            rescaleZForVisualization,
-            poseWithClassification.classificationResult));
-  }
+    @Override
+    protected boolean isMlImageEnabled(Context context) {
+        // Use MlImage in Pose Detection by default, change it to OFF to switch to InputImage.
+        return true;
+    }
 
-  @Override
-  protected void onFailure(@NonNull Exception e) {
-    Log.e(TAG, "Pose detection failed!", e);
-  }
-
-  @Override
-  protected boolean isMlImageEnabled(Context context) {
-    // Use MlImage in Pose Detection by default, change it to OFF to switch to InputImage.
-    return true;
-  }
+    public interface ExerciseUpdate {
+        void onExerciseUpdate(Integer rep, Float form);
+    }
 }
