@@ -30,6 +30,7 @@ abstract class ThemeColors {
   abstract val switchThumb: Color
   val primary: Color = Color(0xFF896CFE)
   val limeGreen: Color = Color(0xFFE2F163)
+  val blackBg: Color = Color(0xFF212020)
   val primaryDisable = Color(0xFFC5EED5)
   val primaryDark: Color = Color(0xFFD81F26)
   val white = Color.White

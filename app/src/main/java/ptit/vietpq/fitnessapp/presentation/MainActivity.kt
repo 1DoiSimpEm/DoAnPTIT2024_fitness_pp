@@ -9,9 +9,11 @@ import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
 import ptit.vietpq.fitnessapp.data.local.sharepref.SharePreferenceProvider
 import ptit.vietpq.fitnessapp.presentation.exercise.ExerciseDestination
+import ptit.vietpq.fitnessapp.presentation.exercise_detail.ExerciseDetailDestination
 import ptit.vietpq.fitnessapp.presentation.home.HomeDestination
 import ptit.vietpq.fitnessapp.presentation.login.LoginDestination
 import ptit.vietpq.fitnessapp.presentation.main.FitnessApp
+import ptit.vietpq.fitnessapp.presentation.meal_planning.MealPlanningDestination
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -24,7 +26,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FitnessApp(
-                startDestination =ExerciseDestination,
+                startDestination = ExerciseDetailDestination,
 //                if(sharePreferenceProvider.isSetupFinished){
 //                    HomeDestination
 //                }

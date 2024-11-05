@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Locale;
 
 import ptit.vietpq.fitnessapp.presentation.exercise.ExerciseStats;
+import timber.log.Timber;
 
 /**
  * Accepts a stream of {@link Pose} for classification and Rep counting.
@@ -86,7 +87,7 @@ public class PoseClassifierProcessor {
                 csvLine = reader.readLine();
             }
         } catch (IOException e) {
-            Log.e(TAG, "Error when loading pose samples.\n" + e);
+            Timber.tag(TAG).e("Error when loading pose samples.\n" + e);
         }
         poseClassifier = new PoseClassifier(poseSamples);
         if (isStreamMode) {
@@ -170,7 +171,7 @@ public class PoseClassifierProcessor {
                         try {
                             reps = Integer.parseInt(parts[1].split(" ")[0]);
                         } catch (NumberFormatException e) {
-                            Log.e(TAG, "Error parsing last rep result", e);
+                            Timber.tag(TAG).e(e, "Error parsing last rep result");
                         }
                     }
                 }

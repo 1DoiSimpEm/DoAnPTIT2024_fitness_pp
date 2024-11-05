@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -57,7 +58,7 @@ fun PoseDetectionExerciseScreen(
     onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var lensFacing by remember { mutableStateOf(CameraSelector.LENS_FACING_BACK) }
+    var lensFacing by remember { mutableIntStateOf(CameraSelector.LENS_FACING_BACK) }
     val context = LocalContext.current
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     var exerciseStats by remember { mutableStateOf(ExerciseStats()) }

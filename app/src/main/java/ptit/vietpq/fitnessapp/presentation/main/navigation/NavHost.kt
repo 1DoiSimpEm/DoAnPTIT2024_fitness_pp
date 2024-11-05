@@ -7,10 +7,12 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import ptit.vietpq.fitnessapp.presentation.exercise.exerciseGraph
+import ptit.vietpq.fitnessapp.presentation.exercise_detail.exerciseDetailRoute
 import ptit.vietpq.fitnessapp.presentation.home.HomeDestination
 import ptit.vietpq.fitnessapp.presentation.home.homeGraph
 import ptit.vietpq.fitnessapp.presentation.login.loginGraph
 import ptit.vietpq.fitnessapp.presentation.main.navigation.destination.FitnessNavigationDestination
+import ptit.vietpq.fitnessapp.presentation.meal_planning.mealPlanningRoute
 import ptit.vietpq.fitnessapp.presentation.profile.ProfileDestination
 import ptit.vietpq.fitnessapp.presentation.profile.profileGraph
 import ptit.vietpq.fitnessapp.presentation.setup.SetupDestination
@@ -88,5 +90,9 @@ fun FitnessNavHost(
         )
 
         exerciseGraph()
+
+        mealPlanningRoute()
+
+        exerciseDetailRoute()
     }
 }
