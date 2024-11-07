@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FitnessApp(
-                startDestination = ExerciseDetailDestination,
+                startDestination = MealPlanningDestination,
 //                if(sharePreferenceProvider.isSetupFinished){
 //                    HomeDestination
 //                }

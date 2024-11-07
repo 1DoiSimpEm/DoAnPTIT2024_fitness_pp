@@ -36,23 +36,48 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
+import ptit.vietpq.fitnessapp.extension.toast
 import ptit.vietpq.fitnessapp.ui.theme.FitnessAppTheme
 
 @Composable
-fun MealPlanningRoute() {
-    MealPlanningScreen()
+fun MealPlanningRoute(
+    viewModel: MealPlanningViewModel = hiltViewModel()
+) {
+    val context = LocalContext.current
+    val state by viewModel.eventFlow.collectAsStateWithLifecycle(initialValue = MealPlanningState.Idle)
+
+    when(val event = state){
+        is MealPlanningState.Error -> {
+            context.toast(event.message)
+        }
+        is MealPlanningState.Idle -> Unit
+        is MealPlanningState.Loading ->{
+
+        }
+        is MealPlanningState.Success -> {
+            context.toast(event.response)
+        }
+    }
+
+    MealPlanningScreen(
+        onCreateButtonClicked = viewModel::fetchChatResponse
+    )
 }
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MealPlanningScreen(
+    onCreateButtonClicked: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var selectedDietaryPreference by remember { mutableStateOf("") }
@@ -274,7 +299,17 @@ fun MealPlanningScreen(
 
                 // Create Button
                 Button(
-                    onClick = { /* TODO: Handle create action */ },
+                    onClick = {
+                        onCreateButtonClicked(
+                            "Dietary Preference: $selectedDietaryPreference\n" +
+                                    "Allergies: $selectedAllergies\n" +
+                                    "Meal Types: $selectedMealTypes\n" +
+                                    "Caloric Goal: $selectedCalorieGoal\n" +
+                                    "Cooking Time: $selectedCookingTime\n" +
+                                    "Servings: $selectedServings" +
+                                    "Make a diet plan for me"
+                        )
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
@@ -365,6 +400,6 @@ private fun MultiSelectableChip(
 @Composable
 private fun PreviewMealPlanningScreen() {
     FitnessAppTheme {
-        MealPlanningScreen()
+        MealPlanningScreen({})
     }
 }

@@ -19,7 +19,7 @@ android {
 
     defaultConfig {
         applicationId = "ptit.vietpq.fitnessapp"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -55,6 +55,10 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/LICENSE.md"
+            excludes += "META-INF/io.netty.versions.properties"
+            excludes += "META-INF/LICENSE-notice.md"
         }
     }
 }
@@ -142,7 +146,7 @@ dependencies {
     // lottie
     implementation(libs.lottie)
 
-    implementation (libs.numberpicker)
+    implementation(libs.numberpicker)
 
     implementation(libs.androidx.multidex)
     implementation(libs.coil.compose)
@@ -161,8 +165,9 @@ dependencies {
     lintChecks(libs.slack.compose.lint)
 
     //ml kit common
-    implementation (libs.pose.detection)
-    implementation (libs.pose.detection.accurate)
+    implementation(libs.pose.detection)
+    implementation(libs.pose.detection.accurate)
+    implementation(libs.azure.ai.inference)
 
 
     implementation(libs.flow.bus)

@@ -57,10 +57,10 @@ suspend fun <T> safeApiCall(apiCall: suspend () -> Response<T>): Result<T> {
     contract { callsInPlace(apiCall, InvocationKind.AT_MOST_ONCE) }
     try {
         val response = apiCall()
-        if (response.isSuccessful) {
-           return Result.success(response.body()!!)
+        return if (response.isSuccessful) {
+            Result.success(response.body()!!)
         } else {
-            return Result.failure(
+            Result.failure(
                 ApiException(
                     Status(
                         response.code(),
