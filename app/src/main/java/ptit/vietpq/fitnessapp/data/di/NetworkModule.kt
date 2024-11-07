@@ -22,8 +22,6 @@ import javax.inject.Qualifier
 import javax.inject.Singleton
 
 const val BASE_URL = "https://ca1d-2405-4802-1a03-e280-9145-40d0-eb89-783d.ngrok-free.app"
-const val GITHUB_KEY = "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"
-const val CHAT_END_POINT = "https://models.inference.ai.azure.com"
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
