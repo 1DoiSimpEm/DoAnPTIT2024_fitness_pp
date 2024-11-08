@@ -1,9 +1,5 @@
 package ptit.vietpq.fitnessapp.data.di
 
-import com.azure.ai.inference.ChatCompletionsClient
-import com.azure.ai.inference.ChatCompletionsClientBuilder
-import com.azure.core.credential.AzureKeyCredential
-import com.azure.core.util.Configuration
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -21,7 +17,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
-const val BASE_URL = "https://ca1d-2405-4802-1a03-e280-9145-40d0-eb89-783d.ngrok-free.app"
+const val BASE_URL = "https://79bc-2a09-bac5-398e-e6-00-17-34d.ngrok-free.app"
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)

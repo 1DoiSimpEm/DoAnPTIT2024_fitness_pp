@@ -12,6 +12,8 @@ import ptit.vietpq.fitnessapp.presentation.home.HomeDestination
 import ptit.vietpq.fitnessapp.presentation.home.homeGraph
 import ptit.vietpq.fitnessapp.presentation.login.loginGraph
 import ptit.vietpq.fitnessapp.presentation.main.navigation.destination.FitnessNavigationDestination
+import ptit.vietpq.fitnessapp.presentation.meal_detailed.MealDetailedDestination
+import ptit.vietpq.fitnessapp.presentation.meal_detailed.mealDetailedGraph
 import ptit.vietpq.fitnessapp.presentation.meal_planning.mealPlanningRoute
 import ptit.vietpq.fitnessapp.presentation.profile.ProfileDestination
 import ptit.vietpq.fitnessapp.presentation.profile.profileGraph
@@ -91,8 +93,20 @@ fun FitnessNavHost(
 
         exerciseGraph()
 
-        mealPlanningRoute()
+        mealPlanningRoute(
+            onMealDetailedNavigating = { mealContent ->
+                onNavigateToDestination(
+                    MealDetailedDestination,
+                    MealDetailedDestination.createNavigationRoute(mealContent)
+                )
+            },
+            onBackPressed = onBackClick
+        )
 
         exerciseDetailRoute()
+        mealDetailedGraph(
+            onBackPressed = onBackClick,
+
+        )
     }
 }

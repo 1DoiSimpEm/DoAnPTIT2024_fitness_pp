@@ -36,7 +36,7 @@ suspend inline fun <R> runSuspendCatching(block: () -> R): Result<R> {
     contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
     return try {
         val result = block()
-        if (result is retrofit2.Response<*>) {
+        if (result is Response<*>) {
             if (result.isSuccessful) {
                 Result.success(result)
             } else {

@@ -10,7 +10,12 @@ data object MealPlanningDestination : FitnessNavigationDestination {
 }
 
 fun NavGraphBuilder.mealPlanningRoute(
+    onBackPressed: () -> Unit,
+    onMealDetailedNavigating: (String) -> Unit,
 ) =
     composable(route = MealPlanningDestination.route) {
-        MealPlanningRoute()
+        MealPlanningRoute(
+            onMealDetailedNavigating = onMealDetailedNavigating,
+            onBackPressed = onBackPressed
+        )
     }

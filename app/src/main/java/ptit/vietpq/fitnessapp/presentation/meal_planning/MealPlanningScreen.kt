@@ -14,30 +14,30 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,33 +51,38 @@ import ptit.vietpq.fitnessapp.ui.theme.FitnessAppTheme
 
 @Composable
 fun MealPlanningRoute(
-    viewModel: MealPlanningViewModel = hiltViewModel()
+    onBackPressed: () -> Unit,
+    onMealDetailedNavigating: (String) -> Unit,
+    viewModel: MealPlanningViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val state by viewModel.eventFlow.collectAsStateWithLifecycle(initialValue = MealPlanningState.Idle)
-
-    when(val event = state){
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    when (val event = state) {
         is MealPlanningState.Error -> {
             context.toast(event.message)
         }
-        is MealPlanningState.Idle -> Unit
-        is MealPlanningState.Loading ->{
 
-        }
+        is MealPlanningState.Idle -> Unit
+
         is MealPlanningState.Success -> {
-            context.toast(event.response)
+            onMealDetailedNavigating(event.response)
         }
     }
 
     MealPlanningScreen(
-        onCreateButtonClicked = viewModel::fetchChatResponse
+        onBackPressed = onBackPressed,
+        uiState = uiState,
+        onCreateButtonClicked = viewModel::fetchChatResponse,
     )
 }
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MealPlanningScreen(
+    onBackPressed: () -> Unit,
     onCreateButtonClicked: (String) -> Unit,
+    uiState: MealPlanningUiState,
     modifier: Modifier = Modifier,
 ) {
     var selectedDietaryPreference by remember { mutableStateOf("") }
@@ -111,9 +116,7 @@ fun MealPlanningScreen(
                     Image(
                         modifier = Modifier
                             .padding(start = 16.dp)
-                            .clickable {
-
-                            },
+                            .clickable(onClick = onBackPressed),
                         painter = painterResource(id = R.drawable.ic_back_arrow),
                         contentDescription = null
                     )
@@ -123,6 +126,18 @@ fun MealPlanningScreen(
         contentColor = FitnessTheme.color.primary,
         containerColor = Color(0xFF1E1E1E),
         content = { innerPadding ->
+            if (uiState.isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.5f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = FitnessTheme.color.limeGreen
+                    )
+                }
+            }
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -133,35 +148,33 @@ fun MealPlanningScreen(
                         end = 16.dp,
                     )
             ) {
-
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Dietary Preferences Section
-                Section(title = "Dietary Preferences") {
+                Section(title = stringResource(R.string.dietary_preferences)) {
                     FlowRow(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         SelectableChip(
-                            "Vegetarian",
+                            stringResource(R.string.vegetarian),
                             selectedDietaryPreference
                         ) { selectedDietaryPreference = it }
-                        SelectableChip("Vegan", selectedDietaryPreference) {
+                        SelectableChip(stringResource(R.string.vegan), selectedDietaryPreference) {
                             selectedDietaryPreference = it
                         }
                         SelectableChip(
-                            "Gluten-Free",
+                            stringResource(R.string.gluten_free),
                             selectedDietaryPreference
                         ) { selectedDietaryPreference = it }
-                        SelectableChip("Keto", selectedDietaryPreference) {
+                        SelectableChip(stringResource(R.string.keto), selectedDietaryPreference) {
                             selectedDietaryPreference = it
                         }
-                        SelectableChip("Paleo", selectedDietaryPreference) {
+                        SelectableChip(stringResource(R.string.paleo), selectedDietaryPreference) {
                             selectedDietaryPreference = it
                         }
                         SelectableChip(
-                            "No preferences",
+                            stringResource(R.string.no_preferences),
                             selectedDietaryPreference
                         ) { selectedDietaryPreference = it }
                     }
@@ -170,9 +183,9 @@ fun MealPlanningScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Allergies Section
-                Section(title = "Allergies") {
+                Section(title = stringResource(R.string.allergies)) {
                     Text(
-                        "Do you have any food allergies we should know about?",
+                        stringResource(R.string.do_you_have_any_food_allergies_we_should_know_about),
                         color = Color.Gray,
                         fontSize = 14.sp
                     )
@@ -181,13 +194,25 @@ fun MealPlanningScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        MultiSelectableChip("Nuts", selectedAllergies) { selectedAllergies = it }
-                        MultiSelectableChip("Dairy", selectedAllergies) { selectedAllergies = it }
-                        MultiSelectableChip("Shellfish", selectedAllergies) {
+                        MultiSelectableChip(
+                            stringResource(R.string.nuts),
+                            selectedAllergies
+                        ) { selectedAllergies = it }
+                        MultiSelectableChip(
+                            stringResource(R.string.dairy),
+                            selectedAllergies
+                        ) { selectedAllergies = it }
+                        MultiSelectableChip(stringResource(R.string.shellfish), selectedAllergies) {
                             selectedAllergies = it
                         }
-                        MultiSelectableChip("Eggs", selectedAllergies) { selectedAllergies = it }
-                        MultiSelectableChip("No allergies", selectedAllergies) {
+                        MultiSelectableChip(
+                            stringResource(R.string.eggs),
+                            selectedAllergies
+                        ) { selectedAllergies = it }
+                        MultiSelectableChip(
+                            stringResource(R.string.no_allergies),
+                            selectedAllergies
+                        ) {
                             selectedAllergies = it
                         }
                     }
@@ -196,9 +221,9 @@ fun MealPlanningScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Meal Types Section
-                Section(title = "Meal Types") {
+                Section(title = stringResource(R.string.meal_types)) {
                     Text(
-                        "Which meals do you want to plan?",
+                        text = stringResource(R.string.which_meals_do_you_want_to_plan),
                         color = Color.Gray,
                         fontSize = 14.sp
                     )
@@ -207,21 +232,30 @@ fun MealPlanningScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        MultiSelectableChip("Breakfast", selectedMealTypes) {
+                        MultiSelectableChip(stringResource(R.string.breakfast), selectedMealTypes) {
                             selectedMealTypes = it
                         }
-                        MultiSelectableChip("Lunch", selectedMealTypes) { selectedMealTypes = it }
-                        MultiSelectableChip("Dinner", selectedMealTypes) { selectedMealTypes = it }
-                        MultiSelectableChip("Snacks", selectedMealTypes) { selectedMealTypes = it }
+                        MultiSelectableChip(
+                            stringResource(R.string.lunch),
+                            selectedMealTypes
+                        ) { selectedMealTypes = it }
+                        MultiSelectableChip(
+                            stringResource(R.string.dinner),
+                            selectedMealTypes
+                        ) { selectedMealTypes = it }
+                        MultiSelectableChip(
+                            stringResource(R.string.snacks),
+                            selectedMealTypes
+                        ) { selectedMealTypes = it }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Caloric Goal Section
-                Section(title = "Caloric Goal") {
+                Section(title = stringResource(R.string.caloric_goal)) {
                     Text(
-                        "What is your daily caloric intake goal?",
+                        text = stringResource(R.string.what_is_your_daily_caloric_intake_goal),
                         color = Color.Gray,
                         fontSize = 14.sp
                     )
@@ -231,18 +265,21 @@ fun MealPlanningScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         SelectableChip(
-                            "Less than 1500 calories",
+                            stringResource(R.string.less_than_1500_calories),
                             selectedCalorieGoal
                         ) { selectedCalorieGoal = it }
-                        SelectableChip("1500-2000 calories", selectedCalorieGoal) {
+                        SelectableChip(
+                            stringResource(R.string._1500_2000_calories),
+                            selectedCalorieGoal
+                        ) {
                             selectedCalorieGoal = it
                         }
                         SelectableChip(
-                            "More than 2000 calories",
+                            stringResource(R.string.more_than_2000_calories),
                             selectedCalorieGoal
                         ) { selectedCalorieGoal = it }
                         SelectableChip(
-                            "Not sure/Don't have a goal",
+                            stringResource(R.string.not_sure_don_t_have_a_goal),
                             selectedCalorieGoal
                         ) { selectedCalorieGoal = it }
                     }
@@ -251,9 +288,9 @@ fun MealPlanningScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Cooking Time Preference Section
-                Section(title = "Cooking Time Preference") {
+                Section(title = stringResource(R.string.cooking_time_preference)) {
                     Text(
-                        "How much time are you willing to spend cooking each meal?",
+                        stringResource(R.string.how_much_time_are_you_willing_to_spend_cooking_each_meal),
                         color = Color.Gray,
                         fontSize = 14.sp
                     )
@@ -262,13 +299,22 @@ fun MealPlanningScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        SelectableChip("Less than 15 minutes", selectedCookingTime) {
+                        SelectableChip(
+                            stringResource(R.string.less_than_15_minutes),
+                            selectedCookingTime
+                        ) {
                             selectedCookingTime = it
                         }
-                        SelectableChip("15-30 minutes", selectedCookingTime) {
+                        SelectableChip(
+                            stringResource(R.string._15_30_minutes),
+                            selectedCookingTime
+                        ) {
                             selectedCookingTime = it
                         }
-                        SelectableChip("More than 30 minutes", selectedCookingTime) {
+                        SelectableChip(
+                            stringResource(R.string.more_than_30_minutes),
+                            selectedCookingTime
+                        ) {
                             selectedCookingTime = it
                         }
                     }
@@ -277,9 +323,9 @@ fun MealPlanningScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Number of Servings Section
-                Section(title = "Number Of Servings") {
+                Section(title = stringResource(R.string.number_of_servings)) {
                     Text(
-                        "How many servings do you need per meal?",
+                        stringResource(R.string.how_many_servings_do_you_need_per_meal),
                         color = Color.Gray,
                         fontSize = 14.sp
                     )
@@ -291,7 +337,10 @@ fun MealPlanningScreen(
                         SelectableChip("1", selectedServings) { selectedServings = it }
                         SelectableChip("2", selectedServings) { selectedServings = it }
                         SelectableChip("3-4", selectedServings) { selectedServings = it }
-                        SelectableChip("More than 4", selectedServings) { selectedServings = it }
+                        SelectableChip(
+                            stringResource(R.string.more_than_4),
+                            selectedServings
+                        ) { selectedServings = it }
                     }
                 }
 
@@ -318,7 +367,7 @@ fun MealPlanningScreen(
                     ),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Create", color = Color.White)
+                    Text(stringResource(R.string.create), color = Color.White)
                 }
                 Spacer(modifier = Modifier.height(24.dp))
             }
@@ -363,9 +412,6 @@ private fun SelectableChip(
             width = 1.dp,
             color = if (isSelected) Color(0xFF6200EE) else Color.Gray
         )
-//        SuggestionChipDefaults.suggestionChipBorder(
-//            borderColor = if (isSelected) Color(0xFF6200EE) else Color.Gray
-//        )
     )
 }
 
@@ -394,12 +440,4 @@ private fun MultiSelectableChip(
             color = if (isSelected) Color(0xFF6200EE) else Color.Gray
         )
     )
-}
-
-@Preview
-@Composable
-private fun PreviewMealPlanningScreen() {
-    FitnessAppTheme {
-        MealPlanningScreen({})
-    }
 }

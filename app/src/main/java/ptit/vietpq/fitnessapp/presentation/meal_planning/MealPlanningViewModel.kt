@@ -1,9 +1,11 @@
 package ptit.vietpq.fitnessapp.presentation.meal_planning
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ptit.vietpq.fitnessapp.core.EventChannel
 import ptit.vietpq.fitnessapp.core.HasEventFlow
@@ -13,10 +15,13 @@ import javax.inject.Inject
 
 sealed interface MealPlanningState {
     data object Idle : MealPlanningState
-    data object Loading : MealPlanningState
     data class Success(val response: String) : MealPlanningState
     data class Error(val message: String) : MealPlanningState
 }
+
+data class MealPlanningUiState(
+  val isLoading : Boolean = false,
+)
 
 @HiltViewModel
 class MealPlanningViewModel @Inject constructor(
@@ -24,17 +29,28 @@ class MealPlanningViewModel @Inject constructor(
     private val eventChannel: EventChannel<MealPlanningState>
 ) : ViewModel(), HasEventFlow<MealPlanningState> by eventChannel {
 
+    private val _uiState : MutableStateFlow<MealPlanningUiState> = MutableStateFlow(MealPlanningUiState())
+    val uiState = _uiState.asStateFlow()
+
     fun fetchChatResponse(prompt: String) {
         viewModelScope.launch {
+            _uiState.update {
+                it.copy(isLoading = true)
+            }
            val result = createMealPlanUseCase(MealPlanRequest(
                1,prompt
            ))
             result.onSuccess { res ->
                 eventChannel.send(MealPlanningState.Success(res.data.description))
-                Log.d("MealPlanningViewModel123123123", "fetchChatResponse: ${res.data.description}")
+                _uiState.update {
+                    it.copy(isLoading = false)
+                }
             }
             result.onFailure {
                 eventChannel.send(MealPlanningState.Error(it.message ?: "Error"))
+                _uiState.update { state ->
+                    state.copy(isLoading = false)
+                }
             }
         }
     }
