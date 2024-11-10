@@ -46,7 +46,6 @@ fun MealDetailedRoute(
         onBackPressed = onBackPressed
     )
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MealPlanDisplayScreen(
@@ -100,7 +99,7 @@ fun MealPlanDisplayScreen(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Split the content by days or sections and display them
+            // Split the content by double newlines to separate sections
             val sections = uiState.mealDescription.split("\n\n")
             sections.forEach { section ->
                 MealPlanSection(section)
@@ -128,6 +127,27 @@ private fun MealPlanSection(content: String) {
             val lines = content.split("\n")
             lines.forEach { line ->
                 when {
+                    // Handle Markdown headers
+                    line.trim().startsWith("###") -> {
+                        Text(
+                            text = line.trim().replace("###", "").trim(),
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFCCFF00),
+                            modifier = Modifier.padding(bottom = 12.dp)
+                        )
+                    }
+                    // Handle bold text (wrapped in **)
+                    line.trim().startsWith("**") && line.trim().endsWith("**") -> {
+                        Text(
+                            text = line.trim().removeSurrounding("**"),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFCCFF00),
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    }
+                    // Handle existing special sections
                     line.trim().startsWith("Day", ignoreCase = true) ||
                             line.trim().startsWith("Breakfast", ignoreCase = true) ||
                             line.trim().startsWith("Lunch", ignoreCase = true) ||
@@ -140,11 +160,13 @@ private fun MealPlanSection(content: String) {
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                     }
-
+                    // Handle nutritional information
                     line.trim().startsWith("Calories", ignoreCase = true) ||
                             line.trim().startsWith("Protein", ignoreCase = true) ||
                             line.trim().startsWith("Carbs", ignoreCase = true) ||
-                            line.trim().startsWith("Fat", ignoreCase = true) -> {
+                            line.trim().startsWith("Fat", ignoreCase = true) ||
+                            line.trim().startsWith("Approx:", ignoreCase = true) ||
+                            line.trim().startsWith("If serving", ignoreCase = true) -> {
                         Text(
                             text = line.trim(),
                             fontSize = 14.sp,
@@ -152,7 +174,7 @@ private fun MealPlanSection(content: String) {
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
                     }
-                    // Regular content
+                    // Handle regular content
                     line.isNotBlank() -> {
                         Text(
                             text = line.trim(),
@@ -173,18 +195,18 @@ private fun PreviewMeal() {
     MealPlanDisplayScreen(
         MealDetailedUiState(
             """
-        Day 1
-        
-        Breakfast:
-        Oatmeal with berries and honey
-        Calories: 300
-        Protein: 8g
-        
-        Lunch:
-        Grilled chicken salad
-        Calories: 450
-        Protein: 35g
-    """.trimIndent()
+            ### Daily Meal Plan
+            
+            **Breakfast:**
+            Oatmeal with berries and honey
+            Calories: 300
+            Protein: 8g
+            
+            **Lunch:**
+            Grilled chicken salad
+            Calories: 450
+            Protein: 35g
+        """.trimIndent()
         ),
         onBackPressed = { /* Handle back navigation */ }
     )

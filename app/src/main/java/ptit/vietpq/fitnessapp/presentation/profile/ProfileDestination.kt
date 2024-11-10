@@ -10,8 +10,9 @@ data object ProfileDestination : FitnessNavigationDestination {
 }
 
 fun NavGraphBuilder.profileGraph(
+    onMealListNavigate: () -> Unit,
     onBackPressed: () -> Unit,
 ) =
     composable(route = ProfileDestination.route) {
-        ProfileRoute(onBackPressed = onBackPressed)
+        ProfileRoute(onBackPressed = onBackPressed, onMealListNavigate = onMealListNavigate)
     }

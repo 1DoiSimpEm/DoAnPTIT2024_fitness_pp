@@ -37,6 +37,15 @@ class SharePreferenceProvider @Inject constructor(
             return get<String>(USER_NAME, "").toString()
         }
 
+    var userId = 0
+        set(value) {
+            save(USER_ID, value, 1)
+            field = value
+        }
+        get() {
+            return get<Int>(USER_ID, 1) ?: 1
+        }
+
     var isSetupFinished = false
         set(value) {
             save("IS_SETUP_FINISHED", value, false)
@@ -100,5 +109,6 @@ class SharePreferenceProvider @Inject constructor(
         const val NAME_SHARE_PREFERENCE = "FitnessAppSharePref"
         const val ACCESS_TOKEN = "ACCESS_TOKEN"
         const val USER_NAME = "USER_NAME"
+        const val USER_ID = "USER_ID"
     }
 }

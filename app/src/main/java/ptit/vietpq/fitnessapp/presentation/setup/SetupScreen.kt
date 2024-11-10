@@ -36,6 +36,7 @@ import ptit.vietpq.fitnessapp.presentation.setup.component.AgePicker
 import ptit.vietpq.fitnessapp.presentation.setup.component.GenderSelection
 import ptit.vietpq.fitnessapp.presentation.setup.component.HeightPicker
 import ptit.vietpq.fitnessapp.presentation.setup.component.WeightPicker
+import ptit.vietpq.fitnessapp.ui.common.LoadingDialog
 
 @Composable
 fun SetupRoute(
@@ -95,6 +96,8 @@ fun SetupScreen(
         }
     }
 
+    LoadingDialog(isLoading = isLoading)
+
     Scaffold(
         modifier = modifier,
         containerColor = FitnessTheme.color.black,
@@ -128,16 +131,6 @@ fun SetupScreen(
             )
         },
         content = { innerPadding ->
-            if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = FitnessTheme.color.limeGreen
-                    )
-                }
-            }
             when (step) {
                 0 -> WeightPicker(
                     innerPadding = innerPadding,

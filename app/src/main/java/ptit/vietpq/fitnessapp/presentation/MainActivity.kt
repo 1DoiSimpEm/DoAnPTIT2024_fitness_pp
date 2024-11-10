@@ -26,15 +26,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FitnessApp(
-                startDestination = MealPlanningDestination,
-//                if(sharePreferenceProvider.isSetupFinished){
-//                    HomeDestination
-//                }
-//                else if (sharePreferenceProvider.accessToken.isEmpty()) {
-//                    LoginDestination
-//                } else {
-//                    ExerciseDestination
-//                },
+                startDestination =
+                if(sharePreferenceProvider.isSetupFinished){
+                    HomeDestination
+                }
+                else if (sharePreferenceProvider.accessToken.isEmpty()) {
+                    LoginDestination
+                } else {
+                    HomeDestination
+                },
                 modifier = Modifier.fillMaxSize()
             )
         }

@@ -6,4 +6,5 @@ data class LoginModel(
     val tokenType: String,
     val accessToken: String,
     val userName: String,
+    val id: Int,
 )

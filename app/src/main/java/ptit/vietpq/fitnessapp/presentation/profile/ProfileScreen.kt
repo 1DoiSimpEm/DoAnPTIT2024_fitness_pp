@@ -37,11 +37,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
 import ptit.vietpq.fitnessapp.extension.toast
+import ptit.vietpq.fitnessapp.ui.common.LoadingDialog
 
 
 @Composable
 fun ProfileRoute(
     onBackPressed: () -> Unit,
+    onMealListNavigate: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -72,6 +74,7 @@ fun ProfileRoute(
         uiState = uiState,
         isLoading = isLoading,
         onBackPressed = onBackPressed,
+        onMealListNavigate = onMealListNavigate,
         onUpdateProfile = viewModel::updateUser
     )
 }
@@ -80,8 +83,9 @@ fun ProfileRoute(
 @Composable
 fun ProfileScreen(
     uiState: ProfileUiState,
-    isLoading : Boolean,
+    isLoading: Boolean,
     onBackPressed: () -> Unit,
+    onMealListNavigate: () -> Unit,
     onUpdateProfile: (
         height: Int,
         weight: Int,
@@ -116,6 +120,8 @@ fun ProfileScreen(
         email = uiState.user?.email ?: ""
     }
 
+    LoadingDialog(isLoading = isLoading)
+
     Scaffold { paddingValues ->
         Column(
             modifier = modifier
@@ -123,17 +129,6 @@ fun ProfileScreen(
                 .background(darkBackground)
                 .padding(paddingValues)
         ) {
-
-            if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = FitnessTheme.color.limeGreen
-                    )
-                }
-            }
 
             // Profile Header
             Column(
@@ -276,7 +271,9 @@ fun ProfileScreen(
                 MenuListItem(Icons.Default.Person, stringResource(R.string.profile)) {
                     isUpdatingState = !isUpdatingState
                 }
-                MenuListItem(Icons.Default.Star, stringResource(R.string.favorite))
+                MenuListItem(Icons.Default.Fastfood, stringResource(R.string.meal_plans)) {
+                    onMealListNavigate()
+                }
                 MenuListItem(Icons.Default.Lock, stringResource(R.string.privacy_policy))
                 MenuListItem(Icons.Default.Settings, stringResource(R.string.settings))
                 MenuListItem(Icons.Default.Headphones, stringResource(R.string.help))

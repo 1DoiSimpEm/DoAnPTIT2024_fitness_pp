@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
-const val BASE_URL = "https://79bc-2a09-bac5-398e-e6-00-17-34d.ngrok-free.app"
+const val BASE_URL = "https://a7c2-2a09-bac5-d45e-e6-00-17-302.ngrok-free.app"
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
@@ -44,6 +44,9 @@ object NetworkModule {
         return OkHttpClient.Builder()
             .addInterceptor(logging)
             .addInterceptor(FormUrlEncodedInterceptor())
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
             .build()
     }
 
@@ -55,9 +58,7 @@ object NetworkModule {
         moshi: Moshi
     ): Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
-        .client(
-            okHttpClient.newBuilder().callTimeout(30, TimeUnit.SECONDS).build()
-        )
+        .client(okHttpClient)
         .addConverterFactory(MoshiConverterFactory.create(moshi))
         .build()
 

@@ -10,7 +10,8 @@ fun LoginResponse.asModel() = LoginModel(
     message = this.message,
     tokenType = this.tokenType,
     accessToken = this.accessToken,
-    userName = this.userName
+    userName = this.userName,
+    id = this.id,
 )
 
 fun RegisterResponse.asModel() = RegisterModel(

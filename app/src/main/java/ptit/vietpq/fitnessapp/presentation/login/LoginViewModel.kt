@@ -47,6 +47,7 @@ class LoginViewModel @Inject constructor(
                 onSuccess = {
                     busEvent(LoginState.LoginSuccess)
                     accessToken = it.accessToken
+                    sharePreferenceProvider.userId = it.id
                     this@LoginViewModel.userName = it.userName
                 },
                 onFailure = {

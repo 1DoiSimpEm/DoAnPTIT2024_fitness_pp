@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ptit.vietpq.fitnessapp.core.EventChannel
 import ptit.vietpq.fitnessapp.core.HasEventFlow
+import ptit.vietpq.fitnessapp.data.local.sharepref.SharePreferenceProvider
 import ptit.vietpq.fitnessapp.data.remote.request.MealPlanRequest
 import ptit.vietpq.fitnessapp.domain.usecase.CreateMealPlanUseCase
 import javax.inject.Inject
@@ -20,16 +21,18 @@ sealed interface MealPlanningState {
 }
 
 data class MealPlanningUiState(
-  val isLoading : Boolean = false,
+    val isLoading: Boolean = false,
 )
 
 @HiltViewModel
 class MealPlanningViewModel @Inject constructor(
     private val createMealPlanUseCase: CreateMealPlanUseCase,
-    private val eventChannel: EventChannel<MealPlanningState>
+    private val sharePreferenceProvider: SharePreferenceProvider,
+    private val eventChannel: EventChannel<MealPlanningState>,
 ) : ViewModel(), HasEventFlow<MealPlanningState> by eventChannel {
 
-    private val _uiState : MutableStateFlow<MealPlanningUiState> = MutableStateFlow(MealPlanningUiState())
+    private val _uiState: MutableStateFlow<MealPlanningUiState> =
+        MutableStateFlow(MealPlanningUiState())
     val uiState = _uiState.asStateFlow()
 
     fun fetchChatResponse(prompt: String) {
@@ -37,9 +40,11 @@ class MealPlanningViewModel @Inject constructor(
             _uiState.update {
                 it.copy(isLoading = true)
             }
-           val result = createMealPlanUseCase(MealPlanRequest(
-               1,prompt
-           ))
+            val result = createMealPlanUseCase(
+                MealPlanRequest(
+                    sharePreferenceProvider.userId, prompt
+                )
+            )
             result.onSuccess { res ->
                 eventChannel.send(MealPlanningState.Success(res.data.description))
                 _uiState.update {

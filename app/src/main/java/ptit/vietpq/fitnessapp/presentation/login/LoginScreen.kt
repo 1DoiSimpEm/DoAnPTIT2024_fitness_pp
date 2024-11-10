@@ -51,6 +51,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
 import ptit.vietpq.fitnessapp.extension.toast
+import ptit.vietpq.fitnessapp.ui.common.LoadingDialog
 
 
 @Composable
@@ -103,6 +104,8 @@ fun LoginScreen(
     var isRegistering by remember {
         mutableStateOf(false)
     }
+    
+    LoadingDialog(isLoading = showLoading)
 
     Scaffold(
         modifier = modifier,
@@ -144,17 +147,6 @@ fun LoginScreen(
             )
         },
         content = { innerPadding ->
-            if (showLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = FitnessTheme.color.limeGreen
-                    )
-                }
-            }
-
             AnimatedVisibility(visible = !isRegistering) {
                 LoginForm(
                     innerPadding = innerPadding,
