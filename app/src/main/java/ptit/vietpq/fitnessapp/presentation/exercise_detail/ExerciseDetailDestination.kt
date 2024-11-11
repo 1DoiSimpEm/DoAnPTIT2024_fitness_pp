@@ -2,6 +2,7 @@ package ptit.vietpq.fitnessapp.presentation.exercise_detail
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import ptit.vietpq.fitnessapp.data.remote.response.ExerciseResponse
 import ptit.vietpq.fitnessapp.presentation.main.navigation.destination.FitnessNavigationDestination
 
 data object ExerciseDetailDestination : FitnessNavigationDestination {
@@ -10,7 +11,10 @@ data object ExerciseDetailDestination : FitnessNavigationDestination {
 }
 
 fun NavGraphBuilder.exerciseDetailRoute(
+    onBackPressed : () -> Unit
 ) =
-    composable(route = ExerciseDetailDestination.route) {
-        ExerciseDetailRoute()
+    composable<ExerciseResponse> {
+        ExerciseDetailRoute(
+            onBackPressed = onBackPressed
+        )
     }

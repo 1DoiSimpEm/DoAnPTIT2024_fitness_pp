@@ -58,7 +58,7 @@ suspend fun <T> safeApiCall(apiCall: suspend () -> Response<T>): Result<T> {
     try {
         val response = apiCall()
         return if (response.isSuccessful) {
-            Result.success(response.body()!!)
+            Result.success(response.body() ?: throw IllegalStateException("Response body is null"))
         } else {
             Result.failure(
                 ApiException(

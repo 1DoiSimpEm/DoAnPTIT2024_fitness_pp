@@ -3,6 +3,7 @@ package ptit.vietpq.fitnessapp.presentation.meal_planning
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,7 +51,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
 import ptit.vietpq.fitnessapp.extension.toast
-import ptit.vietpq.fitnessapp.ui.theme.FitnessAppTheme
 
 @Composable
 fun MealPlanningRoute(
@@ -58,18 +61,20 @@ fun MealPlanningRoute(
     val context = LocalContext.current
     val state by viewModel.eventFlow.collectAsStateWithLifecycle(initialValue = MealPlanningState.Idle)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    when (val event = state) {
-        is MealPlanningState.Error -> {
-            context.toast(event.message)
-        }
 
-        is MealPlanningState.Idle -> Unit
+    LaunchedEffect(state) {
+        when (val event = state) {
+            is MealPlanningState.Error -> {
+                context.toast(event.message)
+            }
 
-        is MealPlanningState.Success -> {
-            onMealDetailedNavigating(event.response)
+            is MealPlanningState.Idle -> Unit
+
+            is MealPlanningState.Success -> {
+                onMealDetailedNavigating(event.response)
+            }
         }
     }
-
     MealPlanningScreen(
         onBackPressed = onBackPressed,
         uiState = uiState,
@@ -86,12 +91,17 @@ fun MealPlanningScreen(
     modifier: Modifier = Modifier,
 ) {
     var selectedDietaryPreference by remember { mutableStateOf("") }
+    var customDietaryPreference by remember { mutableStateOf("") }
     var selectedAllergies by remember { mutableStateOf(setOf<String>()) }
+    var customAllergies by remember { mutableStateOf("") }
     var selectedMealTypes by remember { mutableStateOf(setOf<String>()) }
+    var customMealTypes by remember { mutableStateOf("") }
     var selectedCalorieGoal by remember { mutableStateOf("") }
+    var customCalorieGoal by remember { mutableStateOf("") }
     var selectedCookingTime by remember { mutableStateOf("") }
+    var customCookingTime by remember { mutableStateOf("") }
     var selectedServings by remember { mutableStateOf("") }
-
+    var customServings by remember { mutableStateOf("") }
     Scaffold(
         modifier = modifier.background(Color(0xFF1E1E1E)),
         topBar = {
@@ -177,6 +187,14 @@ fun MealPlanningScreen(
                             stringResource(R.string.no_preferences),
                             selectedDietaryPreference
                         ) { selectedDietaryPreference = it }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        CustomInputField(
+                            value = customDietaryPreference,
+                            onValueChange = {
+                                customDietaryPreference = it; selectedDietaryPreference = ""
+                            },
+                            label = stringResource(R.string.other_dietary_preferences)
+                        )
                     }
                 }
 
@@ -215,6 +233,13 @@ fun MealPlanningScreen(
                         ) {
                             selectedAllergies = it
                         }
+                        CustomInputField(
+                            value = customAllergies,
+                            onValueChange = {
+                                customAllergies = it; selectedAllergies = setOf()
+                            },
+                            label = stringResource(R.string.other_allergies),
+                        )
                     }
                 }
 
@@ -247,6 +272,13 @@ fun MealPlanningScreen(
                             stringResource(R.string.snacks),
                             selectedMealTypes
                         ) { selectedMealTypes = it }
+                        CustomInputField(
+                            value = customMealTypes,
+                            onValueChange = {
+                                customMealTypes = it; selectedMealTypes = setOf()
+                            },
+                            label = stringResource(R.string.another_meal_type)
+                        )
                     }
                 }
 
@@ -282,6 +314,13 @@ fun MealPlanningScreen(
                             stringResource(R.string.not_sure_don_t_have_a_goal),
                             selectedCalorieGoal
                         ) { selectedCalorieGoal = it }
+                        CustomInputField(
+                            value = customCalorieGoal,
+                            onValueChange = {
+                                customCalorieGoal = it; selectedCalorieGoal = ""
+                            },
+                            label = stringResource(R.string.another_goal)
+                        )
                     }
                 }
 
@@ -317,6 +356,13 @@ fun MealPlanningScreen(
                         ) {
                             selectedCookingTime = it
                         }
+                        CustomInputField(
+                            value = customCookingTime,
+                            onValueChange = {
+                                customCookingTime = it; selectedCookingTime = ""
+                            },
+                            label = stringResource(R.string.another_cooking_time)
+                        )
                     }
                 }
 
@@ -341,6 +387,13 @@ fun MealPlanningScreen(
                             stringResource(R.string.more_than_4),
                             selectedServings
                         ) { selectedServings = it }
+                        CustomInputField(
+                            value = customServings,
+                            onValueChange = {
+                                customServings = it; selectedServings = ""
+                            },
+                            label = stringResource(R.string.another_number_of_servings)
+                        )
                     }
                 }
 
@@ -349,14 +402,32 @@ fun MealPlanningScreen(
                 // Create Button
                 Button(
                     onClick = {
+                        val dietaryPref = customDietaryPreference.ifEmpty {
+                            selectedDietaryPreference
+                        }
+
+                        val allergiesList = buildString {
+                            append(selectedAllergies.joinToString(", "))
+                            if (customAllergies.isNotEmpty()) {
+                                if (isNotEmpty()) append(", ")
+                                append(customAllergies)
+                            }
+                        }
+
                         onCreateButtonClicked(
-                            "Dietary Preference: $selectedDietaryPreference\n" +
-                                    "Allergies: $selectedAllergies\n" +
-                                    "Meal Types: $selectedMealTypes\n" +
-                                    "Caloric Goal: $selectedCalorieGoal\n" +
-                                    "Cooking Time: $selectedCookingTime\n" +
-                                    "Servings: $selectedServings" +
-                                    "Make a diet plan for me"
+                            """
+                            Please create a personalized meal plan based on the following preferences:
+                            
+                            Dietary Preference: $dietaryPref
+                            Allergies: $allergiesList
+                            Meal Types: ${selectedMealTypes.joinToString(", ")}${if (customMealTypes.isNotEmpty()) ", $customMealTypes" else ""}
+                            Caloric Goal: ${customCalorieGoal.ifEmpty { selectedCalorieGoal }}
+                            Cooking Time: ${customCookingTime.ifEmpty { selectedCookingTime }}
+                            Servings: ${customServings.ifEmpty { selectedServings }}
+                            
+                            Please provide a detailed meal plan that takes into account all these preferences and restrictions. 
+                            Include specific recipes, nutritional information, and preparation instructions for each meal.
+                            """.trimIndent()
                         )
                     },
                     modifier = Modifier
@@ -373,8 +444,6 @@ fun MealPlanningScreen(
             }
         }
     )
-
-
 }
 
 @Composable
@@ -439,5 +508,46 @@ private fun MultiSelectableChip(
             width = 1.dp,
             color = if (isSelected) Color(0xFF6200EE) else Color.Gray
         )
+    )
+}
+
+@Composable
+private fun CustomInputField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier
+) {
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier
+            .fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = Color.Gray,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .background(Color.Transparent),
+        label = { Text(label) },
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = Color(0xFF1F1F1F),
+            textColor = Color.White,
+            cursorColor = Color(0xFF6200EE),
+            focusedLabelColor = Color(0xFF6200EE),
+            unfocusedLabelColor = Color.Gray,
+        ),
+        singleLine = true
+    )
+}
+
+
+@Preview
+@Composable
+private fun PreviewMealPlanningScreen() {
+    MealPlanningScreen(
+        onBackPressed = {},
+        onCreateButtonClicked = {},
+        uiState = MealPlanningUiState()
     )
 }

@@ -77,7 +77,7 @@ fun FitnessApp(
           onNavigateToDestination = appState::navigate,
           onNavigateToDestinationPopUpTo = appState::navigateWithPopUpTo,
           onNavigateToDestinationPopUpToSplash = appState::navigateWithPopUpToRoute,
-          onBackClick = appState::onBackClick,
+          onBackPressed = appState::onBackClick,
           onShowMessage = { message -> appState.showMessage(message) },
           onSetSystemBarsColorTransparent = { },
           onResetSystemBarsColor = { },

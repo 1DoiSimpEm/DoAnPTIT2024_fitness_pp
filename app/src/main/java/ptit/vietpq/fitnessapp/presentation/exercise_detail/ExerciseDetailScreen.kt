@@ -1,42 +1,68 @@
 package ptit.vietpq.fitnessapp.presentation.exercise_detail
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ChipColors
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
+import ptit.vietpq.fitnessapp.data.remote.response.ExerciseResponse
+import ptit.vietpq.fitnessapp.presentation.exercise_detail.component.VideoPlayer
 
 
 @Composable
-fun ExerciseDetailRoute(){
-    ExerciseDetailScreen()
+fun ExerciseDetailRoute(
+    onBackPressed: () -> Unit,
+    viewModel: ExerciseDetailViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    ExerciseDetailScreen(
+        uiState = uiState,
+        onBackPressed = onBackPressed
+    )
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExerciseDetailScreen(
+    uiState: ExerciseDetailUiState,
+    onBackPressed: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val chipColor =
@@ -55,7 +81,7 @@ fun ExerciseDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Dumbbell Step Up",
+                        uiState.exercise.name,
                         color = FitnessTheme.color.primary
                     )
                 },
@@ -68,22 +94,15 @@ fun ExerciseDetailScreen(
 
                 ),
                 navigationIcon = {
-                    IconButton(onClick = { /* Handle back navigation */ }) {
+                    IconButton(onClick = onBackPressed) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
                             tint = FitnessTheme.color.primary
                         )
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Handle search */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search",
-                            tint = FitnessTheme.color.primary
-                        )
-                    }
                     IconButton(onClick = { /* Handle profile */ }) {
                         Icon(
                             imageVector = Icons.Default.Star,
@@ -101,55 +120,15 @@ fun ExerciseDetailScreen(
                 .fillMaxSize()
                 .background(FitnessTheme.color.blackBg)
         ) {
-            Box(
+            VideoPlayer(
+                thumbnailUrl = uiState.exercise.image,
+                videoUrl = uiState.exercise.videoUrl,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(16.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(FitnessTheme.color.primary.copy(alpha = 0.2f))
-            ) {
-                // Exercise Image
-                Image(
-                    painter = painterResource(id = R.drawable.ic_apple),  // Replace with your image resource
-                    contentDescription = "Exercise demonstration",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
+            )
 
-                // Play Button
-                Box(
-                    modifier = Modifier
-                        .size(80.dp)
-                        .align(Alignment.Center)
-                        .clip(CircleShape)
-                        .background(FitnessTheme.color.primary),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.PlayArrow,
-                        contentDescription = "Play video",
-                        tint = Color.White,
-                        modifier = Modifier.size(40.dp)
-                    )
-                }
-
-                // Favorite Star
-                IconButton(
-                    onClick = { /* Handle favorite */ },
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = "Favorite",
-                        tint = FitnessTheme.color.limeGreen
-                    )
-                }
-            }
-
-            // Exercise Info Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -165,14 +144,14 @@ fun ExerciseDetailScreen(
                         .padding(16.dp)
                 ) {
                     Text(
-                        text = "Dumbbell Step Up",
+                        text = uiState.exercise.name,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = FitnessTheme.color.blackBg
                     )
 
                     Text(
-                        text = "Lorem ipsum Dolor Sit Amet, Consectetur Adipiscing Elit. Sed Cursus Libero Eget.",
+                        text = uiState.exercise.description,
                         fontSize = 14.sp,
                         color = FitnessTheme.color.blackBg.copy(alpha = 0.7f),
                         modifier = Modifier.padding(vertical = 8.dp)
@@ -245,5 +224,19 @@ private fun Chip(
 @Preview
 @Composable
 private fun ExerciseDetailScreenPreview() {
-    ExerciseDetailScreen()
+    val uiState = remember {
+        ExerciseDetailUiState(
+            exercise = ExerciseResponse(
+                id = 1,
+                name = "Push Up",
+                description = "Push up is a great exercise for your chest and triceps",
+                videoUrl = "https://www.youtube.com/watch?v=0d0Wv0k8Zk4"
+            ),
+            isFavorite = false
+        )
+    }
+    ExerciseDetailScreen(
+        uiState = uiState,
+        onBackPressed = {}
+    )
 }

@@ -30,6 +30,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,26 +65,31 @@ fun LoginRoute(
     var showLoading by remember {
         mutableStateOf(false)
     }
-    when (val event = eventFlow.value) {
-        is LoginState.LoginSuccess -> {
-            context.toast("Login success")
-            onLoginSuccess()
-            showLoading = false
-        }
-        is LoginState.RegisterSuccess -> {
-            context.toast("Register success")
-            showLoading = false
-        }
-        is LoginState.Error -> {
-            context.toast(event.message)
-            showLoading = false
-        }
+    LaunchedEffect(eventFlow.value) {
+        when (val event = eventFlow.value) {
+            is LoginState.LoginSuccess -> {
+                context.toast("Login success")
+                onLoginSuccess()
+                showLoading = false
+            }
 
-        LoginState.Empty -> {
+            is LoginState.RegisterSuccess -> {
+                context.toast("Register success")
+                showLoading = false
+            }
 
-        }
-        LoginState.Loading -> {
-            showLoading = true
+            is LoginState.Error -> {
+                context.toast(event.message)
+                showLoading = false
+            }
+
+            LoginState.Empty -> {
+                // Do nothing
+            }
+
+            LoginState.Loading -> {
+                showLoading = true
+            }
         }
     }
     LoginScreen(
@@ -104,7 +110,7 @@ fun LoginScreen(
     var isRegistering by remember {
         mutableStateOf(false)
     }
-    
+
     LoadingDialog(isLoading = showLoading)
 
     Scaffold(

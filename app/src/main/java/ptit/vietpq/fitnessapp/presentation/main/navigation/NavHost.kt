@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import ptit.vietpq.fitnessapp.presentation.exercise.exerciseGraph
+import ptit.vietpq.fitnessapp.presentation.exercise_category.exerciseCategoryGraph
 import ptit.vietpq.fitnessapp.presentation.exercise_detail.exerciseDetailRoute
 import ptit.vietpq.fitnessapp.presentation.home.HomeDestination
 import ptit.vietpq.fitnessapp.presentation.home.homeGraph
@@ -14,7 +15,6 @@ import ptit.vietpq.fitnessapp.presentation.login.loginGraph
 import ptit.vietpq.fitnessapp.presentation.main.navigation.destination.FitnessNavigationDestination
 import ptit.vietpq.fitnessapp.presentation.meal_detailed.MealDetailedDestination
 import ptit.vietpq.fitnessapp.presentation.meal_detailed.mealDetailedGraph
-import ptit.vietpq.fitnessapp.presentation.meal_planning.MealPlanningDestination
 import ptit.vietpq.fitnessapp.presentation.meal_planning.mealPlanningRoute
 import ptit.vietpq.fitnessapp.presentation.meal_plans.MealListDestination
 import ptit.vietpq.fitnessapp.presentation.meal_plans.mealListGraph
@@ -30,7 +30,7 @@ fun FitnessNavHost(
     onNavigateToDestination: (FitnessNavigationDestination, String) -> Unit,
     onNavigateToDestinationPopUpTo: (FitnessNavigationDestination, String) -> Unit,
     onNavigateToDestinationPopUpToSplash: (FitnessNavigationDestination) -> Unit,
-    onBackClick: () -> Unit,
+    onBackPressed: () -> Unit,
     onShowMessage: (String) -> Unit,
     onSetSystemBarsColorTransparent: () -> Unit,
     onResetSystemBarsColor: () -> Unit,
@@ -91,7 +91,7 @@ fun FitnessNavHost(
             }
         )
         profileGraph(
-            onBackPressed = onBackClick,
+            onBackPressed = onBackPressed,
             onMealListNavigate = {
                 onNavigateToDestination(
                     MealListDestination,
@@ -109,16 +109,18 @@ fun FitnessNavHost(
                     MealDetailedDestination.createNavigationRoute(mealContent)
                 )
             },
-            onBackPressed = onBackClick
+            onBackPressed = onBackPressed
         )
 
-        exerciseDetailRoute()
+        exerciseDetailRoute(
+            onBackPressed = onBackPressed
+        )
         mealDetailedGraph(
-            onBackPressed = onBackClick,
+            onBackPressed = onBackPressed,
 
         )
         mealListGraph(
-            onBackPressed = onBackClick,
+            onBackPressed = onBackPressed,
             onMealPlanClick = { meal ->
                 onNavigateToDestination(
                     MealDetailedDestination,
@@ -126,6 +128,11 @@ fun FitnessNavHost(
                 )
             }
         )
-
+        exerciseCategoryGraph(
+            onBackPressed = onBackPressed,
+            onExerciseClicked = { exercise ->
+                navController.navigate(exercise)
+            }
+        )
     }
 }

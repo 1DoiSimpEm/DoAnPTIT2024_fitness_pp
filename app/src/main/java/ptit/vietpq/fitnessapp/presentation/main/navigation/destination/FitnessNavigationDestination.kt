@@ -1,7 +1,7 @@
 package ptit.vietpq.fitnessapp.presentation.main.navigation.destination
 
 /**
- * An interface for describing the QRCode navigation destinations.
+ * An interface for describing the FitnessApp navigation destinations.
  */
 interface FitnessNavigationDestination {
   /**

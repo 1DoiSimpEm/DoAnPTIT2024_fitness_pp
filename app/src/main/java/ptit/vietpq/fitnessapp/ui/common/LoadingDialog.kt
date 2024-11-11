@@ -36,7 +36,7 @@ fun LoadingDialog(
         ) {
             Surface(
                 modifier = modifier
-                    .wrapContentSize()
+                    .width(150.dp)
                     .background(
                         color = Color.Transparent,
                         shape = RoundedCornerShape(8.dp)

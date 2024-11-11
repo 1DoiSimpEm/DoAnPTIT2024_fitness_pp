@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
 import ptit.vietpq.fitnessapp.data.local.sharepref.SharePreferenceProvider
 import ptit.vietpq.fitnessapp.presentation.exercise.ExerciseDestination
+import ptit.vietpq.fitnessapp.presentation.exercise_category.ExerciseCategoryDestination
 import ptit.vietpq.fitnessapp.presentation.exercise_detail.ExerciseDetailDestination
 import ptit.vietpq.fitnessapp.presentation.home.HomeDestination
 import ptit.vietpq.fitnessapp.presentation.login.LoginDestination
@@ -26,15 +27,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FitnessApp(
-                startDestination =
-                if(sharePreferenceProvider.isSetupFinished){
-                    HomeDestination
-                }
-                else if (sharePreferenceProvider.accessToken.isEmpty()) {
-                    LoginDestination
-                } else {
-                    HomeDestination
-                },
+                ExerciseCategoryDestination
+//                if(sharePreferenceProvider.isSetupFinished){
+//                    HomeDestination
+//                }
+//                else if (sharePreferenceProvider.accessToken.isEmpty()) {
+//                    LoginDestination
+//                } else {
+//                    HomeDestination
+//                }
+                ,
                 modifier = Modifier.fillMaxSize()
             )
         }

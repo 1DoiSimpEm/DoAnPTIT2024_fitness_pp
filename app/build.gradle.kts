@@ -8,6 +8,8 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.google.dagger.hilt)
+    kotlin("plugin.serialization") version "2.0.21"
+
 //    alias(libs.plugins.google.firebase.crashlytics)
 //    alias(libs.plugins.google.firebase.perf)
 //    alias(libs.plugins.google.gms.services)
@@ -169,9 +171,14 @@ dependencies {
     implementation(libs.pose.detection.accurate)
     implementation(libs.azure.ai.inference)
 
-
     implementation(libs.flow.bus)
     implementation(libs.zoomable)
     implementation(libs.work.manager.runtime)
     implementation(libs.work.manager.ktx)
+
+    implementation(libs.kotlinx.serialization.json)
+    implementation (libs.exoplayer.core)
+    implementation (libs.exoplayer.ui)
+    implementation(libs.gson)
+
 }

@@ -20,13 +20,10 @@ import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.graphics.Bitmap
-import android.os.Build.VERSION_CODES
 import android.os.SystemClock
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.GuardedBy
 import androidx.annotation.OptIn
-import androidx.annotation.RequiresApi
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
 import com.google.android.gms.tasks.OnFailureListener
@@ -266,7 +263,6 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
             detectInImage(image),
             graphicOverlay,
             originalCameraImage,
-            shouldShowFps,
             frameStartMs
         )
     }
@@ -282,7 +278,6 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
             detectInImage(image),
             graphicOverlay,
             originalCameraImage,
-            shouldShowFps,
             frameStartMs
         )
     }
@@ -292,7 +287,6 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
         task: Task<T>,
         graphicOverlay: GraphicOverlay,
         originalCameraImage: Bitmap?,
-        shouldShowFps: Boolean,
         frameStartMs: Long
     ): Task<T> {
         val detectorStartMs = SystemClock.elapsedRealtime()

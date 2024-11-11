@@ -17,9 +17,11 @@ class MealDetailedViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<MealDetailedUiState> =
-        MutableStateFlow(MealDetailedUiState(
-            MealDetailedDestination.getSavedStateRoute(stateHandle)
-        ))
+        MutableStateFlow(
+            MealDetailedUiState(
+                MealDetailedDestination.getSavedStateRoute(stateHandle)
+            )
+        )
     val uiState = _uiState.asStateFlow()
 
 }
