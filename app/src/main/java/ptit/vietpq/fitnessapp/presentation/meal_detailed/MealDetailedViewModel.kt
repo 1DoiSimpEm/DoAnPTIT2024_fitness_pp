@@ -5,8 +5,11 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.serialization.Serializable
+import ptit.vietpq.fitnessapp.extension.getArg
 import javax.inject.Inject
 
+@Serializable
 data class MealDetailedUiState(
     val mealDescription: String = "",
 )
@@ -18,9 +21,7 @@ class MealDetailedViewModel @Inject constructor(
 
     private val _uiState: MutableStateFlow<MealDetailedUiState> =
         MutableStateFlow(
-            MealDetailedUiState(
-                MealDetailedDestination.getSavedStateRoute(stateHandle)
-            )
+            stateHandle.getArg<MealDetailedUiState>() ?: MealDetailedUiState()
         )
     val uiState = _uiState.asStateFlow()
 

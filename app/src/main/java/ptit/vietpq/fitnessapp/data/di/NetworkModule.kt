@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
-const val BASE_URL = "https://b6fc-2a09-bac5-d459-16dc-00-247-ce.ngrok-free.app"
+const val BASE_URL = "https://54a5-2a09-bac1-7aa0-50-00-246-a5.ngrok-free.app"
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)

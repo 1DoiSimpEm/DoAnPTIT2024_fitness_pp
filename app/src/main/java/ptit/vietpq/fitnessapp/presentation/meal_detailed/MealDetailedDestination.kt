@@ -23,11 +23,7 @@ data object MealDetailedDestination : FitnessNavigationDestination {
 fun NavGraphBuilder.mealDetailedGraph(
     onBackPressed: () -> Unit,
 ) =
-    composable(route = MealDetailedDestination.routeWithArgument, arguments = listOf(
-        navArgument(MealDetailedDestination.idArgument) {
-            type = NavType.StringType
-        }
-    )) {
+    composable<MealDetailedUiState> {
         MealDetailedRoute(
             onBackPressed = onBackPressed
         )

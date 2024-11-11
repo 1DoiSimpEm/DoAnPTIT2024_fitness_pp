@@ -51,6 +51,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
 import ptit.vietpq.fitnessapp.extension.toast
+import ptit.vietpq.fitnessapp.ui.common.LoadingDialog
 
 @Composable
 fun MealPlanningRoute(
@@ -102,6 +103,9 @@ fun MealPlanningScreen(
     var customCookingTime by remember { mutableStateOf("") }
     var selectedServings by remember { mutableStateOf("") }
     var customServings by remember { mutableStateOf("") }
+
+    LoadingDialog(isLoading = uiState.isLoading)
+
     Scaffold(
         modifier = modifier.background(Color(0xFF1E1E1E)),
         topBar = {
@@ -136,18 +140,6 @@ fun MealPlanningScreen(
         contentColor = FitnessTheme.color.primary,
         containerColor = Color(0xFF1E1E1E),
         content = { innerPadding ->
-            if (uiState.isLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.5f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = FitnessTheme.color.limeGreen
-                    )
-                }
-            }
             Column(
                 modifier = Modifier
                     .fillMaxSize()

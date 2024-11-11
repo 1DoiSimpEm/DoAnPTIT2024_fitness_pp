@@ -11,7 +11,14 @@ data object HomeDestination : FitnessNavigationDestination {
 
 fun NavGraphBuilder.homeGraph(
     onUserClicked: () -> Unit,
+    onWorkoutClicked: () -> Unit,
+    onProgressClicked: () -> Unit,
+    onNutritionClicked: () -> Unit,
 ) =
     composable(route = HomeDestination.route) {
-        HomeRoute(onUserClicked = onUserClicked)
+        HomeRoute(
+            onUserClicked = onUserClicked, onWorkoutClicked = onWorkoutClicked,
+            onProgressClicked = onProgressClicked,
+            onNutritionClicked = onNutritionClicked
+        )
     }

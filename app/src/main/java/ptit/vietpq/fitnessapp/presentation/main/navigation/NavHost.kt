@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import ptit.vietpq.fitnessapp.presentation.exercise.exerciseGraph
+import ptit.vietpq.fitnessapp.presentation.exercise_category.ExerciseCategoryDestination
 import ptit.vietpq.fitnessapp.presentation.exercise_category.exerciseCategoryGraph
 import ptit.vietpq.fitnessapp.presentation.exercise_detail.exerciseDetailRoute
 import ptit.vietpq.fitnessapp.presentation.home.HomeDestination
@@ -14,7 +15,9 @@ import ptit.vietpq.fitnessapp.presentation.home.homeGraph
 import ptit.vietpq.fitnessapp.presentation.login.loginGraph
 import ptit.vietpq.fitnessapp.presentation.main.navigation.destination.FitnessNavigationDestination
 import ptit.vietpq.fitnessapp.presentation.meal_detailed.MealDetailedDestination
+import ptit.vietpq.fitnessapp.presentation.meal_detailed.MealDetailedUiState
 import ptit.vietpq.fitnessapp.presentation.meal_detailed.mealDetailedGraph
+import ptit.vietpq.fitnessapp.presentation.meal_planning.MealPlanningDestination
 import ptit.vietpq.fitnessapp.presentation.meal_planning.mealPlanningRoute
 import ptit.vietpq.fitnessapp.presentation.meal_plans.MealListDestination
 import ptit.vietpq.fitnessapp.presentation.meal_plans.mealListGraph
@@ -88,6 +91,21 @@ fun FitnessNavHost(
                     ProfileDestination,
                     ProfileDestination.route
                 )
+            },
+            onWorkoutClicked = {
+                onNavigateToDestination(
+                    ExerciseCategoryDestination,
+                    ExerciseCategoryDestination.route
+                )
+            },
+            onProgressClicked = {
+                /*  NOT YET*/
+            },
+            onNutritionClicked = {
+                onNavigateToDestination(
+                    MealListDestination,
+                    MealListDestination.route
+                )
             }
         )
         profileGraph(
@@ -104,10 +122,7 @@ fun FitnessNavHost(
 
         mealPlanningRoute(
             onMealDetailedNavigating = { mealContent ->
-                onNavigateToDestination(
-                    MealDetailedDestination,
-                    MealDetailedDestination.createNavigationRoute(mealContent)
-                )
+                navController.navigate(MealDetailedUiState(mealContent))
             },
             onBackPressed = onBackPressed
         )
@@ -118,13 +133,16 @@ fun FitnessNavHost(
         mealDetailedGraph(
             onBackPressed = onBackPressed,
 
-        )
+            )
         mealListGraph(
             onBackPressed = onBackPressed,
             onMealPlanClick = { meal ->
+                navController.navigate(MealDetailedUiState(meal.description))
+            },
+            onMealAddClicked = {
                 onNavigateToDestination(
-                    MealDetailedDestination,
-                    MealDetailedDestination.createNavigationRoute(meal.description)
+                    MealPlanningDestination,
+                    MealPlanningDestination.route
                 )
             }
         )

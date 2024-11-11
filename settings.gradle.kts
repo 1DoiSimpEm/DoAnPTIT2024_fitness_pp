@@ -7,6 +7,7 @@ pluginManagement {
                 includeGroupByRegex("androidx.*")
             }
         }
+        maven("https://jitpack.io")
         mavenCentral()
         gradlePluginPortal()
     }
@@ -21,4 +22,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "FitnessApp"
 include(":app")
- 

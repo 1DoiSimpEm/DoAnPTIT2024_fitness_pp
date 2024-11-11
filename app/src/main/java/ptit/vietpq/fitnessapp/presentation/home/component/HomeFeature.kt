@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
+import kotlinx.coroutines.delay
 import ptit.vietpq.fitnessapp.R
 
 @Composable
@@ -32,7 +33,8 @@ fun HomeFeature(
     }
 
     LaunchedEffect(selectedPosition) {
-        onFeatureSelected(selectedPosition)
+        delay(1000L)
+        selectedPosition = 0
     }
 
     Row(
@@ -45,6 +47,7 @@ fun HomeFeature(
             isSelected = selectedPosition == 0,
             onItemSelected = {
                 selectedPosition = 0
+                onFeatureSelected(0)
             }
         )
         Spacer(modifier = Modifier.size(8.dp))
@@ -64,6 +67,7 @@ fun HomeFeature(
             isSelected = selectedPosition == 1,
             onItemSelected = {
                 selectedPosition = 1
+                onFeatureSelected(1)
             }
         )
         Spacer(modifier = Modifier.size(8.dp))
@@ -83,6 +87,7 @@ fun HomeFeature(
             isSelected = selectedPosition == 2,
             onItemSelected = {
                 selectedPosition = 2
+                onFeatureSelected(2)
             }
         )
         Spacer(modifier = Modifier.size(8.dp))
@@ -102,6 +107,7 @@ fun HomeFeature(
             isSelected = selectedPosition == 3,
             onItemSelected = {
                 selectedPosition = 3
+                onFeatureSelected(3)
             }
         )
         Spacer(modifier = Modifier.size(8.dp))

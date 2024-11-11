@@ -5,17 +5,23 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Fastfood
+import androidx.compose.material.icons.filled.FoodBank
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -38,13 +44,11 @@ import ptit.vietpq.fitnessapp.R
 import ptit.vietpq.fitnessapp.data.remote.response.MealPlanResponse
 import ptit.vietpq.fitnessapp.extension.formatTimestamp
 import ptit.vietpq.fitnessapp.ui.common.LoadingDialog
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @Composable
 fun MealListRoute(
     onBackPressed: () -> Unit,
+    onMealAddClicked: () -> Unit,
     onMealPlanClick: (MealPlanResponse) -> Unit,
     viewModel: MealListViewModel = hiltViewModel()
 ) {
@@ -54,7 +58,8 @@ fun MealListRoute(
         onBackPressed = onBackPressed,
         onMealPlanClick = {
             onMealPlanClick(it)
-        }
+        },
+        onMealAddClicked = onMealAddClicked
     )
 }
 
@@ -62,6 +67,7 @@ fun MealListRoute(
 @Composable
 fun MealPlanListScreen(
     uiState: MealListUiState,
+    onMealAddClicked: () -> Unit,
     onMealPlanClick: (MealPlanResponse) -> Unit,
     onBackPressed: () -> Unit,
     modifier: Modifier = Modifier
@@ -96,6 +102,15 @@ fun MealPlanListScreen(
                         painter = painterResource(id = R.drawable.ic_back_arrow),
                         contentDescription = "Back"
                     )
+                },
+                actions = {
+                    Row(modifier = Modifier.clickable {
+                        onMealAddClicked()
+                    }) {
+                        Icon(imageVector = Icons.Default.FoodBank, contentDescription = null)
+
+                    }
+
                 }
             )
         },
@@ -175,7 +190,6 @@ private fun MealPlanCard(
 }
 
 
-
 @Preview
 @Composable
 private fun PreviewMealPlanList() {
@@ -203,5 +217,6 @@ private fun PreviewMealPlanList() {
         ),
         onMealPlanClick = {},
         onBackPressed = {},
+        onMealAddClicked = {}
     )
 }

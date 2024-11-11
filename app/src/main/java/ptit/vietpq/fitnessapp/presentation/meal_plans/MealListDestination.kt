@@ -12,8 +12,9 @@ data object MealListDestination : FitnessNavigationDestination {
 
 fun NavGraphBuilder.mealListGraph(
     onBackPressed: () -> Unit,
+    onMealAddClicked: () -> Unit,
     onMealPlanClick: (MealPlanResponse) -> Unit,
     ) =
     composable(route = MealListDestination.route) {
-        MealListRoute(onBackPressed = onBackPressed, onMealPlanClick = onMealPlanClick)
+        MealListRoute(onBackPressed = onBackPressed, onMealPlanClick = onMealPlanClick, onMealAddClicked = onMealAddClicked)
     }

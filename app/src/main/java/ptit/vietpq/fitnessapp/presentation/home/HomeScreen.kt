@@ -44,12 +44,18 @@ import ptit.vietpq.fitnessapp.presentation.home.component.HomeFeature
 @Composable
 fun HomeRoute(
     onUserClicked: () -> Unit,
+    onWorkoutClicked: () -> Unit,
+    onProgressClicked: () -> Unit,
+    onNutritionClicked: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     HomeScreen(
         uiState = uiState,
-        onUserClicked = onUserClicked
+        onUserClicked = onUserClicked,
+        onWorkoutClicked = onWorkoutClicked,
+        onProgressClicked = onProgressClicked,
+        onNutritionClicked = onNutritionClicked
     )
 }
 
@@ -57,6 +63,9 @@ fun HomeRoute(
 @Composable
 fun HomeScreen(
     onUserClicked: () -> Unit,
+    onWorkoutClicked: () -> Unit,
+    onProgressClicked: () -> Unit,
+    onNutritionClicked: () -> Unit,
     uiState: HomeUiState,
     modifier: Modifier = Modifier
 ) {
@@ -121,7 +130,21 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 HomeFeature(
                     modifier = Modifier.fillMaxWidth(),
-                    onFeatureSelected = { }
+                    onFeatureSelected = {
+                        when (it) {
+                            0 -> {
+                                onWorkoutClicked()
+                            }
+
+                            1 -> {
+                                onProgressClicked()
+                            }
+
+                            2 -> {
+                                onNutritionClicked()
+                            }
+                        }
+                    }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(
@@ -172,5 +195,10 @@ fun HomeScreen(
 @Preview
 @Composable
 private fun HomeScreenPreview() {
-    HomeScreen(onUserClicked = {}, uiState = HomeUiState())
+    HomeScreen(
+        onUserClicked = {},
+        uiState = HomeUiState(),
+        onWorkoutClicked = {},
+        onProgressClicked = {},
+        onNutritionClicked = {})
 }
