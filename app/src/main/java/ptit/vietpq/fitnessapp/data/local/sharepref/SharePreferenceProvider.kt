@@ -21,7 +21,7 @@ class SharePreferenceProvider @Inject constructor(
 
     var accessToken = ""
         set(value) {
-            save(ACCESS_TOKEN, value, "")
+            save(ACCESS_TOKEN, value)
             field = value
         }
         get() {
@@ -30,7 +30,7 @@ class SharePreferenceProvider @Inject constructor(
 
     var userName = ""
         set(value) {
-            save(USER_NAME, value, "")
+            save(USER_NAME, value)
             field = value
         }
         get() {
@@ -39,7 +39,7 @@ class SharePreferenceProvider @Inject constructor(
 
     var userId = 0
         set(value) {
-            save(USER_ID, value, 1)
+            save(USER_ID, value)
             field = value
         }
         get() {
@@ -48,7 +48,7 @@ class SharePreferenceProvider @Inject constructor(
 
     var isSetupFinished = false
         set(value) {
-            save("IS_SETUP_FINISHED", value, false)
+            save("IS_SETUP_FINISHED", value)
             field = value
         }
         get() {
@@ -56,7 +56,7 @@ class SharePreferenceProvider @Inject constructor(
         }
 
     @ToJson
-    inline fun <reified T> save(key: String, any: Any, defaultValue: T? = null) {
+    fun save(key: String, any: Any) {
         val editor = sharedPreferences.edit()
         when (any) {
             is String -> editor.putString(key, any)
@@ -110,5 +110,12 @@ class SharePreferenceProvider @Inject constructor(
         const val ACCESS_TOKEN = "ACCESS_TOKEN"
         const val USER_NAME = "USER_NAME"
         const val USER_ID = "USER_ID"
+        const val GENERAL_NOTIFICATION = "GENERAL_NOTIFICATION"
+        const val SOUND = "SOUND"
+        const val DND_MODE = "DND_MODE"
+        const val VIBRATE = "VIBRATE"
+        const val LOCK_SCREEN = "LOCK_SCREEN"
+        const val REMINDERS = "REMINDERS"
+        const val LANGUAGE = "LANGUAGE"
     }
 }

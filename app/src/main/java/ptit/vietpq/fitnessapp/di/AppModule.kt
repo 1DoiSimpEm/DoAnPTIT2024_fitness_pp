@@ -16,18 +16,19 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class AppModule {
 
-  @Provides
-  @Singleton
-  fun provideMoshi(): Moshi = Moshi.Builder()
-    .addLast(KotlinJsonAdapterFactory())
-    .add(KotlinJsonAdapterFactory())
-    .build()
+    @Provides
+    @Singleton
+    fun provideMoshi(): Moshi = Moshi.Builder()
+        .addLast(KotlinJsonAdapterFactory())
+        .add(KotlinJsonAdapterFactory())
+        .build()
 
-  @Singleton
-  @Provides
-  fun sharedPreference(@ApplicationContext context: Context): SharedPreferences = context.getSharedPreferences(
-    SharePreferenceProvider.NAME_SHARE_PREFERENCE,
-    Context.MODE_PRIVATE,
-  )
+    @Singleton
+    @Provides
+    fun sharedPreference(@ApplicationContext context: Context): SharedPreferences =
+        context.getSharedPreferences(
+            SharePreferenceProvider.NAME_SHARE_PREFERENCE,
+            Context.MODE_PRIVATE,
+        )
 
 }

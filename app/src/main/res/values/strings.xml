@@ -95,4 +95,23 @@
     <string name="another_goal">Another goal</string>
     <string name="another_cooking_time">Another cooking time</string>
     <string name="another_number_of_servings">Another number of servings</string>
+    <string name="setting">Setting</string>
+    <string name="notification_setting">Notification Setting</string>
+    <string name="password_setting">Password Setting</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="yes">Yes</string>
+    <string name="exit">Exit</string>
+    <string name="are_you_sure_you_want_to_exit">Are you sure you want to exit?</string>
+    <string name="no">No</string>
+    <string name="current_password">Current Password</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_new_password">Confirm New Password</string>
+    <string name="change_password">Change Password</string>
+    <string name="general_notification">General Notification</string>
+    <string name="sound">Sound</string>
+    <string name="don_t_disturb_mode">Don\'t Disturb Mode</string>
+    <string name="vibrate">Vibrate</string>
+    <string name="lock_screen">Lock Screen</string>
+    <string name="reminders">Reminders</string>
+    <string name="language">Language</string>
 </resources>

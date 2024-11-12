@@ -21,8 +21,14 @@ import ptit.vietpq.fitnessapp.presentation.meal_planning.MealPlanningDestination
 import ptit.vietpq.fitnessapp.presentation.meal_planning.mealPlanningRoute
 import ptit.vietpq.fitnessapp.presentation.meal_plans.MealListDestination
 import ptit.vietpq.fitnessapp.presentation.meal_plans.mealListGraph
+import ptit.vietpq.fitnessapp.presentation.notification_setting.NotificationSettingsDestination
+import ptit.vietpq.fitnessapp.presentation.notification_setting.notificationSettingsGraph
+import ptit.vietpq.fitnessapp.presentation.password_setting.PasswordSettingDestination
+import ptit.vietpq.fitnessapp.presentation.password_setting.passwordSettingGraph
 import ptit.vietpq.fitnessapp.presentation.profile.ProfileDestination
 import ptit.vietpq.fitnessapp.presentation.profile.profileGraph
+import ptit.vietpq.fitnessapp.presentation.setting.SettingDestination
+import ptit.vietpq.fitnessapp.presentation.setting.settingGraph
 import ptit.vietpq.fitnessapp.presentation.setup.SetupDestination
 import ptit.vietpq.fitnessapp.presentation.setup.setupGraph
 
@@ -101,6 +107,12 @@ fun FitnessNavHost(
             onProgressClicked = {
                 /*  NOT YET*/
             },
+            onSettingsClicked = {
+                onNavigateToDestination(
+                    SettingDestination,
+                    SettingDestination.route
+                )
+            },
             onNutritionClicked = {
                 onNavigateToDestination(
                     MealListDestination,
@@ -114,6 +126,12 @@ fun FitnessNavHost(
                 onNavigateToDestination(
                     MealListDestination,
                     MealListDestination.route
+                )
+            },
+            onSettingNavigate = {
+                onNavigateToDestination(
+                    SettingDestination,
+                    SettingDestination.route
                 )
             }
         )
@@ -151,6 +169,30 @@ fun FitnessNavHost(
             onExerciseClicked = { exercise ->
                 navController.navigate(exercise)
             }
+        )
+
+        settingGraph(
+            onBackPressed = onBackPressed,
+            onNotificationSettingClicked = {
+                onNavigateToDestination(
+                    NotificationSettingsDestination,
+                    NotificationSettingsDestination.route
+                )
+            },
+            onPasswordSettingClicked = {
+                onNavigateToDestination(
+                    PasswordSettingDestination,
+                    PasswordSettingDestination.route
+                )
+            },
+        )
+
+        passwordSettingGraph(
+            onBackPressed = onBackPressed,
+        )
+
+        notificationSettingsGraph(
+            onBackPressed = onBackPressed
         )
     }
 }

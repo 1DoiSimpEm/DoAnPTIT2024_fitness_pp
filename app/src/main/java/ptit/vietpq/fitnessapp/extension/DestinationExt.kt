@@ -20,7 +20,7 @@ import kotlin.reflect.full.primaryConstructor
 inline fun <reified destination : Any> SavedStateHandle.getArg(): destination? = try {
     destination::class.primaryConstructor?.callBy(
         destination::class.primaryConstructor?.parameters?.associate { parameter ->
-            parameter to parameter.getValueFrom(this)
+            parameter to parameter.getValueFrom         (this)
         }.orEmpty()
     )
 } catch (t: Throwable) {

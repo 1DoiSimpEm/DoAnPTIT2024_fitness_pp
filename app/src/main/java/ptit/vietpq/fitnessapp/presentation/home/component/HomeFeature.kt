@@ -102,8 +102,8 @@ fun HomeFeature(
         )
         Spacer(modifier = Modifier.size(8.dp))
         HomeItem(
-            text = stringResource(R.string.community),
-            image = R.drawable.ic_community,
+            text = stringResource(R.string.setting),
+            image = R.drawable.ic_settings,
             isSelected = selectedPosition == 3,
             onItemSelected = {
                 selectedPosition = 3

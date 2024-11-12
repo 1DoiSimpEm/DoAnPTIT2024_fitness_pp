@@ -10,14 +10,6 @@ import ptit.vietpq.fitnessapp.presentation.main.navigation.destination.FitnessNa
 data object MealDetailedDestination : FitnessNavigationDestination {
     override val route: String = "meal_detailed_route"
     override val destination: String = "meal_detailed_destination"
-    const val idArgument = "idArgument"
-    val routeWithArgument = "$route/{$idArgument}"
-    fun createNavigationRoute(content: String): String = "$route/$content"
-
-    fun getSavedStateRoute(savedStateHandle: SavedStateHandle): String =
-        savedStateHandle.get<String>(
-            idArgument
-        ) ?: ""
 }
 
 fun NavGraphBuilder.mealDetailedGraph(

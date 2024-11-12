@@ -14,11 +14,13 @@ fun NavGraphBuilder.homeGraph(
     onWorkoutClicked: () -> Unit,
     onProgressClicked: () -> Unit,
     onNutritionClicked: () -> Unit,
+    onSettingsClicked: () -> Unit,
 ) =
     composable(route = HomeDestination.route) {
         HomeRoute(
             onUserClicked = onUserClicked, onWorkoutClicked = onWorkoutClicked,
             onProgressClicked = onProgressClicked,
-            onNutritionClicked = onNutritionClicked
+            onNutritionClicked = onNutritionClicked,
+            onSettingsClicked = onSettingsClicked,
         )
     }

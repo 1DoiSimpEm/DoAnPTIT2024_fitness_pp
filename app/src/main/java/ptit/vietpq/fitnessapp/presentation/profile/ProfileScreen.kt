@@ -44,6 +44,7 @@ import ptit.vietpq.fitnessapp.ui.common.LoadingDialog
 fun ProfileRoute(
     onBackPressed: () -> Unit,
     onMealListNavigate: () -> Unit,
+    onSettingNavigate: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -74,6 +75,7 @@ fun ProfileRoute(
         uiState = uiState,
         isLoading = isLoading,
         onBackPressed = onBackPressed,
+        onSettingNavigate = onSettingNavigate,
         onMealListNavigate = onMealListNavigate,
         onUpdateProfile = viewModel::updateUser
     )
@@ -86,6 +88,7 @@ fun ProfileScreen(
     isLoading: Boolean,
     onBackPressed: () -> Unit,
     onMealListNavigate: () -> Unit,
+    onSettingNavigate: () -> Unit,
     onUpdateProfile: (
         height: Int,
         weight: Int,
@@ -275,7 +278,9 @@ fun ProfileScreen(
                     onMealListNavigate()
                 }
                 MenuListItem(Icons.Default.Lock, stringResource(R.string.privacy_policy))
-                MenuListItem(Icons.Default.Settings, stringResource(R.string.settings))
+                MenuListItem(Icons.Default.Settings, stringResource(R.string.settings)){
+                    onSettingNavigate()
+                }
                 MenuListItem(Icons.Default.Headphones, stringResource(R.string.help))
                 MenuListItem(Icons.Default.ExitToApp, stringResource(R.string.logout))
             }
@@ -349,7 +354,7 @@ fun MenuListItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(16.dp)
-            .clickable { onClick() },
+            .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(

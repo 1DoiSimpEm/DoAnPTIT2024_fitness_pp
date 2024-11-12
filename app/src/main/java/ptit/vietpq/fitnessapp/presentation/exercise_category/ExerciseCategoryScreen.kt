@@ -150,7 +150,11 @@ fun ExerciseCategoryScreen(
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(uiState.exercises) { exercise ->
+                    items(
+                        items = uiState.exercises,
+                        key = {
+                            it.id
+                        }) { exercise ->
                         ExerciseCard(exercise = exercise, onExerciseClicked = onExerciseClicked)
                     }
                 }

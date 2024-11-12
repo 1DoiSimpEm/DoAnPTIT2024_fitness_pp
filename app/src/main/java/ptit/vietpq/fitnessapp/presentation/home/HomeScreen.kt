@@ -1,6 +1,8 @@
 package ptit.vietpq.fitnessapp.presentation.home
 
+import android.app.Activity
 import android.widget.Space
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,10 +28,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +45,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
 import ptit.vietpq.fitnessapp.presentation.home.component.ExerciseCard
+import ptit.vietpq.fitnessapp.presentation.home.component.ExitDialog
 import ptit.vietpq.fitnessapp.presentation.home.component.HomeFeature
 
 @Composable
@@ -47,6 +54,7 @@ fun HomeRoute(
     onWorkoutClicked: () -> Unit,
     onProgressClicked: () -> Unit,
     onNutritionClicked: () -> Unit,
+    onSettingsClicked: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -55,7 +63,8 @@ fun HomeRoute(
         onUserClicked = onUserClicked,
         onWorkoutClicked = onWorkoutClicked,
         onProgressClicked = onProgressClicked,
-        onNutritionClicked = onNutritionClicked
+        onNutritionClicked = onNutritionClicked,
+        onSettingsClicked = onSettingsClicked,
     )
 }
 
@@ -66,9 +75,27 @@ fun HomeScreen(
     onWorkoutClicked: () -> Unit,
     onProgressClicked: () -> Unit,
     onNutritionClicked: () -> Unit,
+    onSettingsClicked: () -> Unit,
     uiState: HomeUiState,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    var showExitDialog by remember { mutableStateOf(false) }
+
+    if (showExitDialog){
+        ExitDialog(
+            onConfirm = {
+                (context as? Activity)?.finishAffinity()
+            },
+            onDismiss = {
+                showExitDialog = false
+            }
+        )
+    }
+
+    BackHandler {
+        showExitDialog = true
+    }
 
     Scaffold(
         modifier = modifier,
@@ -143,6 +170,9 @@ fun HomeScreen(
                             2 -> {
                                 onNutritionClicked()
                             }
+                            3 -> {
+                                onSettingsClicked()
+                            }
                         }
                     }
                 )
@@ -200,5 +230,6 @@ private fun HomeScreenPreview() {
         uiState = HomeUiState(),
         onWorkoutClicked = {},
         onProgressClicked = {},
-        onNutritionClicked = {})
+        onNutritionClicked = {},
+        onSettingsClicked = {})
 }
