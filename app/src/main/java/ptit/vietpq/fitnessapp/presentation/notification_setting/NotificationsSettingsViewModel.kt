@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import ptit.vietpq.fitnessapp.data.local.sharepref.SharePreferenceProvider
+import ptit.vietpq.fitnessapp.service.NotificationManagerImpl
 import javax.inject.Inject
 
 data class NotificationsSettingsUiState(
@@ -19,6 +20,7 @@ data class NotificationsSettingsUiState(
 
 @HiltViewModel
 class NotificationsSettingsViewModel @Inject constructor(
+    private val notificationManagerImpl: NotificationManagerImpl,
     private val sharePreferenceProvider: SharePreferenceProvider,
 ) : ViewModel() {
 
@@ -63,5 +65,6 @@ class NotificationsSettingsViewModel @Inject constructor(
                 }
             }
         }
+        notificationManagerImpl.setupNotifications()
     }
 }

@@ -75,7 +75,7 @@ fun NotificationsSettingsScreen(
                 title = {
                     Text(
                         modifier = Modifier.padding(start = 16.dp),
-                        text = "Notifications Settings",
+                        text = stringResource(R.string.notifications_settings),
                         style = FitnessTheme.typo.innerBoldSize20LineHeight28,
                         color = Color(0xFF8B80F8)
                     )

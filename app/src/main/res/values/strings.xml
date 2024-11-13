@@ -114,4 +114,14 @@
     <string name="lock_screen">Lock Screen</string>
     <string name="reminders">Reminders</string>
     <string name="language">Language</string>
+    <string name="hide_password">Hide password</string>
+    <string name="show_password">Show password</string>
+    <string name="notifications_settings">Notifications Settings</string>
+    <string name="fitness_reminder">Fitness Reminder</string>
+    <string name="don_t_forget_to_workout_today">Don\'t forget to workout today!</string>
+    <string name="time_for_your_daily_workout">Time for your daily workout!</string>
+    <string name="notifications_restored_to_normal">Notifications restored to normal</string>
+    <string name="notifications_will_be_silent_until">Notifications will be silent until %1$s</string>
+    <string name="do_not_disturb_mode_active">Do not disturb mode Active</string>
+    <string name="do_not_disturb_mode_ended">Do not disturb mode Ended</string>
 </resources>
