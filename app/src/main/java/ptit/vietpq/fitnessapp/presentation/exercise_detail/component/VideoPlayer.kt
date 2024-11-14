@@ -85,7 +85,7 @@ fun VideoPlayer(
                         .crossfade(true)
                         .build(),
                     contentDescription = null,
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Fit
                 )
 
                 // Play Button

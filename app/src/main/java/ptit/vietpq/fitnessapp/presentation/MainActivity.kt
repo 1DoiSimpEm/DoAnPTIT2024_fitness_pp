@@ -15,28 +15,28 @@ import ptit.vietpq.fitnessapp.presentation.home.HomeDestination
 import ptit.vietpq.fitnessapp.presentation.login.LoginDestination
 import ptit.vietpq.fitnessapp.presentation.main.FitnessApp
 import ptit.vietpq.fitnessapp.presentation.meal_planning.MealPlanningDestination
+import ptit.vietpq.fitnessapp.presentation.setup.SetupDestination
+import ptit.vietpq.fitnessapp.presentation.training_program.TrainingProgramDestination
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject lateinit var sharePreferenceProvider: SharePreferenceProvider
+    @Inject
+    lateinit var sharePreferenceProvider: SharePreferenceProvider
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             FitnessApp(
-                HomeDestination
-//                if(sharePreferenceProvider.isSetupFinished){
-//                    HomeDestination
-//                }
-//                else if (sharePreferenceProvider.accessToken.isEmpty()) {
-//                    LoginDestination
-//                } else {
-//                    HomeDestination
-//                }
-                ,
+                if (sharePreferenceProvider.isSetupFinished) {
+                    HomeDestination
+                } else if (sharePreferenceProvider.accessToken.isEmpty()) {
+                    LoginDestination
+                } else {
+                    HomeDestination
+                },
                 modifier = Modifier.fillMaxSize()
             )
         }

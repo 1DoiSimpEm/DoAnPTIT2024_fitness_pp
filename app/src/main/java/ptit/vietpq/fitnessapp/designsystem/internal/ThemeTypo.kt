@@ -2,6 +2,7 @@ package ptit.vietpq.fitnessapp.designsystem.internal
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -211,5 +212,13 @@ class ThemeTypo {
     fontWeight = FontWeight.W700,
     fontSize = 16.sp,
     lineHeight = 24.sp,
+  )
+
+  val markDown = TextStyle(
+    fontFamily = interFontFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 16.sp,
+    lineHeight = 24.sp,
+    color = Color.White,
   )
 }

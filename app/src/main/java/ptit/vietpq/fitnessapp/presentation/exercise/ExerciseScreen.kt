@@ -1,6 +1,7 @@
 package ptit.vietpq.fitnessapp.presentation.exercise
 
 import android.content.Context
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
@@ -12,6 +13,7 @@ import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +25,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -44,8 +49,11 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.google.mlkit.vision.pose.defaults.PoseDetectorOptions
 import ptit.vietpq.fitnessapp.R
+import ptit.vietpq.fitnessapp.presentation.login.LoginRoute
 import ptit.vietpq.fitnessapp.util.GraphicOverlay
+import ptit.vietpq.fitnessapp.util.posedetector.ExerciseInfo
 import ptit.vietpq.fitnessapp.util.posedetector.PoseDetectorProcessor
+import kotlin.math.roundToInt
 
 
 @Composable
@@ -61,110 +69,213 @@ fun PoseDetectionExerciseScreen(
     var lensFacing by remember { mutableIntStateOf(CameraSelector.LENS_FACING_BACK) }
     val context = LocalContext.current
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
-    var exerciseStats by remember { mutableStateOf(ExerciseStats()) }
+    var exerciseInfo by remember {
+        mutableStateOf(
+            ExerciseInfo(
+                 0,
+                  0f,
+                  "",
+                 mapOf(),
+                  ""
+            )
+        )
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         CameraPreview(
             context = context,
             lifecycleOwner = lifecycleOwner,
             lensFacing = lensFacing,
-            onExerciseUpdated = { reps, form ->
-                exerciseStats = exerciseStats.copy(
-                    currentReps = reps,
-                    form = form
-                )
+            onExerciseUpdated = { info ->
+                exerciseInfo = info
             }
         )
 
-        // Overlay UI Elements
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Top Row with Settings and Stats
-            Row(
+            // Main Exercise Info Card
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.TopCenter)
                     .background(
-                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
                         shape = RoundedCornerShape(12.dp)
                     )
                     .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "${exerciseStats.currentReps}",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.reps),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "Form: ${exerciseStats.form}%",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    IconButton(onClick = onSettingsClick) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-            }
-
-            // Bottom Controls
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
-                        shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
-                    )
-                    .padding(16.dp)
-            ) {
+                // Top Row with Exercise Type and Settings
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(
-                        onClick = {
-                            lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) {
-                                CameraSelector.LENS_FACING_FRONT
-                            } else {
-                                CameraSelector.LENS_FACING_BACK
-                            }
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Cameraswitch,
-                            contentDescription = stringResource(R.string.switch_camera),
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-
                     Text(
-                        text = stringResource(R.string.performing_exercise),
-                        style = MaterialTheme.typography.bodyLarge,
+                        text = exerciseInfo.exerciseType.replace("_CLASS", "").lowercase()
+                            .replaceFirstChar { it.uppercase() },
+                        style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Settings"
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    ExerciseMetric(
+                        label = "Reps",
+                        value = exerciseInfo.currentReps.toString()
+                    )
+                    ExerciseMetric(
+                        label = "Form Accuracy",
+                        value = "${exerciseInfo.formAccuracy.roundToInt()}%"
+                    )
+                }
+
+                // Joint Angles
+                if (exerciseInfo.jointAngles.isNotEmpty()) {
+                    Text(
+                        text = "Joint Angles",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        exerciseInfo.jointAngles.forEach { (joint, angle) ->
+                            AngleIndicator(
+                                joint = joint.replace("_", " "),
+                                angle = angle
+                            )
+                        }
+                    }
+                }
+
+                // Form Feedback
+                if (exerciseInfo.formFeedback.isNotEmpty()) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Warning,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                            Text(
+                                text = exerciseInfo.formFeedback,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
+                    }
                 }
             }
+
+            // Camera Controls
+            CameraControls(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                onSwitchCamera = {
+                    lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) {
+                        CameraSelector.LENS_FACING_FRONT
+                    } else {
+                        CameraSelector.LENS_FACING_BACK
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun ExerciseMetric(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+
+@Composable
+private fun AngleIndicator(
+    joint: String,
+    angle: Float,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .background(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = joint,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        Text(
+            text = "${angle.roundToInt()}°",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+    }
+}
+
+@Composable
+private fun CameraControls(
+    modifier: Modifier = Modifier,
+    onSwitchCamera: () -> Unit
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+                shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+            )
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = onSwitchCamera) {
+            Icon(
+                imageVector = Icons.Default.Cameraswitch,
+                contentDescription = "Switch camera"
+            )
         }
     }
 }
@@ -180,7 +291,7 @@ private fun CameraPreview(
     context: Context,
     lifecycleOwner: LifecycleOwner,
     lensFacing: Int,
-    onExerciseUpdated: (reps: Int, form: Float) -> Unit
+    onExerciseUpdated: (ExerciseInfo) -> Unit
 ) {
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     var previewView by remember { mutableStateOf<PreviewView?>(null) }
@@ -213,8 +324,8 @@ private fun CameraPreview(
                 false,
                 true,
                 true
-            ) { rep, form ->
-                onExerciseUpdated(rep, form)
+            ) { exerciseStat ->
+                onExerciseUpdated(exerciseStat)
             }
 
         } catch (e: Exception) {
@@ -276,14 +387,14 @@ private fun CameraPreview(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-//        AndroidView(
-//            factory = { ctx ->
-//                PreviewView(ctx).also {
-//                    previewView = it
-//                }
-//            },
-//            modifier = Modifier.fillMaxSize()
-//        )
+        AndroidView(
+            factory = { ctx ->
+                PreviewView(ctx).also {
+                    previewView = it
+                }
+            },
+            modifier = Modifier.fillMaxSize()
+        )
 
         AndroidView(
             factory = { ctx ->

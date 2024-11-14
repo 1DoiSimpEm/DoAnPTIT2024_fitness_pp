@@ -18,3 +18,12 @@ fun NavGraphBuilder.exerciseDetailRoute(
             onBackPressed = onBackPressed
         )
     }
+
+//fun NavGraphBuilder.exerciseDetailRoute(
+//    onBackPressed : () -> Unit
+//) =
+//    composable(ExerciseDetailDestination.route) {
+//        ExerciseDetailRoute(
+//            onBackPressed = onBackPressed
+//        )
+//    }

@@ -15,6 +15,7 @@ fun NavGraphBuilder.homeGraph(
     onProgressClicked: () -> Unit,
     onNutritionClicked: () -> Unit,
     onSettingsClicked: () -> Unit,
+    onSeeAllClicked: () -> Unit,
 ) =
     composable(route = HomeDestination.route) {
         HomeRoute(
@@ -22,5 +23,6 @@ fun NavGraphBuilder.homeGraph(
             onProgressClicked = onProgressClicked,
             onNutritionClicked = onNutritionClicked,
             onSettingsClicked = onSettingsClicked,
+            onSeeAllClicked = onSeeAllClicked
         )
     }

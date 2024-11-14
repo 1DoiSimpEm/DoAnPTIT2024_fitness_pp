@@ -31,6 +31,8 @@ import ptit.vietpq.fitnessapp.presentation.setting.SettingDestination
 import ptit.vietpq.fitnessapp.presentation.setting.settingGraph
 import ptit.vietpq.fitnessapp.presentation.setup.SetupDestination
 import ptit.vietpq.fitnessapp.presentation.setup.setupGraph
+import ptit.vietpq.fitnessapp.presentation.training_program.TrainingProgramDestination
+import ptit.vietpq.fitnessapp.presentation.training_program.trainingProgramGraph
 
 @Composable
 fun FitnessNavHost(
@@ -118,6 +120,12 @@ fun FitnessNavHost(
                     MealListDestination,
                     MealListDestination.route
                 )
+            },
+            onSeeAllClicked = {
+                onNavigateToDestination(
+                    TrainingProgramDestination,
+                    TrainingProgramDestination.route
+                )
             }
         )
         profileGraph(
@@ -168,6 +176,13 @@ fun FitnessNavHost(
             onBackPressed = onBackPressed,
             onExerciseClicked = { exercise ->
                 navController.navigate(exercise)
+            }
+        )
+
+        trainingProgramGraph(
+            onBackPressed = onBackPressed,
+            onProgramClicked = { trainingProgram ->
+
             }
         )
 

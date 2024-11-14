@@ -2,18 +2,27 @@ package ptit.vietpq.fitnessapp.presentation.setup
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -22,9 +31,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -64,106 +75,117 @@ fun SetupRoute(
 
         SetupState.Idle -> Unit
     }
+    LoadingDialog(isLoading)
     SetupScreen(
-        isLoading = isLoading,
-        onUpdateUserInfo = { age, weight, height, isMale ->
-            viewModel.updateUser(age, weight, height, if (isMale) "Male" else "Female", "")
-        }
+        viewModel =viewModel,
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SetupScreen(
-    isLoading: Boolean,
-    onUpdateUserInfo: (
-        age: Int,
-        weight: Int,
-        height: Int,
-        isMale: Boolean,
-    ) -> Unit,
-    modifier: Modifier = Modifier,
+    viewModel: SetupViewModel,
+    modifier: Modifier = Modifier
 ) {
-    var step by remember { mutableIntStateOf(0) }
-    var age by remember { mutableIntStateOf(18) }
-    var weight by remember { mutableIntStateOf(60) }
-    var height by remember { mutableIntStateOf(170) }
-    var isMale by remember { mutableStateOf(true) }
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     BackHandler {
-        if (step > 0) {
-            step--
-        }
+        viewModel.onEvent(SetupScreenEvent.OnBackPressed)
     }
 
-    LoadingDialog(isLoading = isLoading)
+    LoadingDialog(isLoading = state.isLoading)
 
     Scaffold(
         modifier = modifier,
         containerColor = FitnessTheme.color.black,
         topBar = {
-            TopAppBar(
-                title = { },
-                navigationIcon = {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                    ) {
-                        Image(
-                            modifier = Modifier.align(Alignment.CenterVertically),
-                            painter = painterResource(id = R.drawable.ic_back_arrow),
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.back),
-                            color = FitnessTheme.color.limeGreen,
-                            style = FitnessTheme.typo.innerBoldSize16LineHeight24
-                        )
-                    }
-                },
-                colors = TopAppBarColors(
-                    containerColor = FitnessTheme.color.black,
-                    actionIconContentColor = FitnessTheme.color.limeGreen,
-                    scrolledContainerColor = FitnessTheme.color.black,
-                    titleContentColor = FitnessTheme.color.limeGreen,
-                    navigationIconContentColor = FitnessTheme.color.limeGreen
-                )
+            SetupTopBar(
+                onBackClick = { viewModel.onEvent(SetupScreenEvent.OnBackPressed) },
+                showBack = state.currentStep != SetupStep.Weight
             )
-        },
-        content = { innerPadding ->
-            when (step) {
-                0 -> WeightPicker(
+        }
+    ) { innerPadding ->
+        Column {
+            when (state.currentStep) {
+                SetupStep.Weight -> WeightPicker(
                     innerPadding = innerPadding,
-                    onContinueClick = {
-                        step = 1
-                        weight = it
+                    initialWeight = state.weight,
+                    onContinueClick = { weight ->
+                        viewModel.onEvent(SetupScreenEvent.OnWeightSelected(weight))
                     }
                 )
-
-                1 -> HeightPicker(
+                SetupStep.Height -> HeightPicker(
                     innerPadding = innerPadding,
-                    onContinueClick = {
-                        step = 2
-                        height = it
+                    initialHeight = state.height,
+                    onContinueClick = { height ->
+                        viewModel.onEvent(SetupScreenEvent.OnHeightSelected(height))
                     }
                 )
-
-                2 -> AgePicker(
+                SetupStep.Age -> AgePicker(
                     innerPadding = innerPadding,
-                    onContinueClick = {
-                        step = 3
-                        age = it
+                    initialAge = state.age,
+                    onContinueClick = { age ->
+                        viewModel.onEvent(SetupScreenEvent.OnAgeSelected(age))
                     }
                 )
-
-                3 -> GenderSelection(
+                SetupStep.Gender -> GenderSelection(
                     innerPadding = innerPadding,
-                    onContinueClick = {
-                        isMale = it
-                        onUpdateUserInfo(age, weight, height, isMale)
+                    isMale = state.isMale,
+                    onContinueClick = { isMale ->
+                        viewModel.onEvent(SetupScreenEvent.OnGenderSelected(isMale))
                     }
                 )
             }
+            Spacer(modifier = Modifier.weight(1f))
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SetupTopBar(
+    onBackClick: () -> Unit,
+    showBack: Boolean,
+    modifier: Modifier = Modifier
+) {
+    TopAppBar(
+        title = { },
+        navigationIcon = {
+            if (showBack) {
+                Row(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .clickable(
+                            onClick = onBackClick,
+                            role = Role.Button
+                        ),
+                ) {
+                    Image(
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        painter = painterResource(id = R.drawable.ic_back_arrow),
+                        contentDescription = "Back",
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.back),
+                        color = FitnessTheme.color.limeGreen,
+                        style = FitnessTheme.typo.innerBoldSize16LineHeight24
+                    )
+                }
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = FitnessTheme.color.black,
+            navigationIconContentColor = FitnessTheme.color.limeGreen,
+        ),
+        modifier = modifier
+    )
+}
+
+
+@Preview
+@Composable
+fun SetupScreenPreview() {
+    SetupScreen(
+        viewModel = hiltViewModel()
     )
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +19,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.FoodBank
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,6 +31,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -39,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import ptit.vietpq.fitnessapp.R
 import ptit.vietpq.fitnessapp.data.remote.response.MealPlanResponse
@@ -104,9 +109,13 @@ fun MealPlanListScreen(
                     )
                 },
                 actions = {
-                    Row(modifier = Modifier.clickable {
-                        onMealAddClicked()
-                    }) {
+                    Row(modifier = Modifier
+                        .padding(
+                            end = 16.dp
+                        )
+                        .clickable {
+                            onMealAddClicked()
+                        }) {
                         Icon(imageVector = Icons.Default.FoodBank, contentDescription = null)
 
                     }
@@ -117,29 +126,76 @@ fun MealPlanListScreen(
         contentColor = FitnessTheme.color.primary,
         containerColor = Color(0xFF1E1E1E)
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(
-                    top = innerPadding.calculateTopPadding(),
-                    start = 16.dp,
-                    end = 16.dp,
-                    bottom = 16.dp
-                )
-        ) {
-            item { Spacer(modifier = Modifier.height(24.dp)) }
-
-            items(
-                items = uiState.mealList,
-                key = {
-                    it.id
-                }) { mealPlan ->
-                MealPlanCard(
-                    mealPlan = mealPlan,
-                    onClick = { onMealPlanClick(mealPlan) }
-                )
-                Spacer(modifier = Modifier.height(16.dp))
+        if (uiState.mealList.isNotEmpty()) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        top = innerPadding.calculateTopPadding(),
+                        start = 16.dp,
+                        end = 16.dp,
+                        bottom = 16.dp
+                    )
+            ) {
+                item { Spacer(modifier = Modifier.height(24.dp)) }
+                items(
+                    items = uiState.mealList,
+                    key = {
+                        it.id
+                    }) { mealPlan ->
+                    MealPlanCard(
+                        mealPlan = mealPlan,
+                        onClick = { onMealPlanClick(mealPlan) }
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
+        } else {
+            if (uiState.isLoading) return@Scaffold
+            MealEmpty(
+                onCreateMealClick = onMealAddClicked
+            )
+        }
+    }
+}
+
+@Composable
+private fun MealEmpty(
+    modifier: Modifier = Modifier,
+    onCreateMealClick: () -> Unit
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.Fastfood,
+            contentDescription = null,
+            modifier = Modifier.size(128.dp),
+            tint = FitnessTheme.color.primary
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = stringResource(id = R.string.no_meals),
+            fontSize = 18.sp,
+            color = Color.White,
+            style = FitnessTheme.typo.caption
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(
+            onClick = onCreateMealClick,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = FitnessTheme.color.limeGreen,
+                contentColor = FitnessTheme.color.primary
+            )
+        ) {
+            Text(
+                text = stringResource(id = R.string.create_meal_prompt),
+                style = FitnessTheme.typo.button,
+            )
         }
     }
 }
@@ -213,7 +269,7 @@ private fun PreviewMealPlanList() {
     MealPlanListScreen(
         uiState = MealListUiState(
             false,
-            sampleMealPlans.toImmutableList()
+            persistentListOf()
         ),
         onMealPlanClick = {},
         onBackPressed = {},

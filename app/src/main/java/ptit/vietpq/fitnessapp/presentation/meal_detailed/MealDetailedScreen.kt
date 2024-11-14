@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
+import dev.jeziellago.compose.markdowntext.MarkdownText
 import ptit.vietpq.fitnessapp.R
 
 
@@ -99,12 +100,11 @@ fun MealPlanDisplayScreen(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Split the content by double newlines to separate sections
-            val sections = uiState.mealDescription.split("\n\n")
-            sections.forEach { section ->
-                MealPlanSection(section)
-                Spacer(modifier = Modifier.height(16.dp))
-            }
+            MarkdownText(
+                style = FitnessTheme.typo.markDown,
+                markdown = uiState.mealDescription,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }

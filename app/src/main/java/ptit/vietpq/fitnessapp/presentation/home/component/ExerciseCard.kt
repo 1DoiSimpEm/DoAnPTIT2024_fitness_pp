@@ -38,11 +38,12 @@ import coil.request.ImageRequest
 import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
 import ptit.vietpq.fitnessapp.data.remote.response.ExerciseResponse
+import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramResponse
 
 @Composable
-fun ExerciseCard(
-    onItemClicked : (ExerciseResponse) -> Unit,
-    exerciseResponse: ExerciseResponse,
+fun TrainingProgramCard(
+    onItemClicked : (TrainingProgramResponse) -> Unit,
+    trainingProgram: TrainingProgramResponse,
     modifier: Modifier = Modifier,
     isFavorite: Boolean = false,
 ) {
@@ -58,7 +59,7 @@ fun ExerciseCard(
             .border(2.dp, Color.White, RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
             .clickable {
-                onItemClicked(exerciseResponse)
+                onItemClicked(trainingProgram)
             }
     ) {
         Column(
@@ -72,14 +73,14 @@ fun ExerciseCard(
                 AsyncImage(
                     contentDescription = null,
                     model = ImageRequest.Builder(context).data(
-                        exerciseResponse.image
+                        trainingProgram.imageUrl
                     ).build(),
                     imageLoader = ImageLoader(context),
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxSize(),
                 )
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_star), // Star icon resource
+                    painter = painterResource(id = R.drawable.ic_star),
                     contentDescription = "Favorite",
                     tint = tint,
                     modifier = Modifier
@@ -92,10 +93,10 @@ fun ExerciseCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = exerciseResponse.name,
+                text = trainingProgram.name,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
-                color = Color(0xFFE5FF00), // Light yellow color
+                color = Color(0xFFE5FF00),
                 modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
             )
 
@@ -106,42 +107,42 @@ fun ExerciseCard(
                     .padding(horizontal = 16.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Time Icon and Text
+                // Duration Weeks Icon and Text
                 Row(
                     modifier = Modifier.fillMaxWidth(0.4f),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_timer), // Timer icon resource
-                        contentDescription = "Timer",
-                        tint = Color(0xFF9B6FFF), // Custom purple color
+                        painter = painterResource(id = R.drawable.ic_timer),
+                        contentDescription = "Duration",
+                        tint = Color(0xFF9B6FFF),
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "12 Minutes",
-                        color = Color(0xFFB2B2B2), // Gray text color
+                        text = "${trainingProgram.durationWeeks} Weeks",
+                        color = Color(0xFFB2B2B2),
                         fontSize = 14.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
 
-                // Calories Icon and Text
+                // Difficulty Level Icon and Text
                 Row(
                     modifier = Modifier.fillMaxWidth(0.4f),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_fire), // Fire icon resource
-                        contentDescription = "Calories",
-                        tint = Color(0xFF9B6FFF), // Custom purple color
+                        painter = painterResource(id = R.drawable.ic_fire),
+                        contentDescription = "Difficulty",
+                        tint = Color(0xFF9B6FFF),
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "120 Kcal",
-                        color = Color(0xFFB2B2B2), // Gray text color
+                        text = trainingProgram.difficultyLevel,
+                        color = Color(0xFFB2B2B2),
                         fontSize = 14.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -153,19 +154,19 @@ fun ExerciseCard(
     }
 }
 
-
 @Preview
 @Composable
-private fun ExerciseCardPreview() {
-    ExerciseCard(
+private fun TrainingProgramCardPreview() {
+    TrainingProgramCard(
         onItemClicked = { },
-        ExerciseResponse(
-            name = "Squat Exercise",
-            description = "Squat is a full body exercise that trains primarily the muscles of the thighs, hips and buttocks, quadriceps femoris muscle, hamstrings, as well as strengthening the bones, ligaments and insertion of the tendons throughout the lower body.",
-            videoUrl = "https://www.youtube.com/watch?v=U3Hj5ZCpGzY",
-            image = "https://images.unsplash.com/photo-1619117459660-3b1b3b3b3b3b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyMjIwNzV8MHwxfGFsbHwxf",
-            muscleGroupId = 1,
-            id = 1
+        trainingProgram = TrainingProgramResponse(
+            name = "Full Body Workout",
+            description = "Complete full body workout program for beginners",
+            categoryId = 1,
+            difficultyLevel = "Beginner",
+            durationWeeks = 8,
+            id = 1,
+            imageUrl = "https://example.com/image.jpg"
         ),
     )
 }

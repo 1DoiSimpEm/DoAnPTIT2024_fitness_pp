@@ -1,7 +1,6 @@
 package ptit.vietpq.fitnessapp.presentation.home
 
 import android.app.Activity
-import android.widget.Space
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -15,11 +14,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -32,19 +29,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
-import ptit.vietpq.fitnessapp.presentation.home.component.ExerciseCard
+import ptit.vietpq.fitnessapp.presentation.home.component.TrainingProgramCard
 import ptit.vietpq.fitnessapp.presentation.home.component.ExitDialog
 import ptit.vietpq.fitnessapp.presentation.home.component.HomeFeature
 
@@ -52,6 +50,7 @@ import ptit.vietpq.fitnessapp.presentation.home.component.HomeFeature
 fun HomeRoute(
     onUserClicked: () -> Unit,
     onWorkoutClicked: () -> Unit,
+    onSeeAllClicked:() -> Unit,
     onProgressClicked: () -> Unit,
     onNutritionClicked: () -> Unit,
     onSettingsClicked: () -> Unit,
@@ -65,12 +64,14 @@ fun HomeRoute(
         onProgressClicked = onProgressClicked,
         onNutritionClicked = onNutritionClicked,
         onSettingsClicked = onSettingsClicked,
+        onSeeAllClicked = onSeeAllClicked
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    onSeeAllClicked:() -> Unit,
     onUserClicked: () -> Unit,
     onWorkoutClicked: () -> Unit,
     onProgressClicked: () -> Unit,
@@ -82,7 +83,7 @@ fun HomeScreen(
     val context = LocalContext.current
     var showExitDialog by remember { mutableStateOf(false) }
 
-    if (showExitDialog){
+    if (showExitDialog) {
         ExitDialog(
             onConfirm = {
                 (context as? Activity)?.finishAffinity()
@@ -170,6 +171,7 @@ fun HomeScreen(
                             2 -> {
                                 onNutritionClicked()
                             }
+
                             3 -> {
                                 onSettingsClicked()
                             }
@@ -188,9 +190,12 @@ fun HomeScreen(
                         color = FitnessTheme.color.limeGreen
                     )
                     Text(
-                        modifier = Modifier,
+                        modifier = Modifier.clickable(onClick = onSeeAllClicked),
                         text = stringResource(R.string.see_all),
-                        style = FitnessTheme.typo.body,
+                        style = FitnessTheme.typo.body.copy(
+                            textDecoration = TextDecoration.Underline,
+                            fontStyle = FontStyle.Italic
+                        ),
                         color = FitnessTheme.color.white
                     )
                 }
@@ -210,10 +215,12 @@ fun HomeScreen(
                     columns = GridCells.Fixed(2),
                     modifier = Modifier,
                 ) {
-                    items(uiState.exercises) { item ->
-                        ExerciseCard(
+                    items(items = uiState.exercises, key = {
+                        it.id
+                    }) { item ->
+                        TrainingProgramCard(
                             onItemClicked = { },
-                            exerciseResponse = item
+                            trainingProgram = item
                         )
                     }
                 }
@@ -231,5 +238,6 @@ private fun HomeScreenPreview() {
         onWorkoutClicked = {},
         onProgressClicked = {},
         onNutritionClicked = {},
+        onSeeAllClicked = {},
         onSettingsClicked = {})
 }

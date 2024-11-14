@@ -26,15 +26,19 @@ import androidx.annotation.WorkerThread;
 
 import com.google.common.base.Preconditions;
 import com.google.mlkit.vision.pose.Pose;
+import com.google.mlkit.vision.pose.PoseLandmark;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import ptit.vietpq.fitnessapp.presentation.exercise.ExerciseStats;
+import ptit.vietpq.fitnessapp.util.posedetector.ExerciseInfo;
 import timber.log.Timber;
 
 /**
@@ -200,6 +204,147 @@ public class PoseClassifierProcessor {
         }
 
         return new ExerciseStats(reps, confidence);
+    }
+
+
+    @WorkerThread
+    public ExerciseInfo getExerciseInfo(Pose pose) {
+        Preconditions.checkState(Looper.myLooper() != Looper.getMainLooper());
+        ClassificationResult classification = poseClassifier.classify(pose);
+
+        int reps = 0;
+        float formAccuracy = 0f;
+        String exerciseType = "";
+        Map<String, Float> jointAngles = new HashMap<>();
+        String formFeedback = "";
+
+        if (isStreamMode) {
+            classification = emaSmoothing.getSmoothedResult(classification);
+
+            if (!pose.getAllPoseLandmarks().isEmpty()) {
+                // Get the current exercise type
+                String maxConfidenceClass = classification.getMaxConfidenceClass();
+                exerciseType = maxConfidenceClass;
+                formAccuracy = (classification.getClassConfidence(maxConfidenceClass) /
+                        poseClassifier.confidenceRange()) * 100;
+
+                // Calculate important joint angles based on exercise type
+                if (maxConfidenceClass.equals(PUSHUPS_CLASS)) {
+                    jointAngles = calculatePushupAngles(pose);
+                    formFeedback = generatePushupFeedback(jointAngles);
+                } else if (maxConfidenceClass.equals(SQUATS_CLASS)) {
+                    jointAngles = calculateSquatAngles(pose);
+                    formFeedback = generateSquatFeedback(jointAngles);
+                }
+            }
+
+            // Get current reps
+            for (RepetitionCounter repCounter : repCounters) {
+                if (repCounter.getClassName().equals(exerciseType)) {
+                    reps = repCounter.getNumRepeats();
+                    break;
+                }
+            }
+        }
+
+        return new ExerciseInfo(reps, formAccuracy, exerciseType, jointAngles, formFeedback);
+    }
+
+    private Map<String, Float> calculatePushupAngles(Pose pose) {
+        Map<String, Float> angles = new HashMap<>();
+
+        // Calculate elbow angle
+        PoseLandmark leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER);
+        PoseLandmark leftElbow = pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW);
+        PoseLandmark leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST);
+
+        float elbowAngle = calculateAngle(leftShoulder, leftElbow, leftWrist);
+        angles.put("elbow_angle", elbowAngle);
+
+        // Calculate back angle (relative to ground)
+        PoseLandmark leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP);
+        float backAngle = calculateAngleToGround(leftShoulder, leftHip);
+        angles.put("back_angle", backAngle);
+
+        return angles;
+    }
+
+    private Map<String, Float> calculateSquatAngles(Pose pose) {
+        Map<String, Float> angles = new HashMap<>();
+
+        // Calculate knee angle
+        PoseLandmark leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP);
+        PoseLandmark leftKnee = pose.getPoseLandmark(PoseLandmark.LEFT_KNEE);
+        PoseLandmark leftAnkle = pose.getPoseLandmark(PoseLandmark.LEFT_ANKLE);
+
+        float kneeAngle = calculateAngle(leftHip, leftKnee, leftAnkle);
+        angles.put("knee_angle", kneeAngle);
+
+        // Calculate hip angle
+        PoseLandmark leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER);
+        float hipAngle = calculateAngle(leftShoulder, leftHip, leftKnee);
+        angles.put("hip_angle", hipAngle);
+
+        return angles;
+    }
+
+    private String generatePushupFeedback(Map<String, Float> angles) {
+        StringBuilder feedback = new StringBuilder();
+
+        float elbowAngle = angles.get("elbow_angle");
+        float backAngle = angles.get("back_angle");
+
+        if (elbowAngle < 90) {
+            feedback.append("Go lower in your pushup. ");
+        } else if (elbowAngle > 160) {
+            feedback.append("Push up more to fully extend arms. ");
+        }
+
+        if (backAngle < 170) {
+            feedback.append("Keep your back straight. ");
+        }
+
+        return feedback.length() > 0 ? feedback.toString() : "Good form!";
+    }
+
+    private String generateSquatFeedback(Map<String, Float> angles) {
+        StringBuilder feedback = new StringBuilder();
+
+        float kneeAngle = angles.get("knee_angle");
+        float hipAngle = angles.get("hip_angle");
+
+        if (kneeAngle > 90) {
+            feedback.append("Squat lower. ");
+        } else if (kneeAngle < 45) {
+            feedback.append("Don't squat too low. ");
+        }
+
+        if (hipAngle < 90) {
+            feedback.append("Keep your back more upright. ");
+        }
+
+        return feedback.length() > 0 ? feedback.toString() : "Good form!";
+    }
+
+    private float calculateAngle(PoseLandmark first, PoseLandmark middle, PoseLandmark last) {
+        double angle = Math.toDegrees(
+                Math.atan2(last.getPosition().y - middle.getPosition().y,
+                        last.getPosition().x - middle.getPosition().x) -
+                        Math.atan2(first.getPosition().y - middle.getPosition().y,
+                                first.getPosition().x - middle.getPosition().x));
+
+        angle = Math.abs(angle);
+        if (angle > 180) {
+            angle = 360.0 - angle;
+        }
+        return (float) angle;
+    }
+
+    private float calculateAngleToGround(PoseLandmark top, PoseLandmark bottom) {
+        double angle = Math.toDegrees(
+                Math.atan2(bottom.getPosition().y - top.getPosition().y,
+                        bottom.getPosition().x - top.getPosition().x));
+        return (float) Math.abs(angle);
     }
 
 }

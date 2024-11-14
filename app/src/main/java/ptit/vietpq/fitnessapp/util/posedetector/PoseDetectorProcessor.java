@@ -124,8 +124,8 @@ public class PoseDetectorProcessor
                                     poseClassifierProcessor = new PoseClassifierProcessor(context, isStreamMode);
                                 }
                                 classificationResult = poseClassifierProcessor.getPoseResult(pose);
-                                ExerciseStats exerciseStats = poseClassifierProcessor.getExerciseStats(pose);
-                                exerciseUpdate.onExerciseUpdate(exerciseStats.getCurrentReps(), exerciseStats.getForm());;
+                                ExerciseInfo exerciseInfo = poseClassifierProcessor.getExerciseInfo(pose);
+                                exerciseUpdate.onExerciseUpdate(exerciseInfo);
                             }
                             return new PoseWithClassification(pose, classificationResult);
                         });
@@ -145,8 +145,8 @@ public class PoseDetectorProcessor
                                     poseClassifierProcessor = new PoseClassifierProcessor(context, isStreamMode);
                                 }
                                 classificationResult = poseClassifierProcessor.getPoseResult(pose);
-                                ExerciseStats exerciseStats = poseClassifierProcessor.getExerciseStats(pose);
-                                exerciseUpdate.onExerciseUpdate(exerciseStats.getCurrentReps(), exerciseStats.getForm());
+                                ExerciseInfo exerciseInfo = poseClassifierProcessor.getExerciseInfo(pose);
+                                exerciseUpdate.onExerciseUpdate(exerciseInfo);
                             }
                             return new PoseWithClassification(pose, classificationResult);
                         });
@@ -156,16 +156,16 @@ public class PoseDetectorProcessor
     protected void onSuccess(
             @NonNull PoseWithClassification poseWithClassification,
             @NonNull GraphicOverlay graphicOverlay) {
-        graphicOverlay.add(
-                new PoseGraphic(
-                        graphicOverlay,
-                        poseWithClassification.pose,
-                        showInFrameLikelihood,
-                        visualizeZ,
-                        rescaleZForVisualization,
-                        poseWithClassification.classificationResult
-                )
-        );
+//        graphicOverlay.add(
+//                new PoseGraphic(
+//                        graphicOverlay,
+//                        poseWithClassification.pose,
+//                        showInFrameLikelihood,
+//                        visualizeZ,
+//                        rescaleZForVisualization,
+//                        poseWithClassification.classificationResult
+//                )
+//        );
     }
 
     @Override
@@ -179,7 +179,4 @@ public class PoseDetectorProcessor
         return true;
     }
 
-    public interface ExerciseUpdate {
-        void onExerciseUpdate(Integer rep, Float form);
-    }
 }

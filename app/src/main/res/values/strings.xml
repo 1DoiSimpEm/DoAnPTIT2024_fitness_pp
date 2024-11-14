@@ -124,4 +124,16 @@
     <string name="notifications_will_be_silent_until">Notifications will be silent until %1$s</string>
     <string name="do_not_disturb_mode_active">Do not disturb mode Active</string>
     <string name="do_not_disturb_mode_ended">Do not disturb mode Ended</string>
+    <string name="paused">Paused</string>
+    <string name="time_s_up">Time\'s up!</string>
+    <string name="set_timer">Set Timer</string>
+    <string name="stopwatch">Stopwatch</string>
+    <string name="timer">Timer</string>
+    <string name="set_timer_duration">Set Timer Duration</string>
+    <string name="cancel">Cancel</string>
+    <string name="no_meals">No meals!</string>
+    <string name="create_meal_prompt">Create meal</string>
+    <string name="weight_picker_content_description">Pick your weight</string>
+    <string name="height_picker_content_description">Pick your height</string>
+    <string name="continue_button_content_description">Continue the flow by presisng continue button</string>
 </resources>

@@ -1,4 +1,5 @@
-package ptit.vietpq.fitnessapp.presentation.exercise_category
+package ptit.vietpq.fitnessapp.presentation.training_program
+
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
@@ -11,17 +12,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.FitnessCenter
+import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,45 +42,46 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
 import kotlinx.collections.immutable.persistentListOf
 import ptit.vietpq.fitnessapp.R
-import ptit.vietpq.fitnessapp.data.remote.response.ExerciseResponse
-import ptit.vietpq.fitnessapp.data.remote.response.MuscleGroupResponse
+import ptit.vietpq.fitnessapp.data.remote.response.TrainingCategoryResponse
+import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramResponse
 import ptit.vietpq.fitnessapp.ui.common.LoadingAnimation
 
 @Composable
-fun ExerciseCategoryRoute(
+fun TrainingProgramRoute(
     onBackPressed: () -> Unit,
-    onExerciseClicked: (ExerciseResponse) -> Unit,
-    viewModel: ExerciseCategoryViewModel = hiltViewModel()
+    onProgramClicked: (TrainingProgramResponse) -> Unit,
+    viewModel: TrainingProgramViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    ExerciseCategoryScreen(
+    TrainingProgramScreen(
         uiState = uiState,
         onBackPressed = onBackPressed,
-        onExerciseClicked = onExerciseClicked,
+        onProgramClicked = onProgramClicked,
         onCategorySelected = viewModel::updateSelectedCategory
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExerciseCategoryScreen(
-    uiState: ExerciseCategoryUiState,
+fun TrainingProgramScreen(
+    uiState: TrainingProgramUiState,
     onBackPressed: () -> Unit,
     onCategorySelected: (Int) -> Unit,
-    onExerciseClicked: (ExerciseResponse) -> Unit,
+    onProgramClicked: (TrainingProgramResponse) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -155,11 +158,11 @@ fun ExerciseCategoryScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(
-                        items = uiState.exercises,
+                        items = uiState.programs,
                         key = {
                             it.id
-                        }) { exercise ->
-                        ExerciseCard(exercise = exercise, onExerciseClicked = onExerciseClicked)
+                        }) { program ->
+                        TrainingProgramCard(program = program, onProgramClicked = onProgramClicked)
                     }
                 }
             }
@@ -167,9 +170,10 @@ fun ExerciseCategoryScreen(
     }
 }
 
+
 @Composable
 private fun CategoryChip(
-    categoryResponse: MuscleGroupResponse,
+    categoryResponse: TrainingCategoryResponse,
     isSelected: Boolean,
     onClick: (Int) -> Unit
 ) {
@@ -199,111 +203,167 @@ private fun CategoryChip(
 }
 
 @Composable
-private fun ExerciseCard(
-    exercise: ExerciseResponse,
-    onExerciseClicked: (ExerciseResponse) -> Unit
+private fun TrainingProgramCard(
+    program: TrainingProgramResponse,
+    onProgramClicked: (TrainingProgramResponse) -> Unit
 ) {
     val context = LocalContext.current
     var isImageLoading by remember { mutableStateOf(true) }
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                onExerciseClicked(exercise)
-            },
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable { onProgramClicked(program) },
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFFFFFFF)
         ),
-        shape = RoundedCornerShape(12.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(120.dp)
+        Column(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            AsyncImage(
+            // Image Section
+            Box(
                 modifier = Modifier
-                    .width(120.dp)
-                    .fillMaxHeight(),
-                contentDescription = null,
-                model = ImageRequest.Builder(context).data(
-                    exercise.image
-                ).build(),
-                imageLoader = ImageLoader(context),
-                contentScale = ContentScale.Fit,
-                onLoading = {
-                    isImageLoading = true
-                },
-                onSuccess = {
-                    isImageLoading = false
-                },
-                onError =  {
-                    isImageLoading = false
-                }
-            )
-
-            LoadingAnimation(showAnim = isImageLoading)
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .height(180.dp)
             ) {
-                Text(
-                    text = exercise.name,
-                    style = FitnessTheme.typo.innerBoldSize16LineHeight24,
-                    color = Color.Black
+                AsyncImage(
+                    modifier = Modifier.fillMaxSize(),
+                    contentDescription = null,
+                    model = ImageRequest.Builder(context)
+                        .data(program.imageUrl)
+                        .crossfade(true)
+                        .build(),
+                    contentScale = ContentScale.Fit,
+                    onLoading = {
+                        isImageLoading = true
+                    },
+                    onSuccess = {
+                        isImageLoading = false
+                    },
+                    onError =  {
+                        isImageLoading = false
+                    }
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = exercise.description,
-                    style = FitnessTheme.typo.body4,
-                    color = Color.Gray
-                )
+
+                LoadingAnimation(showAnim = isImageLoading)
+
+                // Difficulty Badge
+                Surface(
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .align(Alignment.TopStart),
+                    color = when (program.difficultyLevel.lowercase()) {
+                        "beginner" -> Color(0xFF4CAF50)
+                        "intermediate" -> Color(0xFFFFA000)
+                        else -> Color(0xFFE53935)
+                    },
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Text(
+                        text = program.difficultyLevel,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        style = FitnessTheme.typo.caption.copy(color = Color.White)
+                    )
+                }
             }
 
-            // Star Icon
-            Icon(
-                painter = painterResource(id = R.drawable.ic_star),
-                contentDescription = "Favorite",
+            // Content Section
+            Column(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(16.dp)
-                    .size(24.dp),
-                tint = FitnessTheme.color.limeGreen
-            )
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = program.name,
+                        style = FitnessTheme.typo.innerBoldSize16LineHeight24,
+                        color = Color.Black,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+
+//                    Icon(
+//                        painter = painterResource(id = R.drawable.ic_star),
+//                        contentDescription = "Favorite",
+//                        modifier = Modifier.size(24.dp),
+//                        tint = FitnessTheme.color.limeGreen
+//                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = program.description,
+                    style = FitnessTheme.typo.body4,
+                    color = Color.Gray,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Program Details Row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // Duration
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Schedule,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = FitnessTheme.color.limeGreen
+                        )
+                        Text(
+                            text = "${program.durationWeeks} weeks",
+                            style = FitnessTheme.typo.caption,
+                            color = Color.Gray
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
 @Preview
 @Composable
-private fun PreviewExerciseCategory() {
-    val previewState = ExerciseCategoryUiState(
-        isLoading = true,
-        categories = persistentListOf(
-            MuscleGroupResponse(
-                id = 1,
-                name = "Beginner",
+private fun PreviewTrainingProgramScreen() {
+    TrainingProgramScreen(
+        uiState = TrainingProgramUiState(
+            categories = persistentListOf(
+                TrainingCategoryResponse(1, "lmao", "Beginner"),
+                TrainingCategoryResponse(2, "Intermediate", "Intermediate"),
             ),
-            MuscleGroupResponse(
-                id = 2,
-                name = "Intermediate"
-            ),
-            MuscleGroupResponse(
-                id = 3,
-                name = "Advanced"
-            )
-        ),
-        selectedCategory = "Beginner",
-        exercises = persistentListOf(
-            ExerciseResponse("1", "1", "1", "1", 1, 1)
-        )
-    )
+            programs = persistentListOf(
+                TrainingProgramResponse(
+                    1,
+                    "Beginner Program",
+                    "https://via.placeholder.com/150",
+                    1,
+                    "This is a beginner program",
+                    4,
+                    "11"
+                ),
 
-    ExerciseCategoryScreen(
-        uiState = previewState,
-        onBackPressed = { /* Handle back navigation */ },
-        onCategorySelected = {/*Handle category selected */ },
-        onExerciseClicked = {/* */ }
+                ),
+            selectedCategory = "Beginner",
+            isLoading = false
+        ),
+        onBackPressed = {},
+        onCategorySelected = {},
+        onProgramClicked = {}
     )
 }

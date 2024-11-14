@@ -180,5 +180,6 @@ dependencies {
     implementation (libs.exoplayer.core)
     implementation (libs.exoplayer.ui)
     implementation(libs.gson)
+    implementation ("com.github.jeziellago:compose-markdown:0.5.4")
 
 }

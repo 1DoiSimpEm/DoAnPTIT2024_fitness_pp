@@ -36,12 +36,13 @@ import ptit.vietpq.fitnessapp.R
 @Composable
 fun GenderSelection(
     innerPadding: PaddingValues,
+    isMale : Boolean,
     onContinueClick: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ){
     var isMaleSelected by remember {
         mutableStateOf(
-            true
+            isMale
         )
     }
     Column(

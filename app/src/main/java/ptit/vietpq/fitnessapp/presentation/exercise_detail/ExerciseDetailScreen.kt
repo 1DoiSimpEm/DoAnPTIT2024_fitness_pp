@@ -28,20 +28,18 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
-import ptit.vietpq.fitnessapp.data.remote.response.ExerciseResponse
+import ptit.vietpq.fitnessapp.presentation.exercise_detail.component.TimerStopwatchSection
 import ptit.vietpq.fitnessapp.presentation.exercise_detail.component.VideoPlayer
 
 
@@ -53,7 +51,14 @@ fun ExerciseDetailRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     ExerciseDetailScreen(
         uiState = uiState,
-        onBackPressed = onBackPressed
+        onBackPressed = onBackPressed,
+        onTimerStart = viewModel::startTimer,
+        onTimerPause = viewModel::pauseTimer,
+        onTimerReset = viewModel::resetTimer,
+        onStopwatchStart = viewModel::startStopwatch,
+        onStopwatchPause = viewModel::pauseStopwatch,
+        onStopwatchReset = viewModel::resetStopwatch,
+        onDurationSelected = viewModel::setDuration
     )
 }
 
@@ -63,6 +68,13 @@ fun ExerciseDetailRoute(
 fun ExerciseDetailScreen(
     uiState: ExerciseDetailUiState,
     onBackPressed: () -> Unit,
+    onTimerStart: () -> Unit,
+    onTimerPause: () -> Unit,
+    onTimerReset: () -> Unit,
+    onStopwatchStart: () -> Unit,
+    onStopwatchPause: () -> Unit,
+    onStopwatchReset: () -> Unit,
+    onDurationSelected: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val chipColor =
@@ -125,9 +137,25 @@ fun ExerciseDetailScreen(
                 videoUrl = uiState.exercise.videoUrl,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1f )
                     .padding(16.dp)
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TimerStopwatchSection(
+                timerState = uiState.timerState,
+                stopwatchState = uiState.stopwatchState,
+                selectedDuration = uiState.selectedDuration,
+                onTimerStart = onTimerStart,
+                onTimerPause = onTimerPause,
+                onTimerReset = onTimerReset,
+                onStopwatchStart = onStopwatchStart,
+                onStopwatchPause = onStopwatchPause,
+                onStopwatchReset = onStopwatchReset,
+                onDurationSelected = onDurationSelected
+            )
+
 
             Card(
                 modifier = Modifier
@@ -218,25 +246,5 @@ private fun Chip(
         colors = colors,
         shape = RoundedCornerShape(50),
         border = null
-    )
-}
-
-@Preview
-@Composable
-private fun ExerciseDetailScreenPreview() {
-    val uiState = remember {
-        ExerciseDetailUiState(
-            exercise = ExerciseResponse(
-                id = 1,
-                name = "Push Up",
-                description = "Push up is a great exercise for your chest and triceps",
-                videoUrl = "https://www.youtube.com/watch?v=0d0Wv0k8Zk4"
-            ),
-            isFavorite = false
-        )
-    }
-    ExerciseDetailScreen(
-        uiState = uiState,
-        onBackPressed = {}
     )
 }
