@@ -17,3 +17,36 @@ data class TrainingProgramExerciseResponse(
     @Json(name = "id") val id: Int,
     @Json(name = "exercise") val exercise: ExerciseResponse
 )
+
+fun TrainingProgramExerciseResponse.toModel() = TrainingProgramExercise(
+    trainingProgramId = trainingProgramId,
+    exerciseId = exerciseId,
+    sets = sets,
+    reps = reps,
+    duration = duration,
+    restTime = restTime,
+    order = order,
+    id = id,
+    exerciseName = exercise.name,
+    exerciseDescription = exercise.description,
+    exerciseVideoUrl = exercise.videoUrl,
+    exerciseImage = exercise.image,
+    exerciseMuscleGroupId = exercise.muscleGroupId
+)
+
+@Serializable
+data class TrainingProgramExercise(
+    val trainingProgramId: Int,
+    val exerciseId: Int,
+    val sets: Int,
+    val reps: Int,
+    val duration: Int,
+    val restTime: Int,
+    val order: Int,
+    val id: Int,
+    val exerciseName: String,
+    val exerciseDescription: String,
+    val exerciseVideoUrl: String,
+    val exerciseImage: String,
+    val exerciseMuscleGroupId: Int
+)

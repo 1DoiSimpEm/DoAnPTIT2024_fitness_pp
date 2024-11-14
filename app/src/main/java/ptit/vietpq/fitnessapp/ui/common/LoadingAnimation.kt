@@ -19,7 +19,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun LoadingAnimation(
-    showAnim: Boolean
+    showAnim: Boolean,
+    modifier: Modifier = Modifier
 ) {
     val animation = rememberInfiniteTransition(label = "")
     val progress by animation.animateFloat(
@@ -32,7 +33,7 @@ fun LoadingAnimation(
     )
     if (showAnim) {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .size(60.dp)
                 .scale(progress)
                 .alpha(1f - progress)

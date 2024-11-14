@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.util.PatternsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
+import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
 import ptit.vietpq.fitnessapp.extension.toast
 import ptit.vietpq.fitnessapp.ui.common.LoadingDialog

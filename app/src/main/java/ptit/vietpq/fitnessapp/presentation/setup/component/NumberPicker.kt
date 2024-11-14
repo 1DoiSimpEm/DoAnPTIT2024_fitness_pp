@@ -1,7 +1,6 @@
 package ptit.vietpq.fitnessapp.presentation.setup.component
 
 import android.annotation.SuppressLint
-import android.widget.Space
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -22,9 +21,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.chargemap.compose.numberpicker.NumberPicker
-import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
+import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
-import ptit.vietpq.fitnessapp.presentation.setup.SetupStep
 
 // Base picker layout to avoid duplication
 @Composable

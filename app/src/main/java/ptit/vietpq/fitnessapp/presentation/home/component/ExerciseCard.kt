@@ -35,9 +35,8 @@ import androidx.compose.ui.unit.sp
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
+import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
-import ptit.vietpq.fitnessapp.data.remote.response.ExerciseResponse
 import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramResponse
 
 @Composable

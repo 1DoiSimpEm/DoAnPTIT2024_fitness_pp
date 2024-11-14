@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
+import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
 
 abstract class ThemeColors {
   abstract val background: Color

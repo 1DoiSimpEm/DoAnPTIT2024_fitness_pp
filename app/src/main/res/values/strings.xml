@@ -136,4 +136,5 @@
     <string name="weight_picker_content_description">Pick your weight</string>
     <string name="height_picker_content_description">Pick your height</string>
     <string name="continue_button_content_description">Continue the flow by presisng continue button</string>
+    <string name="intermediate">Intermediate</string>
 </resources>

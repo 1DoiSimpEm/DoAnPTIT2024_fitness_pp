@@ -30,6 +30,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FitnessApp(
+//                ExerciseDestination,
                 if (sharePreferenceProvider.isSetupFinished) {
                     HomeDestination
                 } else if (sharePreferenceProvider.accessToken.isEmpty()) {

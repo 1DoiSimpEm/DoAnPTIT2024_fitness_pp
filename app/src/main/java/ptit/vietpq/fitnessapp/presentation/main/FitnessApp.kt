@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
+import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
 import kotlinx.collections.immutable.ImmutableList
 import ptit.vietpq.fitnessapp.presentation.main.navigation.FitnessNavHost
 import ptit.vietpq.fitnessapp.presentation.main.navigation.TopLevelDestination
@@ -34,7 +34,7 @@ import ptit.vietpq.fitnessapp.ui.theme.FitnessAppTheme
 fun FitnessApp(
   startDestination: FitnessNavigationDestination,
   modifier: Modifier = Modifier,
-  appState: QrCodeAppState = rememberQrAppState(),
+  appState: FitnessAppState = rememberFitnessAppState(),
   ) {
 
   FitnessAppTheme {

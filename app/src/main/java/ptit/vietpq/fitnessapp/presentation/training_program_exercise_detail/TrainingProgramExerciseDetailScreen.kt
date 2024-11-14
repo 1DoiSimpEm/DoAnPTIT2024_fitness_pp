@@ -1,4 +1,4 @@
-package ptit.vietpq.fitnessapp.presentation.exercise_detail
+package ptit.vietpq.fitnessapp.presentation.training_program_exercise_detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -40,17 +40,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
+import ptit.vietpq.fitnessapp.extension.withUrl
 import ptit.vietpq.fitnessapp.presentation.exercise_detail.component.TimerStopwatchSection
 import ptit.vietpq.fitnessapp.presentation.exercise_detail.component.VideoPlayer
 
-
 @Composable
-fun ExerciseDetailRoute(
+fun TrainingProgramExerciseDetailRoute(
     onBackPressed: () -> Unit,
-    viewModel: ExerciseDetailViewModel = hiltViewModel()
+    viewModel: TrainingProgramExerciseDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    ExerciseDetailScreen(
+    TrainingProgramExerciseDetailScreen(
         uiState = uiState,
         onBackPressed = onBackPressed,
         onTimerStart = viewModel::startTimer,
@@ -59,15 +59,14 @@ fun ExerciseDetailRoute(
         onStopwatchStart = viewModel::startStopwatch,
         onStopwatchPause = viewModel::pauseStopwatch,
         onStopwatchReset = viewModel::resetStopwatch,
-        onDurationSelected = viewModel::setDuration
     )
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExerciseDetailScreen(
-    uiState: ExerciseDetailUiState,
+fun TrainingProgramExerciseDetailScreen(
+    uiState: TrainingProgramExerciseDetailUiState,
     onBackPressed: () -> Unit,
     onTimerStart: () -> Unit,
     onTimerPause: () -> Unit,
@@ -75,7 +74,6 @@ fun ExerciseDetailScreen(
     onStopwatchStart: () -> Unit,
     onStopwatchPause: () -> Unit,
     onStopwatchReset: () -> Unit,
-    onDurationSelected: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val chipColor =
@@ -94,7 +92,7 @@ fun ExerciseDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        uiState.exercise.name,
+                        uiState.exercise.exerciseName,
                         color = FitnessTheme.color.primary
                     )
                 },
@@ -134,8 +132,8 @@ fun ExerciseDetailScreen(
                 .background(FitnessTheme.color.blackBg)
         ) {
             VideoPlayer(
-                thumbnailUrl = uiState.exercise.image,
-                videoUrl = uiState.exercise.videoUrl,
+                thumbnailUrl = uiState.exercise.exerciseImage.withUrl(),
+                videoUrl = uiState.exercise.exerciseVideoUrl.withUrl(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
@@ -147,14 +145,13 @@ fun ExerciseDetailScreen(
             TimerStopwatchSection(
                 timerState = uiState.timerState,
                 stopwatchState = uiState.stopwatchState,
-                selectedDuration = uiState.selectedDuration,
+                selectedDuration = uiState.exercise.duration.toLong(),
                 onTimerStart = onTimerStart,
                 onTimerPause = onTimerPause,
                 onTimerReset = onTimerReset,
                 onStopwatchStart = onStopwatchStart,
                 onStopwatchPause = onStopwatchPause,
                 onStopwatchReset = onStopwatchReset,
-                onDurationSelected = onDurationSelected
             )
 
 
@@ -173,14 +170,14 @@ fun ExerciseDetailScreen(
                         .padding(16.dp)
                 ) {
                     Text(
-                        text = uiState.exercise.name,
+                        text = uiState.exercise.exerciseName,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = FitnessTheme.color.blackBg
                     )
 
                     Text(
-                        text = uiState.exercise.description,
+                        text = uiState.exercise.exerciseDescription,
                         fontSize = 14.sp,
                         color = FitnessTheme.color.blackBg.copy(alpha = 0.7f),
                         modifier = Modifier.padding(vertical = 8.dp)
@@ -204,7 +201,7 @@ fun ExerciseDetailScreen(
                                     )
                                 }
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("12 Minutes", color = Color.White)
+                                Text("${uiState.exercise.duration} Seconds", color = Color.White)
                             }
                         )
 
@@ -223,7 +220,7 @@ fun ExerciseDetailScreen(
                                     )
                                 }
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text(text = stringResource(R.string.intermediate), color = Color.White)
+                                Text(stringResource(id = R.string.intermediate), color = Color.White)
                             }
                         )
                     }

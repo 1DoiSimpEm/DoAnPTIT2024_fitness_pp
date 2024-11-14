@@ -1,4 +1,4 @@
-package com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem
+package ptit.vietpq.fitnessapp.designsystem
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable

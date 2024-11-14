@@ -50,7 +50,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
+import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
 import kotlinx.collections.immutable.persistentListOf
 import ptit.vietpq.fitnessapp.R
 import ptit.vietpq.fitnessapp.data.remote.response.ExerciseResponse
@@ -237,12 +237,15 @@ private fun ExerciseCard(
                 onSuccess = {
                     isImageLoading = false
                 },
-                onError =  {
+                onError = {
                     isImageLoading = false
                 }
             )
 
-            LoadingAnimation(showAnim = isImageLoading)
+            LoadingAnimation(
+                showAnim = isImageLoading,
+                modifier = Modifier.align(Alignment.CenterVertically)
+            )
 
             Column(
                 modifier = Modifier

@@ -2,7 +2,9 @@ package ptit.vietpq.fitnessapp.data.remote.response
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
+@Serializable
 @JsonClass(generateAdapter = true)
 data class TrainingProgramResponse(
     @Json(name = "id") val id: Int,

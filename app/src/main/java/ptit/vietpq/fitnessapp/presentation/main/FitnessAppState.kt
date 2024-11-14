@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.update
 import ptit.vietpq.fitnessapp.presentation.login.LoginDestination
 
 @Composable
-fun rememberQrAppState(
+fun rememberFitnessAppState(
   startDestination: FitnessNavigationDestination = LoginDestination,
   snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
   coroutineScope: CoroutineScope = rememberCoroutineScope(),
@@ -33,7 +33,7 @@ fun rememberQrAppState(
   navController,
   startDestination,
 ) {
-  QrCodeAppState(
+  FitnessAppState(
     snackbarHostState = snackbarHostState,
     coroutineScope = coroutineScope,
     navController = navController,
@@ -42,7 +42,7 @@ fun rememberQrAppState(
 }
 
 @Stable
-class QrCodeAppState(
+class FitnessAppState(
   val snackbarHostState: SnackbarHostState,
   val coroutineScope: CoroutineScope,
   val navController: NavHostController,

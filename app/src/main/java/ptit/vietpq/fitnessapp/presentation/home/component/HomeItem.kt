@@ -1,8 +1,6 @@
 package ptit.vietpq.fitnessapp.presentation.home.component
 
-import android.widget.Space
 import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -18,7 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.qrcode.qrscanner.barcode.barcodescan.qrreader.designsystem.FitnessTheme
+import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
 
 

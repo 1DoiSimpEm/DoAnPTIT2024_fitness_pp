@@ -6,6 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramExerciseResponse
+import ptit.vietpq.fitnessapp.data.remote.response.toModel
 import ptit.vietpq.fitnessapp.presentation.exercise.exerciseGraph
 import ptit.vietpq.fitnessapp.presentation.exercise_category.ExerciseCategoryDestination
 import ptit.vietpq.fitnessapp.presentation.exercise_category.exerciseCategoryGraph
@@ -14,7 +16,6 @@ import ptit.vietpq.fitnessapp.presentation.home.HomeDestination
 import ptit.vietpq.fitnessapp.presentation.home.homeGraph
 import ptit.vietpq.fitnessapp.presentation.login.loginGraph
 import ptit.vietpq.fitnessapp.presentation.main.navigation.destination.FitnessNavigationDestination
-import ptit.vietpq.fitnessapp.presentation.meal_detailed.MealDetailedDestination
 import ptit.vietpq.fitnessapp.presentation.meal_detailed.MealDetailedUiState
 import ptit.vietpq.fitnessapp.presentation.meal_detailed.mealDetailedGraph
 import ptit.vietpq.fitnessapp.presentation.meal_planning.MealPlanningDestination
@@ -33,6 +34,8 @@ import ptit.vietpq.fitnessapp.presentation.setup.SetupDestination
 import ptit.vietpq.fitnessapp.presentation.setup.setupGraph
 import ptit.vietpq.fitnessapp.presentation.training_program.TrainingProgramDestination
 import ptit.vietpq.fitnessapp.presentation.training_program.trainingProgramGraph
+import ptit.vietpq.fitnessapp.presentation.training_program_exercise.trainingProgramExerciseRoute
+import ptit.vietpq.fitnessapp.presentation.training_program_exercise_detail.trainingProgramExerciseDetailRoute
 
 @Composable
 fun FitnessNavHost(
@@ -182,8 +185,18 @@ fun FitnessNavHost(
         trainingProgramGraph(
             onBackPressed = onBackPressed,
             onProgramClicked = { trainingProgram ->
-
+                navController.navigate(trainingProgram)
             }
+        )
+        trainingProgramExerciseRoute(
+            onBackPressed = onBackPressed,
+            onExerciseSelected = { exercise ->
+                navController.navigate(exercise.toModel())
+            }
+        )
+
+        trainingProgramExerciseDetailRoute(
+            onBackPressed = onBackPressed
         )
 
         settingGraph(
