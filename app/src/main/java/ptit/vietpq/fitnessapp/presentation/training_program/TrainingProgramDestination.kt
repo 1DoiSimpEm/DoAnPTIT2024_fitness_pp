@@ -4,7 +4,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramResponse
 import ptit.vietpq.fitnessapp.presentation.main.navigation.destination.FitnessNavigationDestination
-import ptit.vietpq.fitnessapp.presentation.setup.SetupRoute
 
 data object TrainingProgramDestination : FitnessNavigationDestination {
     override val route: String = "training_program_route"

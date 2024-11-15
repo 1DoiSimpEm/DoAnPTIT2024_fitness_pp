@@ -137,4 +137,14 @@
     <string name="height_picker_content_description">Pick your height</string>
     <string name="continue_button_content_description">Continue the flow by presisng continue button</string>
     <string name="intermediate">Intermediate</string>
+    <string name="sets">Sets</string>
+    <string name="duration">Duration</string>
+    <string name="rest">Rest</string>
+    <string name="sec">%1$s sec</string>
+    <string name="min">%1$s min</string>
+    <string name="exercises">Exercises</string>
+    <string name="total_time">Total Time</string>
+    <string name="total_sets">Total Sets</string>
+    <string name="exercise">%1$s / %2$s Exercise</string>
+    <string name="find_your_next_workout">Find your next workout</string>
 </resources>
