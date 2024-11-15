@@ -307,7 +307,7 @@ private fun MetricsRow(exercise: TrainingProgramExerciseResponse) {
         )
         MetricItem(
             icon = Icons.Default.Timer,
-            value = stringResource(R.string.min, exercise.duration),
+            value = stringResource(R.string.sec, exercise.duration),
             label = stringResource(R.string.duration)
         )
         MetricItem(
@@ -405,7 +405,7 @@ private fun StatisticsRow(
         )
         StatisticItem(
             value = stringResource(
-                R.string.min,
+                R.string.sec,
                 exercises.sumOf { it.duration }
             ),
             label = stringResource(R.string.total_time),

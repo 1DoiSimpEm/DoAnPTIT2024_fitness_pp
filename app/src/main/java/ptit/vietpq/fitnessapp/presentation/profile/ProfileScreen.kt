@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -273,11 +274,11 @@ fun ProfileScreen(
                 MenuListItem(Icons.Default.Person, stringResource(R.string.profile)) {
                     isUpdatingState = !isUpdatingState
                 }
-                MenuListItem(Icons.Default.Fastfood, stringResource(R.string.meal_plans)) {
-                    onMealListNavigate()
-                }
+//                MenuListItem(Icons.Default.Fastfood, stringResource(R.string.meal_plans)) {
+//                    onMealListNavigate()
+//                }
                 MenuListItem(Icons.Default.Lock, stringResource(R.string.privacy_policy))
-                MenuListItem(Icons.Default.Settings, stringResource(R.string.settings)){
+                MenuListItem(Icons.Default.Settings, stringResource(R.string.settings)) {
                     onSettingNavigate()
                 }
                 MenuListItem(Icons.Default.Headphones, stringResource(R.string.help))
@@ -375,4 +376,18 @@ fun MenuListItem(
             tint = Color.White
         )
     }
+}
+
+@Preview
+@Composable
+private fun ProfileScreenPreview() {
+    ProfileScreen(
+        uiState = ProfileUiState.Empty,
+        isLoading = false,
+        onBackPressed = {},
+        onMealListNavigate = {},
+        onSettingNavigate = {},
+        onUpdateProfile = { _, _, _, _ -> },
+
+        )
 }

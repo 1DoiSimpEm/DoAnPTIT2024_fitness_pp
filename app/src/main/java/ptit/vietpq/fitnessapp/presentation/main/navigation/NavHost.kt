@@ -128,7 +128,8 @@ fun FitnessNavHost(
                     TrainingProgramDestination,
                     TrainingProgramDestination.route
                 )
-            }
+            },
+            onRecommendedItemClicked = navController::navigate
         )
         profileGraph(
             onBackPressed = onBackPressed,

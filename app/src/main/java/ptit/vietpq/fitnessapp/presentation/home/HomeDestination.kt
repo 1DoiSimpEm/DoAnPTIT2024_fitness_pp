@@ -2,6 +2,7 @@ package ptit.vietpq.fitnessapp.presentation.home
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramResponse
 import ptit.vietpq.fitnessapp.presentation.main.navigation.destination.FitnessNavigationDestination
 
 data object HomeDestination : FitnessNavigationDestination {
@@ -16,6 +17,7 @@ fun NavGraphBuilder.homeGraph(
     onNutritionClicked: () -> Unit,
     onSettingsClicked: () -> Unit,
     onSeeAllClicked: () -> Unit,
+    onRecommendedItemClicked: (TrainingProgramResponse) -> Unit,
 ) =
     composable(route = HomeDestination.route) {
         HomeRoute(
@@ -23,6 +25,7 @@ fun NavGraphBuilder.homeGraph(
             onProgressClicked = onProgressClicked,
             onNutritionClicked = onNutritionClicked,
             onSettingsClicked = onSettingsClicked,
-            onSeeAllClicked = onSeeAllClicked
+            onSeeAllClicked = onSeeAllClicked,
+            onRecommendedItemClicked = onRecommendedItemClicked
         )
     }

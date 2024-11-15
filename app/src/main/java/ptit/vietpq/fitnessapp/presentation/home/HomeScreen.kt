@@ -42,6 +42,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
+import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramExerciseResponse
+import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramResponse
 import ptit.vietpq.fitnessapp.presentation.home.component.TrainingProgramCard
 import ptit.vietpq.fitnessapp.presentation.home.component.ExitDialog
 import ptit.vietpq.fitnessapp.presentation.home.component.HomeFeature
@@ -50,10 +52,11 @@ import ptit.vietpq.fitnessapp.presentation.home.component.HomeFeature
 fun HomeRoute(
     onUserClicked: () -> Unit,
     onWorkoutClicked: () -> Unit,
-    onSeeAllClicked:() -> Unit,
+    onSeeAllClicked: () -> Unit,
     onProgressClicked: () -> Unit,
     onNutritionClicked: () -> Unit,
     onSettingsClicked: () -> Unit,
+    onRecommendedItemClicked: (TrainingProgramResponse) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -64,19 +67,21 @@ fun HomeRoute(
         onProgressClicked = onProgressClicked,
         onNutritionClicked = onNutritionClicked,
         onSettingsClicked = onSettingsClicked,
-        onSeeAllClicked = onSeeAllClicked
+        onSeeAllClicked = onSeeAllClicked,
+        onRecommendedItemClicked =  onRecommendedItemClicked
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onSeeAllClicked:() -> Unit,
+    onSeeAllClicked: () -> Unit,
     onUserClicked: () -> Unit,
     onWorkoutClicked: () -> Unit,
     onProgressClicked: () -> Unit,
     onNutritionClicked: () -> Unit,
     onSettingsClicked: () -> Unit,
+    onRecommendedItemClicked: (TrainingProgramResponse) -> Unit,
     uiState: HomeUiState,
     modifier: Modifier = Modifier
 ) {
@@ -219,7 +224,7 @@ fun HomeScreen(
                         it.id
                     }) { item ->
                         TrainingProgramCard(
-                            onItemClicked = { },
+                            onItemClicked = onRecommendedItemClicked,
                             trainingProgram = item
                         )
                     }
@@ -239,5 +244,6 @@ private fun HomeScreenPreview() {
         onProgressClicked = {},
         onNutritionClicked = {},
         onSeeAllClicked = {},
-        onSettingsClicked = {})
+        onSettingsClicked = {},
+        onRecommendedItemClicked = {})
 }
