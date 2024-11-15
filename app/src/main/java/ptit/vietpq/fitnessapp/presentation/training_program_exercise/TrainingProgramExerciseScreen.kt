@@ -68,6 +68,8 @@ import ptit.vietpq.fitnessapp.R
 import ptit.vietpq.fitnessapp.data.remote.response.ExerciseResponse
 import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramExerciseResponse
 import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
+import ptit.vietpq.fitnessapp.extension.withUrl
+import ptit.vietpq.fitnessapp.ui.common.LoadingDialog
 
 @Composable
 fun TrainingProgramExerciseRoute(
@@ -98,6 +100,8 @@ fun TrainingProgramExerciseScreen(
         pageCount = { uiState.trainingProgramExercises.size }
     )
 
+    LoadingDialog(uiState.loading)
+
     Scaffold(
         modifier = modifier
             .fillMaxSize()
@@ -105,7 +109,6 @@ fun TrainingProgramExerciseScreen(
         topBar = {
             TopAppBar(
                 title = {
-
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
@@ -128,15 +131,19 @@ fun TrainingProgramExerciseScreen(
                             }, label = ""
                         ) { page ->
                             Text(
-                                text = stringResource(
-                                    R.string.exercise,
-                                    page + 1,
-                                    uiState.trainingProgramExercises.size
-                                ),
+                                text = "${page + 1}/${uiState.trainingProgramExercises.size}",
                                 style = FitnessTheme.typo.innerBoldSize20LineHeight28,
                                 color = FitnessTheme.color.limeGreen
                             )
                         }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(
+                                R.string.exercise
+                            ),
+                            style = FitnessTheme.typo.innerBoldSize20LineHeight28,
+                            color = FitnessTheme.color.limeGreen
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -166,7 +173,7 @@ fun TrainingProgramExerciseScreen(
                 modifier = Modifier.weight(1f)
             ) { page ->
                 val exercise = uiState.trainingProgramExercises[page]
-                EnhancedExerciseCard(
+                ExerciseCard(
                     exercise = exercise,
                     isSelected = pagerState.currentPage == page,
                     onExerciseSelected = onExerciseSelected
@@ -189,7 +196,7 @@ fun TrainingProgramExerciseScreen(
 }
 
 @Composable
-private fun EnhancedExerciseCard(
+private fun ExerciseCard(
     exercise: TrainingProgramExerciseResponse,
     isSelected: Boolean,
     onExerciseSelected: (TrainingProgramExerciseResponse) -> Unit
@@ -199,7 +206,7 @@ private fun EnhancedExerciseCard(
         animationSpec = tween(durationMillis = 300), label = ""
     )
     val animatedHeight by animateDpAsState(
-        targetValue = if (isSelected) 260.dp else 240.dp,
+        targetValue = if (isSelected) 260.dp else 200.dp,
         animationSpec = tween(durationMillis = 300), label = ""
     )
 
@@ -231,8 +238,7 @@ private fun EnhancedExerciseCard(
                     .clip(RoundedCornerShape(12.dp))
             ) {
                 AsyncImage(
-//                    model = exercise.exercise.image.withUrl(),
-                    model = exercise.exercise.image,
+                    model = exercise.exercise.image.withUrl(),
                     contentDescription = exercise.exercise.name,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
@@ -458,7 +464,7 @@ private fun TrainingProgramExerciseScreenPreview() {
             exerciseId = 1,
             sets = 3,
             reps = 10,
-            duration = 30,
+            duration = 90,
             restTime = 30,
             order = 1,
             exercise = ExerciseResponse(
@@ -474,7 +480,23 @@ private fun TrainingProgramExerciseScreenPreview() {
             exerciseId = 1,
             sets = 3,
             reps = 10,
-            duration = 30,
+            duration = 90,
+            restTime = 30,
+            order = 1,
+            exercise = ExerciseResponse(
+                id = 1,
+                name = "Push Up",
+                description = "Push up is a great exercise for your chest and triceps",
+                image = "https://media.tenor.com/6DiM1V23hkwAAAAe/two-black-people.png"
+            )
+        ),
+        TrainingProgramExerciseResponse(
+            id = 1,
+            trainingProgramId = 1,
+            exerciseId = 1,
+            sets = 3,
+            reps = 10,
+            duration = 90,
             restTime = 30,
             order = 1,
             exercise = ExerciseResponse(

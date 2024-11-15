@@ -145,6 +145,6 @@
     <string name="exercises">Exercises</string>
     <string name="total_time">Total Time</string>
     <string name="total_sets">Total Sets</string>
-    <string name="exercise">%1$s / %2$s Exercise</string>
+    <string name="exercise">Exercise</string>
     <string name="find_your_next_workout">Find your next workout</string>
 </resources>

@@ -1,6 +1,12 @@
 package ptit.vietpq.fitnessapp.presentation.exercise_category
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -87,12 +93,20 @@ fun ExerciseCategoryScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        modifier = Modifier.padding(start = 16.dp),
-                        text = uiState.selectedCategory,
-                        style = FitnessTheme.typo.innerBoldSize20LineHeight28,
-                        color = FitnessTheme.color.limeGreen
-                    )
+                    AnimatedContent(
+                        targetState = uiState.selectedCategory,
+                        transitionSpec = {
+                            (slideInHorizontally { width -> width } + fadeIn()).togetherWith(
+                                slideOutHorizontally { width -> -width } + fadeOut())
+                        }, label = ""
+                    ) { _ ->
+                        Text(
+                            modifier = Modifier.padding(start = 16.dp),
+                            text = uiState.selectedCategory,
+                            style = FitnessTheme.typo.innerBoldSize20LineHeight28,
+                            color = FitnessTheme.color.limeGreen
+                        )
+                    }
                 },
                 colors = TopAppBarColors(
                     containerColor = FitnessTheme.color.black,

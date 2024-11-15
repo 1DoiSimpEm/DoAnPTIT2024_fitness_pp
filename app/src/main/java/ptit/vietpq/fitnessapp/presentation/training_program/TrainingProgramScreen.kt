@@ -1,7 +1,14 @@
 package ptit.vietpq.fitnessapp.presentation.training_program
 
 
+import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -44,6 +51,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -88,12 +96,20 @@ fun TrainingProgramScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        modifier = Modifier.padding(start = 16.dp),
-                        text = uiState.selectedCategory,
-                        style = FitnessTheme.typo.innerBoldSize20LineHeight28,
-                        color = FitnessTheme.color.limeGreen
-                    )
+                    AnimatedContent(
+                        targetState = uiState.selectedCategory,
+                        transitionSpec = {
+                            (slideInHorizontally { width -> width } + fadeIn()).togetherWith(
+                                slideOutHorizontally { width -> -width } + fadeOut())
+                        }, label = ""
+                    ) { _ ->
+                        Text(
+                            modifier = Modifier.padding(start = 16.dp),
+                            text = uiState.selectedCategory,
+                            style = FitnessTheme.typo.innerBoldSize20LineHeight28,
+                            color = FitnessTheme.color.limeGreen
+                        )
+                    }
                 },
                 colors = TopAppBarColors(
                     containerColor = FitnessTheme.color.black,

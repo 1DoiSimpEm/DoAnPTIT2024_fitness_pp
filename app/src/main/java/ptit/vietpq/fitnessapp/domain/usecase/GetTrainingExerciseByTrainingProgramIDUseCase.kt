@@ -6,7 +6,7 @@ import ptit.vietpq.fitnessapp.core.safeApiCall
 import ptit.vietpq.fitnessapp.data.remote.service.TrainingService
 import javax.inject.Inject
 
-class GetTrainingExerciseByTrainingProgramID @Inject constructor(
+class GetTrainingExerciseByTrainingProgramIDUseCase @Inject constructor(
     private val dispatchers: AppCoroutineDispatchers,
     private val trainingService: TrainingService,
 ) {

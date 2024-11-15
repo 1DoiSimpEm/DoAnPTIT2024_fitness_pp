@@ -34,7 +34,7 @@ class HomeViewModel @Inject constructor(
         getExercises()
     }
 
-    fun getExercises() {
+    private fun getExercises() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val result = getTrainingProgramUseCase()

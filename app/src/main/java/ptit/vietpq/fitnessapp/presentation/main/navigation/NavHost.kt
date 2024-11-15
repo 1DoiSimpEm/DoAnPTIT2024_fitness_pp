@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramExerciseResponse
 import ptit.vietpq.fitnessapp.data.remote.response.toModel
 import ptit.vietpq.fitnessapp.presentation.exercise.exerciseGraph
 import ptit.vietpq.fitnessapp.presentation.exercise_category.ExerciseCategoryDestination
@@ -161,8 +160,7 @@ fun FitnessNavHost(
         )
         mealDetailedGraph(
             onBackPressed = onBackPressed,
-
-            )
+        )
         mealListGraph(
             onBackPressed = onBackPressed,
             onMealPlanClick = { meal ->
@@ -177,17 +175,14 @@ fun FitnessNavHost(
         )
         exerciseCategoryGraph(
             onBackPressed = onBackPressed,
-            onExerciseClicked = { exercise ->
-                navController.navigate(exercise)
-            }
+            onExerciseClicked = navController::navigate
         )
 
         trainingProgramGraph(
             onBackPressed = onBackPressed,
-            onProgramClicked = { trainingProgram ->
-                navController.navigate(trainingProgram)
-            }
+            onProgramClicked = navController::navigate
         )
+
         trainingProgramExerciseRoute(
             onBackPressed = onBackPressed,
             onExerciseSelected = { exercise ->

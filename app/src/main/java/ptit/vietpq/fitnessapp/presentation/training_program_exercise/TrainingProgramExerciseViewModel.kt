@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import ptit.vietpq.fitnessapp.data.remote.response.ExerciseResponse
 import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramExerciseResponse
 import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramResponse
-import ptit.vietpq.fitnessapp.domain.usecase.GetTrainingExerciseByTrainingProgramID
+import ptit.vietpq.fitnessapp.domain.usecase.GetTrainingExerciseByTrainingProgramIDUseCase
 import ptit.vietpq.fitnessapp.extension.getArg
 import javax.inject.Inject
 
@@ -59,7 +59,7 @@ data class TrainingProgramExerciseUiState(
 
 @HiltViewModel
 class TrainingProgramExerciseViewModel @Inject constructor(
-    private val getTrainingExerciseByTrainingProgramID: GetTrainingExerciseByTrainingProgramID,
+    private val getTrainingExerciseByTrainingProgramIDUseCase: GetTrainingExerciseByTrainingProgramIDUseCase,
     savedStateHandle: SavedStateHandle,
 ): ViewModel() {
     private val _uiState = MutableStateFlow(TrainingProgramExerciseUiState())
@@ -76,7 +76,7 @@ class TrainingProgramExerciseViewModel @Inject constructor(
             _uiState.update {
                 it.copy(loading = true)
             }
-            getTrainingExerciseByTrainingProgramID(trainingProgramId)
+            getTrainingExerciseByTrainingProgramIDUseCase(trainingProgramId)
                 .onSuccess { trainingProgramExercises ->
                     _uiState.update {
                         it.copy(
