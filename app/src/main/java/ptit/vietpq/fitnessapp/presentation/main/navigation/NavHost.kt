@@ -35,6 +35,8 @@ import ptit.vietpq.fitnessapp.presentation.training_program.TrainingProgramDesti
 import ptit.vietpq.fitnessapp.presentation.training_program.trainingProgramGraph
 import ptit.vietpq.fitnessapp.presentation.training_program_exercise.trainingProgramExerciseRoute
 import ptit.vietpq.fitnessapp.presentation.training_program_exercise_detail.trainingProgramExerciseDetailRoute
+import ptit.vietpq.fitnessapp.presentation.workout_plan.WorkoutPlanDestination
+import ptit.vietpq.fitnessapp.presentation.workout_plan.workoutCalendarGraph
 
 @Composable
 fun FitnessNavHost(
@@ -129,6 +131,12 @@ fun FitnessNavHost(
                     TrainingProgramDestination.route
                 )
             },
+            onCalendarClicked = {
+                onNavigateToDestination(
+                    WorkoutPlanDestination,
+                    WorkoutPlanDestination.route
+                )
+            },
             onRecommendedItemClicked = navController::navigate
         )
         profileGraph(
@@ -145,6 +153,10 @@ fun FitnessNavHost(
                     SettingDestination.route
                 )
             }
+        )
+
+        workoutCalendarGraph(
+            onBackPressed = onBackPressed
         )
 
         exerciseGraph()

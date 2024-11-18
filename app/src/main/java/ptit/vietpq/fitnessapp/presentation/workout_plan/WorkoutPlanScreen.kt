@@ -67,6 +67,20 @@ import ptit.vietpq.fitnessapp.domain.model.WorkoutPlan
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@Composable
+fun WorkoutCalendarRoute(
+    onBackPressed: () -> Unit,
+    onCreateWorkoutPlan: (WorkoutPlan) -> Unit,
+    onWorkoutPlanClicked: (Long) -> Unit
+) {
+    WorkoutCalendarScreen(
+        uiState = WorkoutPlanUiState(),
+        onBackPressed = onBackPressed,
+        onWorkoutPlanClicked = onWorkoutPlanClicked,
+        onCreateWorkoutPlan = {}
+    )
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

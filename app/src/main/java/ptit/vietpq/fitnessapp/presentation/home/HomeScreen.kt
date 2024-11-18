@@ -2,7 +2,6 @@ package ptit.vietpq.fitnessapp.presentation.home
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,8 +16,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -51,6 +54,7 @@ import ptit.vietpq.fitnessapp.presentation.home.component.HomeFeature
 @Composable
 fun HomeRoute(
     onUserClicked: () -> Unit,
+    onCalendarClicked: () -> Unit,
     onWorkoutClicked: () -> Unit,
     onSeeAllClicked: () -> Unit,
     onProgressClicked: () -> Unit,
@@ -68,7 +72,8 @@ fun HomeRoute(
         onNutritionClicked = onNutritionClicked,
         onSettingsClicked = onSettingsClicked,
         onSeeAllClicked = onSeeAllClicked,
-        onRecommendedItemClicked =  onRecommendedItemClicked
+        onRecommendedItemClicked = onRecommendedItemClicked,
+        onCalendarClicked = onCalendarClicked
     )
 }
 
@@ -77,6 +82,7 @@ fun HomeRoute(
 fun HomeScreen(
     onSeeAllClicked: () -> Unit,
     onUserClicked: () -> Unit,
+    onCalendarClicked: () -> Unit,
     onWorkoutClicked: () -> Unit,
     onProgressClicked: () -> Unit,
     onNutritionClicked: () -> Unit,
@@ -125,20 +131,29 @@ fun HomeScreen(
                 },
                 actions = {
                     Row {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_search),
+                        Icon(
+                            modifier = Modifier.size(20.dp),
+                            imageVector = Icons.Default.Search,
                             contentDescription = "Search",
+                            tint = FitnessTheme.color.primary
                         )
                         Spacer(modifier = Modifier.size(24.dp))
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_notification),
+                        Icon(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clickable(onClick = onCalendarClicked),
+                            imageVector = Icons.Default.CalendarMonth,
                             contentDescription = "Notification",
+                            tint = FitnessTheme.color.primary
                         )
                         Spacer(modifier = Modifier.size(24.dp))
-                        Image(
-                            modifier = Modifier.clickable { onUserClicked() },
+                        Icon(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clickable { onUserClicked() },
                             painter = painterResource(id = R.drawable.ic_user),
                             contentDescription = "User",
+                            tint = FitnessTheme.color.primary
                         )
                         Spacer(modifier = Modifier.size(24.dp))
                     }
@@ -245,5 +260,6 @@ private fun HomeScreenPreview() {
         onNutritionClicked = {},
         onSeeAllClicked = {},
         onSettingsClicked = {},
-        onRecommendedItemClicked = {})
+        onRecommendedItemClicked = {},
+        onCalendarClicked = {})
 }
