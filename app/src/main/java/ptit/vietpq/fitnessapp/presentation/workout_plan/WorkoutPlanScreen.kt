@@ -382,20 +382,15 @@ private fun WorkoutPlanCard(
                 Text(
                     text = workoutPlan.name,
                     style = FitnessTheme.typo.innerBoldSize16LineHeight24,
-                    color = FitnessTheme.color.limeGreen
+                    color = Color.Black
                 )
                 Text(
-                    text = "${workoutPlan.exercises.size} exercises • ${workoutPlan.estimatedDuration} min",
+                    text = "${workoutPlan.exercises.size} exercises • ${workoutPlan.exercises.sumOf { 
+                        it.duration
+                    }} min",
                     style = FitnessTheme.typo.caption,
-                    color = Color.White.copy(alpha = 0.7f)
+                    color = Color.Black.copy(alpha = 0.7f)
                 )
-            }
-
-            Badge(
-                containerColor = FitnessTheme.color.limeGreen,
-                contentColor = FitnessTheme.color.black
-            ) {
-                Text(workoutPlan.difficulty)
             }
         }
     }
@@ -553,9 +548,6 @@ private fun CreateWorkoutPlanDialog(
                             onCreatePlan(
                                 WorkoutPlan(
                                     name = name,
-                                    description = description,
-                                    difficulty = difficulty,
-                                    estimatedDuration = duration.toIntOrNull() ?: 30,
                                     exercises = exercises,
                                     scheduledDate = LocalDate.now()
                                 )
@@ -616,10 +608,7 @@ private fun WorkoutCalendarScreenPreview() {
     val workoutPlans = List(3) {
         WorkoutPlan(
             name = "Workout Plan $it",
-            description = "Description",
             scheduledDate = LocalDate.now(),
-            difficulty = "Beginner",
-            estimatedDuration = 30,
             exercises = persistentListOf(
                 TrainingProgramExerciseResponse(
                     trainingProgramId = 1,
