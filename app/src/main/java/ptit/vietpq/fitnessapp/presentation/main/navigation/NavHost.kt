@@ -156,7 +156,10 @@ fun FitnessNavHost(
         )
 
         workoutCalendarGraph(
-            onBackPressed = onBackPressed
+            onBackPressed = onBackPressed,
+            onWorkoutPlanClicked = { workoutPlan ->
+                navController.navigate(workoutPlan.trainingProgramExercise.toModel())
+            }
         )
 
         exerciseGraph()

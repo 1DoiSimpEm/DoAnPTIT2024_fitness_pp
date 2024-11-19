@@ -14,13 +14,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
@@ -29,11 +33,16 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material3.Badge
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
@@ -44,6 +53,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,32 +62,46 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import ptit.vietpq.fitnessapp.R
 import ptit.vietpq.fitnessapp.data.remote.response.ExerciseResponse
+import ptit.vietpq.fitnessapp.data.remote.response.WorkoutPlanResponse
 import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramExerciseResponse
-import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.domain.model.WorkoutPlan
+import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
+import ptit.vietpq.fitnessapp.extension.toLocalDate
+import ptit.vietpq.fitnessapp.extension.withUrl
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun WorkoutCalendarRoute(
     onBackPressed: () -> Unit,
-    onCreateWorkoutPlan: (WorkoutPlan) -> Unit,
-    onWorkoutPlanClicked: (Long) -> Unit
+    onWorkoutPlanClicked: (WorkoutPlanResponse) -> Unit,
+    viewModel: WorkoutPlanViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     WorkoutCalendarScreen(
-        uiState = WorkoutPlanUiState(),
+        uiState = uiState,
         onBackPressed = onBackPressed,
         onWorkoutPlanClicked = onWorkoutPlanClicked,
-        onCreateWorkoutPlan = {}
+        onCreateWorkoutPlan = viewModel::createWorkoutPlans,
+        onDateClicked = viewModel::getWorkoutPlanByDate
     )
 }
 
@@ -87,12 +111,22 @@ fun WorkoutCalendarRoute(
 fun WorkoutCalendarScreen(
     uiState: WorkoutPlanUiState,
     onBackPressed: () -> Unit,
-    onWorkoutPlanClicked: (Long) -> Unit,
+    onWorkoutPlanClicked: (WorkoutPlanResponse) -> Unit,
+    onDateClicked: (String) -> Unit,
     onCreateWorkoutPlan: (WorkoutPlan) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     var showCreateDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(selectedDate) {
+        onDateClicked(
+            selectedDate.format(
+                DateTimeFormatter.ofPattern("MM/dd/yyyy")
+            )
+        )
+    }
+
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -153,9 +187,11 @@ fun WorkoutCalendarScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             WorkoutPlansList(
+                isLoading = uiState.isLoading,
                 workoutPlans = uiState.workoutPlans.filter {
-                    it.scheduledDate == selectedDate
-                }.toImmutableList()
+                    it.scheduledDate.toLocalDate() == selectedDate
+                }.toImmutableList(),
+                onWorkoutPlanClicked = onWorkoutPlanClicked
             )
         }
 
@@ -165,7 +201,9 @@ fun WorkoutCalendarScreen(
                 onCreatePlan = { plan ->
                     onCreateWorkoutPlan(plan)
                     showCreateDialog = false
-                }
+                },
+                trainingExercises = uiState.trainingExercises.toImmutableList(),
+                selectedTime = selectedDate
             )
         }
     }
@@ -212,7 +250,7 @@ private fun CalendarHeader(
 @Composable
 private fun CalendarGrid(
     selectedDate: LocalDate,
-    workoutPlans: ImmutableList<WorkoutPlan>,
+    workoutPlans: ImmutableList<WorkoutPlanResponse>,
     onDateSelected: (LocalDate) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -225,7 +263,13 @@ private fun CalendarGrid(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat").forEach { day ->
+            listOf(
+                stringResource(R.string.sun),
+                stringResource(R.string.mon),
+                stringResource(R.string.tue), stringResource(R.string.wed),
+                stringResource(R.string.thu), stringResource(R.string.fri),
+                stringResource(R.string.sat)
+            ).forEach { day ->
                 Text(
                     text = day,
                     modifier = Modifier.weight(1f),
@@ -258,7 +302,7 @@ private fun CalendarGrid(
             // Days of the month
             items(daysInMonth) { day ->
                 val date = selectedDate.withDayOfMonth(day + 1)
-                val hasWorkout = workoutPlans.any { it.scheduledDate == date }
+                val hasWorkout = workoutPlans.any { it.scheduledDate.toLocalDate() == date }
 
                 CalendarDay(
                     date = date,
@@ -316,7 +360,9 @@ private fun CalendarDay(
 
 @Composable
 private fun WorkoutPlansList(
-    workoutPlans: ImmutableList<WorkoutPlan>,
+    isLoading: Boolean,
+    workoutPlans: ImmutableList<WorkoutPlanResponse>,
+    onWorkoutPlanClicked: (WorkoutPlanResponse) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -335,25 +381,45 @@ private fun WorkoutPlansList(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        if (workoutPlans.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 32.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "No workouts scheduled",
-                    style = FitnessTheme.typo.body,
-                    color = Color.White.copy(alpha = 0.7f)
-                )
+        when {
+            isLoading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = FitnessTheme.color.limeGreen
+                    )
+                }
             }
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(workoutPlans) { plan ->
-                    WorkoutPlanCard(workoutPlan = plan)
+
+            workoutPlans.isEmpty() -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No workouts scheduled",
+                        style = FitnessTheme.typo.body,
+                        color = Color.White.copy(alpha = 0.7f)
+                    )
+                }
+            }
+
+            else -> {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(workoutPlans) { plan ->
+                        WorkoutPlanCard(
+                            workoutPlan = plan,
+                            onWorkoutPlanClicked = onWorkoutPlanClicked
+                        )
+                    }
                 }
             }
         }
@@ -362,11 +428,16 @@ private fun WorkoutPlansList(
 
 @Composable
 private fun WorkoutPlanCard(
-    workoutPlan: WorkoutPlan,
+    workoutPlan: WorkoutPlanResponse,
+    onWorkoutPlanClicked: (WorkoutPlanResponse) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable {
+                onWorkoutPlanClicked(workoutPlan)
+            },
         colors = CardDefaults.cardColors(
             containerColor = FitnessTheme.color.background
         )
@@ -385,9 +456,7 @@ private fun WorkoutPlanCard(
                     color = Color.Black
                 )
                 Text(
-                    text = "${workoutPlan.exercises.size} exercises • ${workoutPlan.exercises.sumOf { 
-                        it.duration
-                    }} min",
+                    text = "${workoutPlan.trainingProgramExercise.exercise.name} • ${workoutPlan.trainingProgramExercise.duration}min",
                     style = FitnessTheme.typo.caption,
                     color = Color.Black.copy(alpha = 0.7f)
                 )
@@ -399,44 +468,56 @@ private fun WorkoutPlanCard(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CreateWorkoutPlanDialog(
+    trainingExercises: ImmutableList<TrainingProgramExerciseResponse>,
     onDismiss: () -> Unit,
-    onCreatePlan: (WorkoutPlan) -> Unit
+    onCreatePlan: (WorkoutPlan) -> Unit,
+    selectedTime: LocalDate = LocalDate.now(),
 ) {
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var difficulty by remember { mutableStateOf("Beginner") }
     var duration by remember { mutableStateOf("30") }
-    var exercises by remember { mutableStateOf<List<TrainingProgramExerciseResponse>>(emptyList()) }
-    var showAddExercise by remember { mutableStateOf(false) }
+    var selectedExercises by remember {
+        mutableStateOf<List<TrainingProgramExerciseResponse>>(
+            emptyList()
+        )
+    }
+    var showExerciseSelection by remember { mutableStateOf(false) }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
             colors = CardDefaults.cardColors(
-                containerColor = FitnessTheme.color.background
-            )
+                containerColor = Color(0xFF282c34)
+            ),
+            modifier = Modifier.fillMaxWidth()
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
                 Text(
                     text = "Create Workout Plan",
                     style = FitnessTheme.typo.innerBoldSize20LineHeight28,
                     color = FitnessTheme.color.limeGreen
                 )
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Plan Name") },
+                    label = { Text(stringResource(R.string.plan_name), color = Color.White) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         textColor = Color.White,
                         focusedBorderColor = FitnessTheme.color.limeGreen,
                         focusedLabelColor = FitnessTheme.color.limeGreen,
-                        unfocusedLabelColor = Color.White
+                        unfocusedLabelColor = Color.White,
+                        errorBorderColor = Color.White,
+                        disabledBorderColor = Color.White,
+                        unfocusedBorderColor = Color.White
                     )
                 )
 
@@ -445,13 +526,16 @@ private fun CreateWorkoutPlanDialog(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("Description") },
+                    label = { Text("Description", color = Color.White) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         textColor = Color.White,
                         focusedBorderColor = FitnessTheme.color.limeGreen,
                         focusedLabelColor = FitnessTheme.color.limeGreen,
-                        unfocusedLabelColor = Color.White
+                        unfocusedLabelColor = Color.White,
+                        errorBorderColor = Color.White,
+                        disabledBorderColor = Color.White,
+                        unfocusedBorderColor = Color.White
                     )
                 )
 
@@ -461,25 +545,55 @@ private fun CreateWorkoutPlanDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    var isExpanded by remember { mutableStateOf(false) }
                     ExposedDropdownMenuBox(
-                        expanded = false,
-                        onExpandedChange = {},
+                        expanded = isExpanded,
+                        onExpandedChange = { isExpanded = it },
                         modifier = Modifier.weight(1f)
                     ) {
                         OutlinedTextField(
                             value = difficulty,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Difficulty") },
-                            trailingIcon = { Icon(Icons.Filled.ArrowDropDown, null) },
+                            label = {
+                                Text(
+                                    stringResource(R.string.difficulty),
+                                    color = Color.White
+                                )
+                            },
+                            trailingIcon = {
+                                Icon(
+                                    Icons.Filled.ArrowDropDown,
+                                    null,
+                                    tint = Color.White
+                                )
+                            },
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 textColor = Color.White,
                                 focusedBorderColor = FitnessTheme.color.limeGreen,
                                 focusedLabelColor = FitnessTheme.color.limeGreen,
-                                unfocusedLabelColor = Color.White
-                            )
+                                unfocusedLabelColor = Color.White,
+                                errorBorderColor = Color.White,
+                                disabledBorderColor = Color.White,
+                                unfocusedBorderColor = Color.White
+                            ),
+                            modifier = Modifier.menuAnchor()
                         )
-                        // Dropdown menu content here
+
+                        ExposedDropdownMenu(
+                            expanded = isExpanded,
+                            onDismissRequest = { isExpanded = false }
+                        ) {
+                            listOf("Beginner", "Intermediate", "Advanced").forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(option) },
+                                    onClick = {
+                                        difficulty = option
+                                        isExpanded = false
+                                    }
+                                )
+                            }
+                        }
                     }
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -487,44 +601,246 @@ private fun CreateWorkoutPlanDialog(
                     OutlinedTextField(
                         value = duration,
                         onValueChange = { duration = it },
-                        label = { Text("Duration (min)") },
+                        label = {
+                            Text(
+                                stringResource(R.string.duration_min),
+                                color = Color.White
+                            )
+                        },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.weight(1f),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
                             textColor = Color.White,
                             focusedBorderColor = FitnessTheme.color.limeGreen,
                             focusedLabelColor = FitnessTheme.color.limeGreen,
-                            unfocusedLabelColor = Color.White
+                            unfocusedLabelColor = Color.White,
+                            errorBorderColor = Color.White,
+                            disabledBorderColor = Color.White,
+                            unfocusedBorderColor = Color.White
                         )
                     )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                // Exercise Selection Section
+                Text(
+                    text = "Selected Exercises (${selectedExercises.size})",
+                    style = FitnessTheme.typo.innerBoldSize16LineHeight24,
+                    color = Color.White
+                )
+
+                Button(
+                    onClick = { showExerciseSelection = true },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = FitnessTheme.color.limeGreen,
+                        contentColor = FitnessTheme.color.black
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = "Exercises (${exercises.size})",
-                        style = FitnessTheme.typo.body,
-                        color = Color.White
-                    )
-                    IconButton(onClick = { showAddExercise = true }) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add Exercise",
-                            tint = FitnessTheme.color.limeGreen
+                    Text(stringResource(R.string.select_exercises))
+                }
+
+                LazyColumn(
+                    modifier = Modifier
+                        .height(200.dp)
+                        .fillMaxWidth()
+                ) {
+                    items(selectedExercises) { exercise ->
+                        ExerciseSelectionItem(
+                            exercise = exercise,
+                            onRemove = {
+                                selectedExercises = selectedExercises.filter { it != exercise }
+                            }
                         )
                     }
                 }
 
-                LazyColumn(
-                    modifier = Modifier.height(200.dp)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
                 ) {
-                    items(exercises) { exercise ->
-                        ExerciseItem(exercise = exercise)
+                    TextButton(
+                        onClick = onDismiss,
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = Color.White,
+                            containerColor = Color.Red
+                        ),
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(
+                                vertical = 6.dp,
+                                horizontal = 12.dp
+                            ), text = "Cancel"
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    TextButton(
+                        onClick = {
+                            onCreatePlan(
+                                WorkoutPlan(
+                                    name = name,
+                                    exercises = selectedExercises,
+                                    scheduledDate = selectedTime,
+                                )
+                            )
+                        },
+                        enabled = name.isNotBlank() && selectedExercises.isNotEmpty(),
+                        colors = ButtonDefaults.textButtonColors(
+                            containerColor = FitnessTheme.color.limeGreen,
+                            contentColor = FitnessTheme.color.black,
+                            disabledContainerColor = FitnessTheme.color.primaryDisable
+                        )
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(
+                                vertical = 6.dp,
+                                horizontal = 12.dp
+                            ), text = stringResource(R.string.create), color = Color.White
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    if (showExerciseSelection) {
+        ExerciseSelectionDialog(
+            availableExercises = trainingExercises,
+            selectedExercises = selectedExercises.toImmutableList(),
+            onDismiss = { showExerciseSelection = false },
+            onExercisesSelected = { exercises ->
+                selectedExercises = exercises
+                showExerciseSelection = false
+            }
+        )
+    }
+}
+
+@Composable
+private fun ExerciseSelectionItem(
+    exercise: TrainingProgramExerciseResponse,
+    onRemove: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = FitnessTheme.color.background.copy(alpha = 0.5f)
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = exercise.exercise.name,
+                    style = FitnessTheme.typo.body,
+                    color = Color.White
+                )
+                Text(
+                    text = "${exercise.sets} sets × ${exercise.reps} reps",
+                    style = FitnessTheme.typo.caption,
+                    color = Color.White.copy(alpha = 0.7f)
+                )
+            }
+            IconButton(onClick = onRemove) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Remove Exercise",
+                    tint = Color.White
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExerciseSelectionDialog(
+    availableExercises: ImmutableList<TrainingProgramExerciseResponse>,
+    selectedExercises: ImmutableList<TrainingProgramExerciseResponse>,
+    onDismiss: () -> Unit,
+    onExercisesSelected: (List<TrainingProgramExerciseResponse>) -> Unit
+) {
+    var tempSelectedExercises by remember { mutableStateOf(selectedExercises) }
+    var searchQuery by remember { mutableStateOf("") }
+
+    LaunchedEffect(selectedExercises) {
+        tempSelectedExercises = selectedExercises
+    }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFF282c34)
+            ),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.select_exercises),
+                    style = FitnessTheme.typo.innerBoldSize20LineHeight28,
+                    color = FitnessTheme.color.limeGreen
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    label = {
+                        Text(
+                            stringResource(R.string.search_exercises),
+                            color = Color.White
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = Color.White,
+                        focusedBorderColor = FitnessTheme.color.limeGreen,
+                        focusedLabelColor = FitnessTheme.color.limeGreen,
+                        unfocusedLabelColor = Color.White,
+                        unfocusedBorderColor = Color.White,
+                        disabledBorderColor = Color.White,
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                ) {
+                    val filteredExercises = availableExercises.filter {
+                        it.exercise.name.contains(searchQuery, ignoreCase = true)
+                    }
+
+                    items(filteredExercises) { exercise ->
+                        val isSelected = tempSelectedExercises.contains(exercise)
+                        ExerciseSelectionListItem(
+                            exercise = exercise,
+                            isSelected = isSelected,
+                            onToggle = {
+                                tempSelectedExercises = if (isSelected) {
+                                    tempSelectedExercises.filter { it != exercise }
+                                } else {
+                                    tempSelectedExercises + exercise
+                                }.toImmutableList()
+                            }
+                        )
                     }
                 }
 
@@ -540,64 +856,80 @@ private fun CreateWorkoutPlanDialog(
                             contentColor = Color.White
                         )
                     ) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
-                        onClick = {
-                            onCreatePlan(
-                                WorkoutPlan(
-                                    name = name,
-                                    exercises = exercises,
-                                    scheduledDate = LocalDate.now()
-                                )
-                            )
-                        },
-                        enabled = name.isNotBlank() && exercises.isNotEmpty(),
+                        onClick = { onExercisesSelected(tempSelectedExercises) },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = FitnessTheme.color.limeGreen,
                             contentColor = FitnessTheme.color.black
                         )
                     ) {
-                        Text("Create")
+                        Text(stringResource(R.string.confirm, tempSelectedExercises.size))
                     }
                 }
             }
         }
     }
-
-//    if (showAddExercise) {
-//        AddExerciseDialog(
-//            onDismiss = { showAddExercise = false },
-//            onAddExercise = { exercise ->
-//                exercises = exercises + exercise.copy(order = exercises.size)
-//                showAddExercise = false
-//            }
-//        )
-//    }
 }
 
 @Composable
-private fun ExerciseItem(
+private fun ExerciseSelectionListItem(
     exercise: TrainingProgramExerciseResponse,
+    isSelected: Boolean,
+    onToggle: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .clickable(onClick = onToggle)
+            .padding(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = exercise.exercise.name,
-            style = FitnessTheme.typo.body,
-            color = Color.White
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(exercise.exercise.image.withUrl())
+                .crossfade(true)
+                .build(),
+            contentDescription = "Exercise image",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(56.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(FitnessTheme.color.background.copy(alpha = 0.5f)),
+            error = rememberVectorPainter(Icons.Default.FitnessCenter),
+            placeholder = rememberVectorPainter(Icons.Default.FitnessCenter)
         )
-        Text(
-            text = "${exercise.sets}×${exercise.reps}",
-            style = FitnessTheme.typo.body,
-            color = Color.White.copy(alpha = 0.7f)
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 4.dp)
+        ) {
+            Text(
+                text = exercise.exercise.name,
+                style = FitnessTheme.typo.body,
+                color = Color.White
+            )
+            Text(
+                text = "${exercise.sets} sets × ${exercise.reps} reps",
+                style = FitnessTheme.typo.caption,
+                color = Color.White.copy(alpha = 0.7f)
+            )
+        }
+
+        Checkbox(
+            checked = isSelected,
+            onCheckedChange = { onToggle() },
+            colors = CheckboxDefaults.colors(
+                checkedColor = FitnessTheme.color.limeGreen,
+                uncheckedColor = Color.White
+            )
         )
     }
 }
@@ -606,36 +938,100 @@ private fun ExerciseItem(
 @Composable
 private fun WorkoutCalendarScreenPreview() {
     val workoutPlans = List(3) {
-        WorkoutPlan(
+        WorkoutPlanResponse(
             name = "Workout Plan $it",
-            scheduledDate = LocalDate.now(),
-            exercises = persistentListOf(
-                TrainingProgramExerciseResponse(
-                    trainingProgramId = 1,
-                    exerciseId = 1,
-                    sets = 3,
-                    reps = 10,
-                    duration = 0,
-                    restTime = 0,
-                    order = 0,
+            scheduledDate = "2024-11-19",
+            trainingProgramExercise = TrainingProgramExerciseResponse(
+                trainingProgramId = 1,
+                exerciseId = 1,
+                sets = 3,
+                reps = 10,
+                duration = 0,
+                restTime = 0,
+                order = 0,
+                id = 1,
+                exercise = ExerciseResponse(
                     id = 1,
-                    exercise = ExerciseResponse(
-                        id = 1,
-                        name = "Exercise",
-                        description = "Description",
-                        videoUrl = "",
-                        image = "",
-                        muscleGroupId = 1
-                    )
+                    name = "Exercise",
+                    description = "Description",
+                    videoUrl = "",
+                    image = "",
+                    muscleGroupId = 1
                 )
             )
+
         )
+
     }
 
     WorkoutCalendarScreen(
         uiState = WorkoutPlanUiState(workoutPlans = workoutPlans.toImmutableList()),
         onBackPressed = {},
         onWorkoutPlanClicked = {},
-        onCreateWorkoutPlan = {}
+        onCreateWorkoutPlan = {},
+        onDateClicked = {}
+    )
+}
+
+@Preview
+@Composable
+private fun PreviewCreateWorkoutPlanDialog() {
+    val exercises = List(5) {
+        TrainingProgramExerciseResponse(
+            trainingProgramId = 1,
+            exerciseId = 1,
+            sets = 3,
+            reps = 10,
+            duration = 0,
+            restTime = 0,
+            order = 0,
+            id = 1,
+            exercise = ExerciseResponse(
+                id = 1,
+                name = "Exercise $it",
+                description = "Description",
+                videoUrl = "",
+                image = "",
+                muscleGroupId = 1
+            )
+        )
+    }
+
+    CreateWorkoutPlanDialog(
+        trainingExercises = exercises.toImmutableList(),
+        onDismiss = {},
+        onCreatePlan = {}
+    )
+}
+
+@Preview
+@Composable
+private fun PreviewExerciseSelectionDialog() {
+    val exercises = List(5) {
+        TrainingProgramExerciseResponse(
+            trainingProgramId = 1,
+            exerciseId = 1,
+            sets = 3,
+            reps = 10,
+            duration = 0,
+            restTime = 0,
+            order = 0,
+            id = 1,
+            exercise = ExerciseResponse(
+                id = 1,
+                name = "Exercise $it",
+                description = "Description",
+                videoUrl = "",
+                image = "",
+                muscleGroupId = 1
+            )
+        )
+    }
+
+    ExerciseSelectionDialog(
+        availableExercises = exercises.toImmutableList(),
+        selectedExercises = persistentListOf(),
+        onDismiss = {},
+        onExercisesSelected = {}
     )
 }

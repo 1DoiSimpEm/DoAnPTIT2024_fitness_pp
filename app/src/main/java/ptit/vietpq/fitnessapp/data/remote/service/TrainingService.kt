@@ -20,7 +20,10 @@ interface TrainingService {
     ): Response<List<TrainingProgramResponse>>
 
     @GET("api/training-program-exercises/program/{id}")
-    suspend fun getTrainingProgramExercises(
+    suspend fun getTrainingProgramExercisesByProgram(
         @Path("id") trainingProgramId: Int
     ): Response<List<TrainingProgramExerciseResponse>>
+
+    @GET("/api/training-program-exercises")
+    suspend fun getTrainingProgramExercises(): Response<List<TrainingProgramExerciseResponse>>
 }

@@ -147,4 +147,17 @@
     <string name="total_sets">Total Sets</string>
     <string name="exercise">Exercise</string>
     <string name="find_your_next_workout">Find your next workout</string>
+    <string name="plan_name">Plan Name</string>
+    <string name="duration_min">Duration (min)</string>
+    <string name="difficulty">Difficulty</string>
+    <string name="select_exercises">Select Exercises</string>
+    <string name="search_exercises">Search exercises</string>
+    <string name="confirm">Confirm (%1$s)</string>
+    <string name="sun">Sun</string>
+    <string name="mon">Mon</string>
+    <string name="tue">Tue</string>
+    <string name="wed">Wed</string>
+    <string name="thu">Thu</string>
+    <string name="fri">Fri</string>
+    <string name="sat">Sat</string>
 </resources>

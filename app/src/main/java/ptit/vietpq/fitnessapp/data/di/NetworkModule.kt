@@ -12,13 +12,14 @@ import ptit.vietpq.fitnessapp.data.remote.service.AuthService
 import ptit.vietpq.fitnessapp.data.remote.service.ExerciseService
 import ptit.vietpq.fitnessapp.data.remote.service.MealService
 import ptit.vietpq.fitnessapp.data.remote.service.TrainingService
+import ptit.vietpq.fitnessapp.data.remote.service.WorkoutPlanService
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
-const val BASE_URL = "https://d070-2a09-bac5-d45c-e6-00-17-32f.ngrok-free.app"
+const val BASE_URL = "https://5c12-2a09-bac5-d45a-e6-00-17-334.ngrok-free.app"
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
@@ -82,4 +83,9 @@ object NetworkModule {
     @Singleton
     fun provideTrainingService(@RetrofitAuthQualifier retrofit: Retrofit): TrainingService =
         retrofit.create(TrainingService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideWorkoutPlanService(@RetrofitAuthQualifier retrofit: Retrofit): WorkoutPlanService =
+        retrofit.create(WorkoutPlanService::class.java)
 }

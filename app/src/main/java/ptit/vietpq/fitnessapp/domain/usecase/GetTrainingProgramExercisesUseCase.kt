@@ -6,14 +6,14 @@ import ptit.vietpq.fitnessapp.core.safeApiCall
 import ptit.vietpq.fitnessapp.data.remote.service.TrainingService
 import javax.inject.Inject
 
-class GetTrainingExerciseByTrainingProgramIDUseCase @Inject constructor(
+class GetTrainingProgramExercisesUseCase @Inject constructor(
     private val dispatchers: AppCoroutineDispatchers,
     private val trainingService: TrainingService,
 ) {
 
-    suspend operator fun invoke(trainingProgramId: Int) = withContext(dispatchers.io){
+    suspend operator fun invoke() = withContext(dispatchers.io){
         safeApiCall {
-            trainingService.getTrainingProgramExercisesByProgram(trainingProgramId)
+            trainingService.getTrainingProgramExercises()
         }
     }
 

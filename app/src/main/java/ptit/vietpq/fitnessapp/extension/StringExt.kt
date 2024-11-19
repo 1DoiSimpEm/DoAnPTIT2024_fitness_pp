@@ -2,6 +2,8 @@ package ptit.vietpq.fitnessapp.extension
 
 import ptit.vietpq.fitnessapp.data.di.BASE_URL
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
@@ -12,3 +14,5 @@ fun Long.formatTimestamp(): String {
 }
 
 fun String.withUrl() = "$BASE_URL/$this"
+
+fun String.toLocalDate(): LocalDate = LocalDate.parse(this, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
