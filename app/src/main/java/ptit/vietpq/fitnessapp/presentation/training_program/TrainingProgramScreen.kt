@@ -373,7 +373,7 @@ private fun PreviewTrainingProgramScreen() {
                 ),
 
                 ),
-            selectedCategory = "Beginner",
+            selectedCategory = "lmao",
             isLoading = false
         ),
         onBackPressed = {},

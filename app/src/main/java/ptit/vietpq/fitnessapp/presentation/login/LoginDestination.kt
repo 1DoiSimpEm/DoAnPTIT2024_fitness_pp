@@ -10,8 +10,9 @@ data object LoginDestination : FitnessNavigationDestination {
 }
 
 fun NavGraphBuilder.loginGraph(
-  onLoginSuccess : () -> Unit
+  onLoginSuccess : () -> Unit,
+  onRegisterClick: () -> Unit
 ) =
   composable(route = LoginDestination.route) {
-    LoginRoute(onLoginSuccess = onLoginSuccess)
+    LoginRoute(onLoginSuccess = onLoginSuccess, onRegisterClick = onRegisterClick)
   }

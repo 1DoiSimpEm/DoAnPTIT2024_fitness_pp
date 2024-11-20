@@ -1,6 +1,5 @@
-package ptit.vietpq.fitnessapp.presentation.login
+package ptit.vietpq.fitnessapp.presentation.register
 
-import android.widget.Space
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -9,9 +8,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,24 +22,21 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AppRegistration
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Password
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.outlined.FitnessCenter
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -55,17 +48,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -74,64 +62,56 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ptit.vietpq.fitnessapp.R
 import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.extension.toast
+import ptit.vietpq.fitnessapp.presentation.login.AnimatedTextField
+import ptit.vietpq.fitnessapp.presentation.login.LoginState
 
 
 @Composable
-fun LoginRoute(
-    onLoginSuccess: () -> Unit,
-    onRegisterClick: () -> Unit,
-    viewModel: LoginViewModel = hiltViewModel()
+fun RegisterRoute(
+    onBackPressed: () -> Unit,
+    viewModel: RegisterViewModel = hiltViewModel()
 ) {
+    val event by viewModel.eventFlow.collectAsStateWithLifecycle(LoginState.Empty)
     val context = LocalContext.current
-    val eventFlow = viewModel.eventFlow.collectAsStateWithLifecycle(initialValue = LoginState.Empty)
-    var showLoading by remember {
-        mutableStateOf(false)
-    }
-    LaunchedEffect(eventFlow.value) {
-        when (val event = eventFlow.value) {
-            is LoginState.LoginSuccess -> {
-                context.toast("Login success")
-                onLoginSuccess()
-                showLoading = false
-            }
-
-            is LoginState.RegisterSuccess -> {
-                context.toast("Register success")
-                showLoading = false
-            }
-
+    var showLoading by remember { mutableStateOf(false) }
+    LaunchedEffect(event) {
+        when (event) {
+            LoginState.Empty -> Unit
             is LoginState.Error -> {
-                context.toast(event.message)
+                context.toast((event as LoginState.Error).message)
                 showLoading = false
-            }
-
-            LoginState.Empty -> {
-                // Do nothing
             }
 
             LoginState.Loading -> {
                 showLoading = true
             }
+
+            LoginState.LoginSuccess -> Unit
+            LoginState.RegisterSuccess -> {
+                showLoading = false
+                onBackPressed()
+            }
         }
     }
-    LoginScreen(
-        onLoginClick = viewModel::login,
-        showLoading = showLoading,
-        onRegisterClick = onRegisterClick
+    RegisterScreen(
+        onRegisterClick = viewModel::register,
+        onBackToLogin = onBackPressed,
+        showLoading = showLoading
     )
 }
 
+
 @Composable
-fun LoginScreen(
-    onLoginClick: (String, String) -> Unit,
+fun RegisterScreen(
+    onRegisterClick: (String, String, String) -> Unit,
     showLoading: Boolean,
     modifier: Modifier = Modifier,
-    onRegisterClick: () -> Unit = {},
-    onForgotPasswordClick: () -> Unit = {}
+    onBackToLogin: () -> Unit = {}
 ) {
+    var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var rememberMe by remember { mutableStateOf(false) }
+    var confirmPassword by remember { mutableStateOf("") }
 
     val infiniteTransition = rememberInfiniteTransition(label = "background")
     val gradientOffset by infiniteTransition.animateFloat(
@@ -143,8 +123,6 @@ fun LoginScreen(
         ),
         label = "gradient"
     )
-
-    // Pulse animation for the logo
     val scale by animateFloatAsState(
         targetValue = if (showLoading) 1.1f else 1f,
         animationSpec = infiniteRepeatable(
@@ -153,6 +131,7 @@ fun LoginScreen(
         ),
         label = "pulse"
     )
+
 
     Box(
         modifier = modifier
@@ -185,32 +164,40 @@ fun LoginScreen(
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // App Title and Tagline
-                Text(
-                    text = stringResource(R.string.app_name),
-                    color = Color.White,
-                    style = FitnessTheme.typo.innerBoldSize16LineHeight24,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = stringResource(R.string.transform_your_life_one_rep_at_a_time),
-                    color = Color.White.copy(alpha = 0.9f),
-                    style = FitnessTheme.typo.innerBoldSize16LineHeight24,
-                    textAlign = TextAlign.Center
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = onBackToLogin) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back to login",
+                            tint = Color.White
+                        )
+                    }
+                    Text(
+                        text = stringResource(R.string.create_account),
+                        color = Color.White,
+                        style = FitnessTheme.typo.innerBoldSize20LineHeight28,
+                    )
+                    // Empty box for centering
+                    Box(modifier = Modifier.width(48.dp))
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Box(
                     modifier = Modifier
                         .size(80.dp)
-                        .scale(scale)
                         .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.2f)),
-                    contentAlignment = Alignment.Center
+                        .background(Color.White.copy(alpha = 0.2f))
+                        .scale(scale),
+                    contentAlignment = Alignment.Center,
+
                 ) {
                     Icon(
-                        imageVector = Icons.Outlined.FitnessCenter,  // Fitness-specific icon
+                        imageVector = Icons.Default.Person,
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier.size(40.dp)
@@ -219,10 +206,27 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
+                // Name field
+                AnimatedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = stringResource(R.string.name),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Email field
                 AnimatedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = stringResource(R.string.username_or_email),
+                    label = stringResource(R.string.email),
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Email,
@@ -234,6 +238,7 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Password field
                 AnimatedTextField(
                     value = password,
                     onValueChange = { password = it },
@@ -241,7 +246,7 @@ fun LoginScreen(
                     isPassword = true,
                     leadingIcon = {
                         Icon(
-                            imageVector = Icons.Default.Password,
+                            imageVector = Icons.Default.Lock,
                             contentDescription = null,
                             tint = Color.White
                         )
@@ -250,38 +255,39 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Remember me checkbox with fitness-themed text
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Checkbox(
-                        checked = rememberMe,
-                        onCheckedChange = { rememberMe = it },
-                        colors = CheckboxDefaults.colors(
-                            checkedColor = Color.White,
-                            uncheckedColor = Color.White.copy(alpha = 0.7f)
+                // Confirm Password field
+                AnimatedTextField(
+                    value = confirmPassword,
+                    onValueChange = { confirmPassword = it },
+                    label = stringResource(R.string.confirm_password),
+                    isPassword = true,
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Lock,
+                            contentDescription = null,
+                            tint = Color.White
                         )
-                    )
-                    Text(
-                        text = stringResource(R.string.keep_me_active),  // Fitness-themed remember me text
-                        color = Color.White,
-                        modifier = Modifier.clickable { rememberMe = !rememberMe }
-                    )
-                }
+                    }
+                )
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Login button with fitness theme
+                Spacer(modifier = Modifier.height(32.dp))
                 Button(
-                    onClick = { onLoginClick(email, password) },
+                    onClick = {
+                        if (password == confirmPassword && email.isNotEmpty() && name.isNotEmpty()) {
+                            onRegisterClick(name, email, password)
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
                     shape = RoundedCornerShape(25.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF4CAF50)  // Fitness green
-                    )
+                    ),
+                    enabled = password == confirmPassword &&
+                            password.isNotEmpty() &&
+                            email.isNotEmpty() &&
+                            name.isNotEmpty()
                 ) {
                     if (showLoading) {
                         CircularProgressIndicator(
@@ -294,14 +300,14 @@ fun LoginScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = Icons.Default.PlayArrow,
+                                imageVector = Icons.Default.AppRegistration,
                                 contentDescription = null,
                                 tint = Color.White,
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = stringResource(R.string.start_your_journey),  // Fitness-themed login text
+                                text = stringResource(R.string.register),  // Fitness-themed login text
                                 color = Color.White
                             )
                         }
@@ -310,106 +316,33 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                TextButton(
-                    onClick = onForgotPasswordClick,
-                    modifier = Modifier.fillMaxWidth()
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Reset Your Password",  // More friendly password reset text
-                        color = Color.White,
-                        style = TextStyle(
-                            textDecoration = TextDecoration.Underline
-                        )
-                    )
-                }
-
-                Column (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = stringResource(R.string.ready_to_start_your_fitness_journey),
+                        text = stringResource(R.string.already_have_an_account),
                         color = Color.White
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = stringResource(R.string.join_now),
-                        color = Color.White,
-                        style = TextStyle(
-                            textDecoration = TextDecoration.Underline,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        modifier = Modifier.clickable(onClick = onRegisterClick)
-                    )
+                    TextButton(onClick = onBackToLogin) {
+                        Text(
+                            text = stringResource(R.string.login),
+                            color = Color.White,
+                            style = TextStyle(textDecoration = TextDecoration.Underline)
+                        )
+                    }
                 }
-
-                // Motivational text at the bottom
-                Text(
-                    text = stringResource(R.string.your_strongest_self_awaits),
-                    color = Color.White.copy(alpha = 0.8f),
-                    style = FitnessTheme.typo.innerRegularSize14LineHeight20,
-                    modifier = Modifier.padding(top = 16.dp),
-                    textAlign = TextAlign.Center
-                )
             }
         }
     }
 }
 
-@Composable
-fun AnimatedTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    modifier: Modifier = Modifier,
-    leadingIcon: @Composable (() -> Unit)? = null,
-    isPassword: Boolean = false
-) {
-    var isFocused by remember { mutableStateOf(false) }
-    val strokeWidth by animateFloatAsState(
-        targetValue = if (isFocused) 2f else 1f,
-        label = "stroke"
-    )
-
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = {
-            Text(
-                text = label,
-                color = if (isFocused) Color.White else Color.White.copy(alpha = 0.7f)
-            )
-        },
-        leadingIcon = leadingIcon,
-        modifier = modifier
-            .fillMaxWidth()
-            .border(
-                width = strokeWidth.dp,
-                color = if (isFocused) Color.White else Color.White.copy(alpha = 0.7f),
-                shape = RoundedCornerShape(12.dp)
-            )
-            .onFocusEvent {
-                isFocused = it.isFocused
-            },
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.White.copy(alpha = 0.1f),
-            unfocusedContainerColor = Color.White.copy(alpha = 0.1f),
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
-        ),
-        shape = RoundedCornerShape(12.dp),
-        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-        singleLine = true,
-    )
-
-}
-
-
 @Preview
 @Composable
-private fun PreviewLoginScreen() {
-    LoginScreen({ _, _ -> }, true)
+private fun PreviewRegisterScreen() {
+    RegisterScreen(
+        onRegisterClick = { _, _, _ -> },
+        showLoading = true
+    )
 }

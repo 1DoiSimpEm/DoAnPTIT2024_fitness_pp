@@ -27,6 +27,8 @@ import ptit.vietpq.fitnessapp.presentation.password_setting.PasswordSettingDesti
 import ptit.vietpq.fitnessapp.presentation.password_setting.passwordSettingGraph
 import ptit.vietpq.fitnessapp.presentation.profile.ProfileDestination
 import ptit.vietpq.fitnessapp.presentation.profile.profileGraph
+import ptit.vietpq.fitnessapp.presentation.register.RegisterDestination
+import ptit.vietpq.fitnessapp.presentation.register.registerGraph
 import ptit.vietpq.fitnessapp.presentation.setting.SettingDestination
 import ptit.vietpq.fitnessapp.presentation.setting.settingGraph
 import ptit.vietpq.fitnessapp.presentation.setup.SetupDestination
@@ -81,14 +83,26 @@ fun FitnessNavHost(
             )
         },
     ) {
+
         loginGraph(
             onLoginSuccess = {
                 onNavigateToDestinationPopUpTo(
                     SetupDestination,
                     SetupDestination.route
                 )
+            },
+            onRegisterClick = {
+                onNavigateToDestination(
+                    RegisterDestination,
+                    RegisterDestination.route
+                )
             }
         )
+
+        registerGraph(
+            onBackPressed = onBackPressed
+        )
+
         setupGraph(
             onSetupCompleted = {
                 onNavigateToDestinationPopUpTo(

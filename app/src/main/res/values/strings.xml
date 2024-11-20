@@ -160,4 +160,13 @@
     <string name="thu">Thu</string>
     <string name="fri">Fri</string>
     <string name="sat">Sat</string>
+    <string name="your_meal_plan">Your Meal Plan</string>
+    <string name="remember_me">Remember me</string>
+    <string name="already_have_an_account">Already have an account?</string>
+    <string name="transform_your_life_one_rep_at_a_time">Transform Your Life, One Rep at a Time</string>
+    <string name="your_strongest_self_awaits">Your strongest self awaits!</string>
+    <string name="start_your_journey">Start Your Journey</string>
+    <string name="ready_to_start_your_fitness_journey">"Ready to start your fitness journey? "</string>
+    <string name="join_now">Join Now</string>
+    <string name="keep_me_active">Keep me active</string>
 </resources>
