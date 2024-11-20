@@ -144,7 +144,6 @@ fun LoginScreen(
         label = "gradient"
     )
 
-    // Pulse animation for the logo
     val scale by animateFloatAsState(
         targetValue = if (showLoading) 1.1f else 1f,
         animationSpec = infiniteRepeatable(
@@ -316,7 +315,7 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Reset Your Password",  // More friendly password reset text
+                        text = stringResource(R.string.reset_your_password),  // More friendly password reset text
                         color = Color.White,
                         style = TextStyle(
                             textDecoration = TextDecoration.Underline
