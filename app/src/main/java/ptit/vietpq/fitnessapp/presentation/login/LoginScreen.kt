@@ -281,7 +281,8 @@ fun LoginScreen(
                     shape = RoundedCornerShape(25.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF4CAF50)  // Fitness green
-                    )
+                    ),
+                    enabled = email.isNotEmpty() && password.isNotEmpty() && !showLoading
                 ) {
                     if (showLoading) {
                         CircularProgressIndicator(
@@ -411,5 +412,5 @@ fun AnimatedTextField(
 @Preview
 @Composable
 private fun PreviewLoginScreen() {
-    LoginScreen({ _, _ -> }, true)
+    LoginScreen({ _, _ -> }, false)
 }
