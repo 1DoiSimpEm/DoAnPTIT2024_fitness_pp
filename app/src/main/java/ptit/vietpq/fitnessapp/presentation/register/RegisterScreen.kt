@@ -287,7 +287,7 @@ fun RegisterScreen(
                     enabled = password == confirmPassword &&
                             password.isNotEmpty() &&
                             email.isNotEmpty() &&
-                            name.isNotEmpty()
+                            name.isNotEmpty() || !showLoading
                 ) {
                     if (showLoading) {
                         CircularProgressIndicator(

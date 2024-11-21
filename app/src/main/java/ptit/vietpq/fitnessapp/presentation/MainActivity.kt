@@ -11,6 +11,7 @@ import ptit.vietpq.fitnessapp.data.local.sharepref.SharePreferenceProvider
 import ptit.vietpq.fitnessapp.presentation.home.HomeDestination
 import ptit.vietpq.fitnessapp.presentation.login.LoginDestination
 import ptit.vietpq.fitnessapp.presentation.main.FitnessApp
+import ptit.vietpq.fitnessapp.presentation.setup.SetupDestination
 import javax.inject.Inject
 
 @AndroidEntryPoint

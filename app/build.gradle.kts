@@ -180,6 +180,7 @@ dependencies {
     implementation (libs.exoplayer.core)
     implementation (libs.exoplayer.ui)
     implementation(libs.gson)
+    implementation(libs.vico.compose)
     implementation ("com.google.accompanist:accompanist-systemuicontroller:0.30.0")
 
     implementation ("com.github.jeziellago:compose-markdown:0.5.4")

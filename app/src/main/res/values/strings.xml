@@ -170,4 +170,11 @@
     <string name="join_now">Join Now</string>
     <string name="keep_me_active">Keep me active</string>
     <string name="reset_your_password">Reset Your Password</string>
+    <string name="total_sessions">Total Sessions</string>
+    <string name="average_duration">Average duration</string>
+    <string name="reps_completed">Reps Completed</string>
+    <string name="weight_used">Weight Used</string>
+    <string name="status">Status</string>
+    <string name="notes">Notes: %1$s</string>
+    <string name="session_details">Session Details</string>
 </resources>

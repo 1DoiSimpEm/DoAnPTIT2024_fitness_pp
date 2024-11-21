@@ -28,6 +28,8 @@ import ptit.vietpq.fitnessapp.presentation.password_setting.PasswordSettingDesti
 import ptit.vietpq.fitnessapp.presentation.password_setting.passwordSettingGraph
 import ptit.vietpq.fitnessapp.presentation.profile.ProfileDestination
 import ptit.vietpq.fitnessapp.presentation.profile.profileGraph
+import ptit.vietpq.fitnessapp.presentation.progress.ProgressDestination
+import ptit.vietpq.fitnessapp.presentation.progress.progressGraph
 import ptit.vietpq.fitnessapp.presentation.register.RegisterDestination
 import ptit.vietpq.fitnessapp.presentation.register.registerGraph
 import ptit.vietpq.fitnessapp.presentation.setting.SettingDestination
@@ -126,7 +128,10 @@ fun FitnessNavHost(
                 )
             },
             onProgressClicked = {
-                /*  NOT YET*/
+                onNavigateToDestination(
+                    ProgressDestination,
+                    ProgressDestination.route
+                )
             },
             onSettingsClicked = {
                 onNavigateToDestination(
@@ -168,6 +173,10 @@ fun FitnessNavHost(
                     SettingDestination.route
                 )
             }
+        )
+
+        progressGraph(
+            onBackPressed = onBackPressed
         )
 
         workoutCalendarGraph(
