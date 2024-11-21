@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -43,9 +44,8 @@ import ptit.vietpq.fitnessapp.ui.common.LoadingDialog
 @Composable
 fun ProfileRoute(
     onBackPressed: () -> Unit,
-    onMealListNavigate: () -> Unit,
+    onLoginNavigate: () -> Unit,
     onSettingNavigate: () -> Unit,
-    modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -76,7 +76,7 @@ fun ProfileRoute(
         isLoading = isLoading,
         onBackPressed = onBackPressed,
         onSettingNavigate = onSettingNavigate,
-        onMealListNavigate = onMealListNavigate,
+        onLoginNavigate = onLoginNavigate,
         onUpdateProfile = viewModel::updateUser
     )
 }
@@ -87,7 +87,7 @@ fun ProfileScreen(
     uiState: ProfileUiState,
     isLoading: Boolean,
     onBackPressed: () -> Unit,
-    onMealListNavigate: () -> Unit,
+    onLoginNavigate:() -> Unit,
     onSettingNavigate: () -> Unit,
     onUpdateProfile: (
         height: Int,
@@ -282,7 +282,9 @@ fun ProfileScreen(
                     onSettingNavigate()
                 }
                 MenuListItem(Icons.Default.Headphones, stringResource(R.string.help))
-                MenuListItem(Icons.Default.ExitToApp, stringResource(R.string.logout))
+                MenuListItem(Icons.AutoMirrored.Filled.ExitToApp, stringResource(R.string.logout)){
+                    onLoginNavigate()
+                }
             }
         }
     }
@@ -385,7 +387,7 @@ private fun ProfileScreenPreview() {
         uiState = ProfileUiState.Empty,
         isLoading = false,
         onBackPressed = {},
-        onMealListNavigate = {},
+        onLoginNavigate = {},
         onSettingNavigate = {},
         onUpdateProfile = { _, _, _, _ -> },
 

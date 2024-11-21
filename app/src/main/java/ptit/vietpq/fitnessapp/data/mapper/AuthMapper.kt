@@ -17,6 +17,4 @@ fun LoginResponse.asModel() = LoginModel(
 fun RegisterResponse.asModel() = RegisterModel(
     status = this.status,
     message = this.message,
-    accessToken = this.accessToken,
-    tokenType = this.tokenType
 )

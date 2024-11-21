@@ -42,7 +42,8 @@ fun LoadingDialog(
                         shape = RoundedCornerShape(8.dp)
                     ),
                 shape = RoundedCornerShape(8.dp),
-                tonalElevation = 4.dp
+                tonalElevation = 4.dp,
+                color = Color.White
             ) {
                 Column(
                     modifier = Modifier

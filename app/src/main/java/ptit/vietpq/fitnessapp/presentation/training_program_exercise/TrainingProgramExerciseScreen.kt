@@ -226,6 +226,10 @@ private fun ExerciseCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp,
             hoveredElevation = 8.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White,
+            contentColor = FitnessTheme.color.primary
         )
     ) {
         Column(

@@ -13,6 +13,7 @@ import ptit.vietpq.fitnessapp.presentation.exercise_category.exerciseCategoryGra
 import ptit.vietpq.fitnessapp.presentation.exercise_detail.exerciseDetailRoute
 import ptit.vietpq.fitnessapp.presentation.home.HomeDestination
 import ptit.vietpq.fitnessapp.presentation.home.homeGraph
+import ptit.vietpq.fitnessapp.presentation.login.LoginDestination
 import ptit.vietpq.fitnessapp.presentation.login.loginGraph
 import ptit.vietpq.fitnessapp.presentation.main.navigation.destination.FitnessNavigationDestination
 import ptit.vietpq.fitnessapp.presentation.meal_detailed.MealDetailedUiState
@@ -155,10 +156,10 @@ fun FitnessNavHost(
         )
         profileGraph(
             onBackPressed = onBackPressed,
-            onMealListNavigate = {
-                onNavigateToDestination(
-                    MealListDestination,
-                    MealListDestination.route
+            onLoginNavigate = {
+                onNavigateToDestinationPopUpTo(
+                    LoginDestination,
+                    LoginDestination.route
                 )
             },
             onSettingNavigate = {
