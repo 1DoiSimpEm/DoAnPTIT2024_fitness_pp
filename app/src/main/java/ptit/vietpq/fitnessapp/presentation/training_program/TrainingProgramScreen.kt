@@ -3,6 +3,7 @@ package ptit.vietpq.fitnessapp.presentation.training_program
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -29,18 +30,23 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.rounded.Schedule
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -90,7 +96,6 @@ fun TrainingProgramScreen(
     onProgramClicked: (TrainingProgramResponse) -> Unit,
     modifier: Modifier = Modifier
 ) {
-
     Scaffold(
         modifier = modifier.background(Color(0xFF1E1E1E)),
         topBar = {
@@ -216,6 +221,7 @@ private fun CategoryChip(
     }
 }
 
+
 @Composable
 private fun TrainingProgramCard(
     program: TrainingProgramResponse,
@@ -257,7 +263,7 @@ private fun TrainingProgramCard(
                     onSuccess = {
                         isImageLoading = false
                     },
-                    onError =  {
+                    onError = {
                         isImageLoading = false
                     }
                 )
@@ -351,6 +357,8 @@ private fun TrainingProgramCard(
         }
     }
 }
+
+
 
 @Preview
 @Composable

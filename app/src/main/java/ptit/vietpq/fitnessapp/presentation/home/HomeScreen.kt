@@ -2,6 +2,11 @@ package ptit.vietpq.fitnessapp.presentation.home
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -75,6 +80,7 @@ fun HomeRoute(
         onRecommendedItemClicked = onRecommendedItemClicked,
         onCalendarClicked = onCalendarClicked
     )
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

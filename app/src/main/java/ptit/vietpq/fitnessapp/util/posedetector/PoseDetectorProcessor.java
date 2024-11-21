@@ -31,15 +31,12 @@ import com.google.mlkit.vision.pose.PoseDetectorOptionsBase;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import ptit.vietpq.fitnessapp.presentation.exercise.ExerciseStats;
 import ptit.vietpq.fitnessapp.util.GraphicOverlay;
 import ptit.vietpq.fitnessapp.util.VisionProcessorBase;
 import ptit.vietpq.fitnessapp.util.posedetector.classification.PoseClassifierProcessor;
-import timber.log.Timber;
 
 /**
  * A processor to run pose detector.

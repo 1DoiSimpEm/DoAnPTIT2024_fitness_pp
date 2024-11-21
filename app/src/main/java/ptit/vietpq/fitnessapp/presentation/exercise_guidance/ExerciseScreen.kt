@@ -1,4 +1,4 @@
-package ptit.vietpq.fitnessapp.presentation.exercise
+package ptit.vietpq.fitnessapp.presentation.exercise_guidance
 
 import android.content.Context
 import androidx.annotation.OptIn

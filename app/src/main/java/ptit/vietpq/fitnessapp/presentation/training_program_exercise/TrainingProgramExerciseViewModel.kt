@@ -21,40 +21,8 @@ import javax.inject.Inject
 data class TrainingProgramExerciseUiState(
     val loading: Boolean = false,
     val error: Throwable? = null,
-    val trainingProgramExercises: ImmutableList<TrainingProgramExerciseResponse> = persistentListOf(
-        TrainingProgramExerciseResponse(
-            id = 1,
-            trainingProgramId = 1,
-            exerciseId = 1,
-            sets = 3,
-            reps = 10,
-            duration = 30,
-            restTime = 30,
-            order = 1,
-            exercise = ExerciseResponse(
-                id = 1,
-                name = "Push Up",
-                description = "Push up is a great exercise for your chest and triceps",
-                image = "https://media.tenor.com/6DiM1V23hkwAAAAe/two-black-people.png"
-            )
-        ),
-        TrainingProgramExerciseResponse(
-            id = 1,
-            trainingProgramId = 1,
-            exerciseId = 1,
-            sets = 3,
-            reps = 10,
-            duration = 30,
-            restTime = 30,
-            order = 1,
-            exercise = ExerciseResponse(
-                id = 1,
-                name = "Push Up",
-                description = "Push up is a great exercise for your chest and triceps",
-                image = "https://media.tenor.com/6DiM1V23hkwAAAAe/two-black-people.png"
-            )
-        ),
-    )
+    val trainingProgramExercises: ImmutableList<TrainingProgramExerciseResponse> = persistentListOf(),
+    val trainingProgram: TrainingProgramResponse? = null,
 )
 
 @HiltViewModel
@@ -62,7 +30,9 @@ class TrainingProgramExerciseViewModel @Inject constructor(
     private val getTrainingExerciseByTrainingProgramIDUseCase: GetTrainingExerciseByTrainingProgramIDUseCase,
     savedStateHandle: SavedStateHandle,
 ): ViewModel() {
-    private val _uiState = MutableStateFlow(TrainingProgramExerciseUiState())
+    private val _uiState = MutableStateFlow(TrainingProgramExerciseUiState().copy(
+        trainingProgram = savedStateHandle.getArg<TrainingProgramResponse>()
+    ))
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -71,7 +41,7 @@ class TrainingProgramExerciseViewModel @Inject constructor(
         )
     }
 
-    fun getTrainingProgramExercises(trainingProgramId: Int) {
+    private fun getTrainingProgramExercises(trainingProgramId: Int) {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(loading = true)

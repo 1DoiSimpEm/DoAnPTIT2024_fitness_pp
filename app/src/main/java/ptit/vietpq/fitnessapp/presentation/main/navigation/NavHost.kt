@@ -7,10 +7,11 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import ptit.vietpq.fitnessapp.data.remote.response.toModel
-import ptit.vietpq.fitnessapp.presentation.exercise.exerciseGraph
+import ptit.vietpq.fitnessapp.presentation.exercise_guidance.exerciseGraph
 import ptit.vietpq.fitnessapp.presentation.exercise_category.ExerciseCategoryDestination
 import ptit.vietpq.fitnessapp.presentation.exercise_category.exerciseCategoryGraph
 import ptit.vietpq.fitnessapp.presentation.exercise_detail.exerciseDetailRoute
+import ptit.vietpq.fitnessapp.presentation.exercise_guidance.ExerciseDestination
 import ptit.vietpq.fitnessapp.presentation.home.HomeDestination
 import ptit.vietpq.fitnessapp.presentation.home.homeGraph
 import ptit.vietpq.fitnessapp.presentation.login.LoginDestination
@@ -196,7 +197,13 @@ fun FitnessNavHost(
         )
 
         exerciseDetailRoute(
-            onBackPressed = onBackPressed
+            onBackPressed = onBackPressed,
+            onPoseDetectionClick = {
+                onNavigateToDestination(
+                    ExerciseDestination,
+                    ExerciseDestination.route
+                )
+            }
         )
         mealDetailedGraph(
             onBackPressed = onBackPressed,

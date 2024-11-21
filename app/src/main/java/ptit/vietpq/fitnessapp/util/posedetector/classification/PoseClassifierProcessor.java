@@ -20,7 +20,6 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Looper;
-import android.util.Log;
 
 import androidx.annotation.WorkerThread;
 
@@ -37,7 +36,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import ptit.vietpq.fitnessapp.presentation.exercise.ExerciseStats;
+import ptit.vietpq.fitnessapp.presentation.exercise_guidance.ExerciseStats;
 import ptit.vietpq.fitnessapp.util.posedetector.ExerciseInfo;
 import timber.log.Timber;
 

@@ -11,11 +11,13 @@ data object ExerciseDetailDestination : FitnessNavigationDestination {
 }
 
 fun NavGraphBuilder.exerciseDetailRoute(
-    onBackPressed : () -> Unit
+    onBackPressed : () -> Unit,
+    onPoseDetectionClick:() -> Unit,
 ) =
     composable<ExerciseResponse> {
         ExerciseDetailRoute(
-            onBackPressed = onBackPressed
+            onBackPressed = onBackPressed,
+            onPoseDetectionClick = onPoseDetectionClick
         )
     }
 

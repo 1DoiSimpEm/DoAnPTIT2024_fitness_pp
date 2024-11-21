@@ -177,4 +177,6 @@
     <string name="status">Status</string>
     <string name="notes">Notes: %1$s</string>
     <string name="session_details">Session Details</string>
+    <string name="pose_correction">Pose Correction</string>
+    <string name="start_now">Start Now</string>
 </resources>

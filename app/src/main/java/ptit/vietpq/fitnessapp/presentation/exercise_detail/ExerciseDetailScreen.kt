@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -47,6 +48,7 @@ import ptit.vietpq.fitnessapp.presentation.exercise_detail.component.VideoPlayer
 @Composable
 fun ExerciseDetailRoute(
     onBackPressed: () -> Unit,
+    onPoseDetectionClick:() -> Unit,
     viewModel: ExerciseDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -59,7 +61,8 @@ fun ExerciseDetailRoute(
         onStopwatchStart = viewModel::startStopwatch,
         onStopwatchPause = viewModel::pauseStopwatch,
         onStopwatchReset = viewModel::resetStopwatch,
-        onDurationSelected = viewModel::setDuration
+        onDurationSelected = viewModel::setDuration,
+        onPoseDetectionClick = onPoseDetectionClick,
     )
 }
 
@@ -76,6 +79,7 @@ fun ExerciseDetailScreen(
     onStopwatchPause: () -> Unit,
     onStopwatchReset: () -> Unit,
     onDurationSelected: (Long) -> Unit,
+    onPoseDetectionClick:() -> Unit,
     modifier: Modifier = Modifier
 ) {
     val chipColor =
@@ -116,13 +120,13 @@ fun ExerciseDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Handle profile */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = "Profile",
-                            tint = FitnessTheme.color.primary
-                        )
-                    }
+//                    IconButton(onClick = { /* Handle profile */ }) {
+//                        Icon(
+//                            imageVector = Icons.Default.Star,
+//                            contentDescription = "Profile",
+//                            tint = FitnessTheme.color.primary
+//                        )
+//                    }
                 }
             )
         }
@@ -224,6 +228,27 @@ fun ExerciseDetailScreen(
                                 }
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(text = stringResource(R.string.intermediate), color = Color.White)
+                            }
+                        )
+                        Chip(
+                            onClick = onPoseDetectionClick,
+                            colors = chipColor,
+                            label = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Icon(
+                                        modifier = Modifier.size(16.dp),
+                                        imageVector = Icons.Default.Psychology,
+                                        contentDescription = "Pose Correction",
+                                        tint = FitnessTheme.color.primary
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.pose_correction),
+                                        color = Color.White
+                                    )
+                                }
                             }
                         )
                     }

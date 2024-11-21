@@ -1,6 +1,8 @@
 package ptit.vietpq.fitnessapp.presentation.training_program_exercise
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -30,10 +32,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,6 +50,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -53,6 +61,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -61,16 +70,27 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import ptit.vietpq.fitnessapp.R
 import ptit.vietpq.fitnessapp.data.remote.response.ExerciseResponse
 import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramExerciseResponse
+import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramResponse
 import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.extension.withUrl
 import ptit.vietpq.fitnessapp.ui.common.LoadingDialog
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.with
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.delay
+
+@SuppressLint("ComposeModifierMissing")
 @Composable
 fun TrainingProgramExerciseRoute(
     onExerciseSelected: (TrainingProgramExerciseResponse) -> Unit,
@@ -78,12 +98,39 @@ fun TrainingProgramExerciseRoute(
     viewModel: TrainingProgramExerciseViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var showPreparation by remember { mutableStateOf(false) }
 
-    TrainingProgramExerciseScreen(
-        uiState = uiState,
-        onExerciseSelected = onExerciseSelected,
-        onBackPressed = onBackPressed
-    )
+    LaunchedEffect(true) {
+        delay(300)
+        showPreparation = true
+    }
+
+    AnimatedContent(
+        targetState = showPreparation,
+        transitionSpec = {
+            (slideInHorizontally() + fadeIn()) togetherWith
+                    (slideOutHorizontally() + fadeOut())
+        },
+        label = ""
+    ) { isPreparation ->
+        if (isPreparation) {
+            PreparationScreen(
+                program = uiState.trainingProgram ?: return@AnimatedContent,
+                onStartChallenge = {
+                    showPreparation = false
+                },
+                onBackPressed = {
+                    showPreparation = false
+                }
+            )
+        } else {
+            TrainingProgramExerciseScreen(
+                uiState = uiState,
+                onExerciseSelected = onExerciseSelected,
+                onBackPressed = onBackPressed
+            )
+        }
+    }
 }
 
 
@@ -456,6 +503,102 @@ private fun StatisticItem(
             color = Color.Gray
         )
     }
+}
+
+@Composable
+fun PreparationScreen(
+    program: TrainingProgramResponse,
+    onStartChallenge: () -> Unit,
+    onBackPressed: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+
+    Box(modifier = modifier.background(FitnessTheme.color.black)) {
+
+        IconButton(
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.TopStart),
+            onClick = onBackPressed
+        )
+        {
+            Icon(
+                imageVector = Icons.Default.ArrowBackIosNew,
+                contentDescription = null,
+                tint = Color.White
+            )
+        }
+
+        AsyncImage(
+            modifier = Modifier.fillMaxSize(),
+            contentDescription = null,
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(program.imageUrl)
+                .crossfade(true)
+                .build(),
+            contentScale = ContentScale.FillHeight,
+        )
+
+        AnimatedVisibility(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxWidth(),
+            visible = true,
+            enter = fadeIn() + slideInHorizontally(),
+            exit = fadeOut() + slideOutHorizontally()
+        ) {
+            Column(
+                modifier = Modifier
+                    .background(FitnessTheme.color.primary)
+                    .padding(32.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = program.name,
+                    style = FitnessTheme.typo.heading,
+                    color = Color.White
+                )
+                Text(
+                    text = program.description,
+                    style = FitnessTheme.typo.body,
+                    color = FitnessTheme.color.black,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+        }
+
+        Button(
+            onClick = onStartChallenge,
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(32.dp)
+                .height(48.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.White.copy(alpha = 0.15f),
+                contentColor = Color.White
+            )
+        ) {
+            Text(text = stringResource(R.string.start_now))
+        }
+    }
+}
+
+
+@Preview
+@Composable
+private fun PreviewPreparationScreen() {
+    val a = TrainingProgramResponse(
+        1,
+        "Beginner Program",
+        "https://via.placeholder.com/150",
+        1,
+        "This is a beginner program",
+        4,
+        "11"
+    )
+    PreparationScreen(program = a, onStartChallenge = { /*TODO*/ }, onBackPressed = {})
 }
 
 @Preview
