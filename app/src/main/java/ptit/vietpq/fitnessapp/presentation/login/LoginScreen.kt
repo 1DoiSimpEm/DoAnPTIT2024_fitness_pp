@@ -1,12 +1,20 @@
 package ptit.vietpq.fitnessapp.presentation.login
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,6 +26,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -48,6 +57,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusEvent
@@ -64,6 +74,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ptit.vietpq.fitnessapp.R
@@ -242,7 +253,7 @@ fun LoginScreen(
                             contentDescription = null,
                             tint = Color.White
                         )
-                    }
+                    },
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -321,7 +332,7 @@ fun LoginScreen(
                     )
                 }
 
-                Column (
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp),
@@ -364,45 +375,125 @@ fun AnimatedTextField(
     label: String,
     modifier: Modifier = Modifier,
     leadingIcon: @Composable (() -> Unit)? = null,
-    isPassword: Boolean = false
+    isPassword: Boolean = false,
+    regex: Regex? = null,
+    errorMessage: String = stringResource(R.string.invalid_input)
 ) {
     var isFocused by remember { mutableStateOf(false) }
+    var isError by remember { mutableStateOf(false) }
+    var showError by remember { mutableStateOf(false) }
+
+    // Animations
     val strokeWidth by animateFloatAsState(
         targetValue = if (isFocused) 2f else 1f,
         label = "stroke"
     )
 
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = {
-            Text(
-                text = label,
-                color = if (isFocused) Color.White else Color.White.copy(alpha = 0.7f)
-            )
+    val borderColor by animateColorAsState(
+        targetValue = when {
+            isError -> Color.Red
+            isFocused -> Color.White
+            else -> Color.White.copy(alpha = 0.7f)
         },
-        leadingIcon = leadingIcon,
-        modifier = modifier
-            .fillMaxWidth()
-            .border(
-                width = strokeWidth.dp,
-                color = if (isFocused) Color.White else Color.White.copy(alpha = 0.7f),
-                shape = RoundedCornerShape(12.dp)
-            )
-            .onFocusEvent {
-                isFocused = it.isFocused
-            },
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.White.copy(alpha = 0.1f),
-            unfocusedContainerColor = Color.White.copy(alpha = 0.1f),
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
-        ),
-        shape = RoundedCornerShape(12.dp),
-        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-        singleLine = true,
+        label = "borderColor"
     )
 
+    val containerColor by animateColorAsState(
+        targetValue = when {
+            isError -> Color.Red.copy(alpha = 0.1f)
+            isFocused -> Color.White.copy(alpha = 0.1f)
+            else -> Color.White.copy(alpha = 0.1f)
+        },
+        label = "containerColor"
+    )
+
+    val errorAlpha by animateFloatAsState(
+        targetValue = if (showError) 1f else 0f,
+        animationSpec = tween(durationMillis = 300),
+        label = "errorAlpha"
+    )
+
+    val shakeOffset by animateFloatAsState(
+        targetValue = if (isError) 0f else 10f,
+        animationSpec = spring(
+            dampingRatio = 0.2f,
+            stiffness = Spring.StiffnessHigh
+        ),
+        label = "shakeOffset"
+    )
+
+    Column {
+        TextField(
+            value = value,
+            onValueChange = { newValue ->
+                onValueChange(newValue)
+                if (regex != null && newValue.isNotEmpty()) {
+                    isError = !newValue.matches(regex)
+                    showError = isError
+                } else {
+                    isError = false
+                    showError = false
+                }
+            },
+            label = {
+                Text(
+                    text = label,
+                    color = when {
+                        isError -> Color.Red
+                        isFocused -> Color.White
+                        else -> Color.White.copy(alpha = 0.7f)
+                    }
+                )
+            },
+            leadingIcon = leadingIcon,
+            modifier = modifier
+                .fillMaxWidth()
+                .border(
+                    width = strokeWidth.dp,
+                    color = borderColor,
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .offset(x = if (isError) shakeOffset.dp else 0.dp)
+                .onFocusEvent {
+                    isFocused = it.isFocused
+                    if (!it.isFocused && regex != null) {
+                        isError = !value.matches(regex)
+                        showError = isError
+                    }
+                },
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = containerColor,
+                unfocusedContainerColor = containerColor,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                errorContainerColor = containerColor,
+                errorIndicatorColor = Color.Transparent,
+                errorLeadingIconColor = Color.Red,
+                errorTrailingIconColor = Color.Red,
+                errorCursorColor = Color.Red,
+                errorLabelColor = Color.Red
+            ),
+            shape = RoundedCornerShape(12.dp),
+            visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+            singleLine = true,
+            isError = isError
+        )
+
+        AnimatedVisibility(
+            visible = showError,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            Text(
+                text = errorMessage,
+                color = Color.Red,
+                fontSize = 12.sp,
+                modifier = Modifier
+                    .padding(start = 16.dp, top = 4.dp)
+                    .alpha(errorAlpha)
+            )
+        }
+    }
 }
 
 

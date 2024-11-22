@@ -48,7 +48,7 @@ import ptit.vietpq.fitnessapp.presentation.exercise_detail.component.VideoPlayer
 @Composable
 fun ExerciseDetailRoute(
     onBackPressed: () -> Unit,
-    onPoseDetectionClick:() -> Unit,
+    onPoseDetectionClick: () -> Unit,
     viewModel: ExerciseDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -79,7 +79,7 @@ fun ExerciseDetailScreen(
     onStopwatchPause: () -> Unit,
     onStopwatchReset: () -> Unit,
     onDurationSelected: (Long) -> Unit,
-    onPoseDetectionClick:() -> Unit,
+    onPoseDetectionClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val chipColor =
@@ -215,22 +215,6 @@ fun ExerciseDetailScreen(
                         Spacer(modifier = Modifier.width(8.dp))
 
                         Chip(
-                            onClick = { },
-                            colors = chipColor,
-                            label = {
-                                Row {
-                                    Icon(
-                                        modifier = Modifier.size(16.dp),
-                                        painter = painterResource(R.drawable.ic_fire),
-                                        contentDescription = "Difficulty",
-                                        tint = FitnessTheme.color.primary
-                                    )
-                                }
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(text = stringResource(R.string.intermediate), color = Color.White)
-                            }
-                        )
-                        Chip(
                             onClick = onPoseDetectionClick,
                             colors = chipColor,
                             label = {
@@ -244,6 +228,7 @@ fun ExerciseDetailScreen(
                                         contentDescription = "Pose Correction",
                                         tint = FitnessTheme.color.primary
                                     )
+                                    Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         text = stringResource(R.string.pose_correction),
                                         color = Color.White

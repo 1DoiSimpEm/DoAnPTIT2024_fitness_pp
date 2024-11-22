@@ -2,7 +2,6 @@ package ptit.vietpq.fitnessapp.presentation.register
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import ptit.vietpq.fitnessapp.presentation.login.LoginRoute
 import ptit.vietpq.fitnessapp.presentation.main.navigation.destination.FitnessNavigationDestination
 
 data object RegisterDestination : FitnessNavigationDestination {

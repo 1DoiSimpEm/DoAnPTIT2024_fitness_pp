@@ -50,7 +50,7 @@ import kotlin.math.roundToInt
 
 
 @Composable
-fun ExerciseScreen() {
+fun ExerciseGuidance() {
     PoseDetectionExerciseScreen(onSettingsClick = {})
 }
 

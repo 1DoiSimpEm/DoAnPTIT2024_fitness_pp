@@ -57,6 +57,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.util.PatternsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ptit.vietpq.fitnessapp.R
@@ -195,7 +196,7 @@ fun RegisterScreen(
                         .scale(scale),
                     contentAlignment = Alignment.Center,
 
-                ) {
+                    ) {
                     Icon(
                         imageVector = Icons.Default.Person,
                         contentDescription = null,
@@ -231,14 +232,15 @@ fun RegisterScreen(
                         Icon(
                             imageVector = Icons.Default.Email,
                             contentDescription = null,
-                            tint = Color.White
+                            tint = Color.White,
                         )
-                    }
+                    },
+                    regex = PatternsCompat.EMAIL_ADDRESS.toRegex(),
+                    errorMessage = stringResource(R.string.invalid_email),
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Password field
                 AnimatedTextField(
                     value = password,
                     onValueChange = { password = it },
@@ -250,7 +252,9 @@ fun RegisterScreen(
                             contentDescription = null,
                             tint = Color.White
                         )
-                    }
+                    },
+                    regex = Regex("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@\$!%*#?&])[A-Za-z\\d@\$!%*#?&]{8,}\$"),
+                    errorMessage = stringResource(R.string.password_must_contain_at_least_1_letter_1_number_and_be_at_least_8_characters_long)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -267,7 +271,10 @@ fun RegisterScreen(
                             contentDescription = null,
                             tint = Color.White
                         )
-                    }
+                    },
+                    regex =  Regex("^${Regex.escape(password)}\$"),
+                    errorMessage = stringResource(R.string.does_not_match_password)
+
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))

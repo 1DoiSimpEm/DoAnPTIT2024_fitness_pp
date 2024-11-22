@@ -37,7 +37,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ptit.vietpq.fitnessapp.R
+import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.extension.toast
+import ptit.vietpq.fitnessapp.presentation.setting.component.LogoutBottomSheet
 import ptit.vietpq.fitnessapp.ui.common.LoadingDialog
 
 
@@ -87,7 +89,7 @@ fun ProfileScreen(
     uiState: ProfileUiState,
     isLoading: Boolean,
     onBackPressed: () -> Unit,
-    onLoginNavigate:() -> Unit,
+    onLoginNavigate: () -> Unit,
     onSettingNavigate: () -> Unit,
     onUpdateProfile: (
         height: Int,
@@ -124,6 +126,21 @@ fun ProfileScreen(
     }
 
     LoadingDialog(isLoading = isLoading)
+
+    var showLogoutBottomSheet by remember {
+        mutableStateOf(false)
+    }
+
+    LogoutBottomSheet(
+        showSheet = showLogoutBottomSheet,
+        onDismiss = {
+            showLogoutBottomSheet = false
+        },
+        onLogout = {
+            showLogoutBottomSheet = false
+            onLoginNavigate()
+        }
+    )
 
     Scaffold { paddingValues ->
         Column(
@@ -282,9 +299,18 @@ fun ProfileScreen(
                     onSettingNavigate()
                 }
                 MenuListItem(Icons.Default.Headphones, stringResource(R.string.help))
-                MenuListItem(Icons.AutoMirrored.Filled.ExitToApp, stringResource(R.string.logout)){
-                    onLoginNavigate()
+                MenuListItem(Icons.AutoMirrored.Filled.ExitToApp, stringResource(R.string.logout)) {
+                    showLogoutBottomSheet = true
                 }
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(
+                        bottom = 16.dp
+                    ),
+                    text = stringResource(R.string.made_by_vietpq_all_right_reserved),
+                    color = Color.LightGray,
+                    style = FitnessTheme.typo.body,
+                )
             }
         }
     }

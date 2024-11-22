@@ -12,5 +12,5 @@ data object ExerciseDestination : FitnessNavigationDestination {
 fun NavGraphBuilder.exerciseGraph(
 ) =
     composable(route = ExerciseDestination.route) {
-        ExerciseScreen()
+        ExerciseGuidance()
     }

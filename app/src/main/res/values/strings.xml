@@ -179,4 +179,13 @@
     <string name="session_details">Session Details</string>
     <string name="pose_correction">Pose Correction</string>
     <string name="start_now">Start Now</string>
+    <string name="are_you_sure_you_want_to_log_out">Are you sure you want to\nlog out?</string>
+    <string name="yes_logout">Yes, logout</string>
+    <string name="invalid_input">Invalid input</string>
+    <string name="password_must_contain_at_least_1_letter_1_number_and_be_at_least_8_characters_long">
+        Password must contain at least 1 letter, 1 number, 1 special character and be at least 8 characters long
+    </string>
+    <string name="invalid_email">Invalid email</string>
+    <string name="does_not_match_password">Does not match password</string>
+    <string name="made_by_vietpq_all_right_reserved">Made by VietPQ, all right reserved</string>
 </resources>
