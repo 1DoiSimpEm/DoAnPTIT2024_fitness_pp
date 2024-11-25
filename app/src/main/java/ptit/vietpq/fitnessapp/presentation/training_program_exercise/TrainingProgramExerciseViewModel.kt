@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ptit.vietpq.fitnessapp.data.remote.response.ExerciseResponse
 import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramExerciseResponse
 import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramResponse
 import ptit.vietpq.fitnessapp.domain.usecase.GetTrainingExerciseByTrainingProgramIDUseCase

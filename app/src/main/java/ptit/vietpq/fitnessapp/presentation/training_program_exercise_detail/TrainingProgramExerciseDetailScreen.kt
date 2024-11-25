@@ -1,5 +1,11 @@
 package ptit.vietpq.fitnessapp.presentation.training_program_exercise_detail
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,7 +33,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,6 +51,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
 import ptit.vietpq.fitnessapp.extension.withUrl
+import ptit.vietpq.fitnessapp.presentation.exercise_detail.TimerState
+import ptit.vietpq.fitnessapp.presentation.exercise_detail.component.Congrats
 import ptit.vietpq.fitnessapp.presentation.exercise_detail.component.TimerStopwatchSection
 import ptit.vietpq.fitnessapp.presentation.exercise_detail.component.VideoPlayer
 
@@ -50,18 +62,47 @@ fun TrainingProgramExerciseDetailRoute(
     viewModel: TrainingProgramExerciseDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    TrainingProgramExerciseDetailScreen(
-        uiState = uiState,
-        onBackPressed = onBackPressed,
-        onTimerStart = viewModel::startTimer,
-        onTimerPause = viewModel::pauseTimer,
-        onTimerReset = viewModel::resetTimer,
-        onStopwatchStart = viewModel::startStopwatch,
-        onStopwatchPause = viewModel::pauseStopwatch,
-        onStopwatchReset = viewModel::resetStopwatch,
-    )
-}
+    var showCongrats by remember {
+        mutableStateOf(false)
+    }
 
+
+    LaunchedEffect(uiState.timerState) {
+        when(uiState.timerState){
+            TimerState.Finished -> {
+                showCongrats = true
+            }
+            TimerState.Idle -> Unit
+            TimerState.Paused -> Unit
+            is TimerState.Running -> Unit
+        }
+    }
+
+    AnimatedContent(
+        targetState = showCongrats,
+        transitionSpec = {
+            (slideInHorizontally() + fadeIn()) togetherWith
+                    (slideOutHorizontally() + fadeOut())
+        },
+        label = ""
+    ) { onCongrats ->
+        if (onCongrats) {
+            Congrats()
+        } else {
+            TrainingProgramExerciseDetailScreen(
+                uiState = uiState,
+                onBackPressed = onBackPressed,
+                onTimerStart = viewModel::startTimer,
+                onTimerPause = viewModel::pauseTimer,
+                onTimerReset = viewModel::resetTimer,
+                onStopwatchStart = viewModel::startStopwatch,
+                onStopwatchPause = viewModel::pauseStopwatch,
+                onStopwatchReset = viewModel::resetStopwatch,
+            )
+        }
+
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -201,7 +242,10 @@ fun TrainingProgramExerciseDetailScreen(
                                     )
                                 }
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("${uiState.exercise.duration} Seconds", color = Color.White)
+                                Text(
+                                    "${uiState.exercise.duration} Seconds",
+                                    color = Color.White
+                                )
                             }
                         )
 
@@ -220,7 +264,10 @@ fun TrainingProgramExerciseDetailScreen(
                                     )
                                 }
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text(stringResource(id = R.string.intermediate), color = Color.White)
+                                Text(
+                                    stringResource(id = R.string.intermediate),
+                                    color = Color.White
+                                )
                             }
                         )
                     }

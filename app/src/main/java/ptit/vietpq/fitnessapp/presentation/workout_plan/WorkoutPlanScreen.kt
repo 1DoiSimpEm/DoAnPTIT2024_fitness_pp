@@ -671,7 +671,6 @@ private fun CreateWorkoutPlanDialog(
                     ) {
                         Text(
                             modifier = Modifier.padding(
-                                vertical = 6.dp,
                                 horizontal = 12.dp
                             ), text = "Cancel"
                         )
@@ -696,7 +695,6 @@ private fun CreateWorkoutPlanDialog(
                     ) {
                         Text(
                             modifier = Modifier.padding(
-                                vertical = 6.dp,
                                 horizontal = 12.dp
                             ), text = stringResource(R.string.create), color = Color.White
                         )
