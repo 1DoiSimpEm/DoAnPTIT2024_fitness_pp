@@ -10,15 +10,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,6 +47,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
@@ -71,7 +77,6 @@ import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramResponse
 import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.ui.common.LoadingDialog
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserExerciseProgressRoute(
     onBackPressed: () -> Unit,
@@ -136,14 +141,59 @@ fun UserExerciseProgressScreen(
                 .padding(innerPadding)
                 .background(FitnessTheme.color.black)
         ) {
-            // Progress Overview
-            ProgressOverviewRow(uiState.progressList)
+            if (uiState.progressList.isEmpty()) {
+                ProgressEmpty(
+                    onCreateProgressClicked = {}
+                )
+            } else {
+                ProgressOverviewRow(uiState.progressList)
 
-            // Progress Chart
-            ProgressChart(uiState.progressList)
+                ProgressChart(uiState.progressList)
 
-            // Detailed Progress List
-            ProgressDetailList(uiState.progressList)
+                ProgressDetailList(uiState.progressList)
+            }
+
+        }
+    }
+}
+
+@Composable
+private fun ProgressEmpty(
+    modifier: Modifier = Modifier,
+    onCreateProgressClicked: () -> Unit
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.History,
+            contentDescription = null,
+            modifier = Modifier.size(128.dp),
+            tint = FitnessTheme.color.primary
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = stringResource(R.string.oops_you_haven_t_tracked_any_progress_yet),
+            fontSize = 18.sp,
+            color = Color.White,
+            style = FitnessTheme.typo.caption
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(
+            onClick = onCreateProgressClicked,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = FitnessTheme.color.limeGreen,
+                contentColor = FitnessTheme.color.primary
+            )
+        ) {
+            Text(
+                text = stringResource(id = R.string.create_meal_prompt),
+                style = FitnessTheme.typo.button,
+            )
         }
     }
 }

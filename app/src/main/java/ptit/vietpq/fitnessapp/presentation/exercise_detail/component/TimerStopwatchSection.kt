@@ -58,7 +58,7 @@ fun TimerStopwatchSection(
             .padding(16.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = FitnessTheme.color.white
+            containerColor = FitnessTheme.color.white.copy(alpha = 0.15f)
         )
     ) {
         Column(

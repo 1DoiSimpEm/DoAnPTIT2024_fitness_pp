@@ -188,4 +188,7 @@
     <string name="invalid_email">Invalid email</string>
     <string name="does_not_match_password">Does not match password</string>
     <string name="made_by_vietpq_all_right_reserved">Made by VietPQ, all right reserved</string>
+    <string name="oops_you_haven_t_tracked_any_progress_yet">Oops! You haven\'t tracked any progress yet.</string>
+    <string name="welcome_to_fitness_app">Welcome to Fitness App!</string>
+    <string name="time_to_get_fit_and_healthy_let_s_start_by_setting_up_your_profile">Time to get fit and healthy. Let\'s start by setting up your profile.</string>
 </resources>

@@ -252,18 +252,36 @@ public class PoseClassifierProcessor {
     private Map<String, Float> calculatePushupAngles(Pose pose) {
         Map<String, Float> angles = new HashMap<>();
 
-        // Calculate elbow angle
-        PoseLandmark leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER);
-        PoseLandmark leftElbow = pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW);
-        PoseLandmark leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST);
+        // Calculate both left and right side angles for more robust detection
+        float leftElbowAngle = calculateAngle(
+                pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER),
+                pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW),
+                pose.getPoseLandmark(PoseLandmark.LEFT_WRIST)
+        );
+        float rightElbowAngle = calculateAngle(
+                pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER),
+                pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW),
+                pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST)
+        );
 
-        float elbowAngle = calculateAngle(leftShoulder, leftElbow, leftWrist);
+        // Average of both sides for more accurate representation
+        float elbowAngle = (leftElbowAngle + rightElbowAngle) / 2;
         angles.put("elbow_angle", elbowAngle);
 
-        // Calculate back angle (relative to ground)
+        // Calculate back angle using both hip and shoulder landmarks
+        PoseLandmark leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER);
+        PoseLandmark rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER);
         PoseLandmark leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP);
-        float backAngle = calculateAngleToGround(leftShoulder, leftHip);
+        PoseLandmark rightHip = pose.getPoseLandmark(PoseLandmark.RIGHT_HIP);
+
+        float backAngleLeft = calculateAngleToGround(leftShoulder, leftHip);
+        float backAngleRight = calculateAngleToGround(rightShoulder, rightHip);
+        float backAngle = (backAngleLeft + backAngleRight) / 2;
         angles.put("back_angle", backAngle);
+
+        // Additional body alignment metrics
+        float shoulderAlignment = calculateHorizontalAlignment(leftShoulder, rightShoulder);
+        angles.put("shoulder_alignment", shoulderAlignment);
 
         return angles;
     }
@@ -271,18 +289,35 @@ public class PoseClassifierProcessor {
     private Map<String, Float> calculateSquatAngles(Pose pose) {
         Map<String, Float> angles = new HashMap<>();
 
-        // Calculate knee angle
-        PoseLandmark leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP);
-        PoseLandmark leftKnee = pose.getPoseLandmark(PoseLandmark.LEFT_KNEE);
-        PoseLandmark leftAnkle = pose.getPoseLandmark(PoseLandmark.LEFT_ANKLE);
+        // Calculate both left and right side angles
+        float leftKneeAngle = calculateAngle(
+                pose.getPoseLandmark(PoseLandmark.LEFT_HIP),
+                pose.getPoseLandmark(PoseLandmark.LEFT_KNEE),
+                pose.getPoseLandmark(PoseLandmark.LEFT_ANKLE)
+        );
+        float rightKneeAngle = calculateAngle(
+                pose.getPoseLandmark(PoseLandmark.RIGHT_HIP),
+                pose.getPoseLandmark(PoseLandmark.RIGHT_KNEE),
+                pose.getPoseLandmark(PoseLandmark.RIGHT_ANKLE)
+        );
 
-        float kneeAngle = calculateAngle(leftHip, leftKnee, leftAnkle);
+        float kneeAngle = (leftKneeAngle + rightKneeAngle) / 2;
         angles.put("knee_angle", kneeAngle);
 
-        // Calculate hip angle
+        // Hip angle calculation
         PoseLandmark leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER);
-        float hipAngle = calculateAngle(leftShoulder, leftHip, leftKnee);
+        PoseLandmark rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER);
+        PoseLandmark leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP);
+        PoseLandmark rightHip = pose.getPoseLandmark(PoseLandmark.RIGHT_HIP);
+
+        float leftHipAngle = calculateAngle(leftShoulder, leftHip, leftHip);
+        float rightHipAngle = calculateAngle(rightShoulder, rightHip, rightHip);
+        float hipAngle = (leftHipAngle + rightHipAngle) / 2;
         angles.put("hip_angle", hipAngle);
+
+        // Depth and balance metrics
+        float horizontalBalance = calculateHorizontalBalance(pose);
+        angles.put("horizontal_balance", horizontalBalance);
 
         return angles;
     }
@@ -292,18 +327,26 @@ public class PoseClassifierProcessor {
 
         float elbowAngle = angles.get("elbow_angle");
         float backAngle = angles.get("back_angle");
+        float shoulderAlignment = angles.get("shoulder_alignment");
 
-        if (elbowAngle < 90) {
-            feedback.append("Go lower in your pushup. ");
-        } else if (elbowAngle > 160) {
-            feedback.append("Push up more to fully extend arms. ");
+        // Detailed elbow angle feedback
+        if (elbowAngle < 70) {
+            feedback.append("Go deeper: Bend your elbows more at the bottom of the pushup. ");
+        } else if (elbowAngle > 170) {
+            feedback.append("Full extension: Straighten your arms completely at the top. ");
         }
 
-        if (backAngle < 170) {
-            feedback.append("Keep your back straight. ");
+        // Back alignment feedback
+        if (backAngle < 160) {
+            feedback.append("Keep your back straight. Maintain a rigid plank-like position. ");
         }
 
-        return feedback.length() > 0 ? feedback.toString() : "Good form!";
+        // Shoulder alignment feedback
+        if (Math.abs(shoulderAlignment) > 5) {
+            feedback.append("Level your shoulders. Maintain even weight distribution. ");
+        }
+
+        return feedback.length() > 0 ? feedback.toString() : "Excellent pushup form!";
     }
 
     private String generateSquatFeedback(Map<String, Float> angles) {
@@ -311,18 +354,39 @@ public class PoseClassifierProcessor {
 
         float kneeAngle = angles.get("knee_angle");
         float hipAngle = angles.get("hip_angle");
+        float horizontalBalance = angles.get("horizontal_balance");
 
-        if (kneeAngle > 90) {
-            feedback.append("Squat lower. ");
-        } else if (kneeAngle < 45) {
-            feedback.append("Don't squat too low. ");
+        // Knee angle progression feedback
+        if (kneeAngle > 110) {
+            feedback.append("Squat deeper: Aim to get thighs parallel to ground. ");
+        } else if (kneeAngle < 60) {
+            feedback.append("Don't overextend: Avoid going too low to prevent knee strain. ");
         }
 
-        if (hipAngle < 90) {
-            feedback.append("Keep your back more upright. ");
+        // Hip and back posture feedback
+        if (hipAngle < 80) {
+            feedback.append("Keep your torso more upright. Chest up, back straight. ");
         }
 
-        return feedback.length() > 0 ? feedback.toString() : "Good form!";
+        // Balance feedback
+        if (Math.abs(horizontalBalance) > 10) {
+            feedback.append("Balance your weight evenly. Distribute weight through both feet. ");
+        }
+
+        return feedback.length() > 0 ? feedback.toString() : "Perfect squat technique!";
+    }
+
+    private float calculateHorizontalAlignment(PoseLandmark left, PoseLandmark right) {
+        // Calculate horizontal misalignment between two landmarks
+        return right.getPosition().x - left.getPosition().x;
+    }
+
+    private float calculateHorizontalBalance(Pose pose) {
+        PoseLandmark leftAnkle = pose.getPoseLandmark(PoseLandmark.LEFT_ANKLE);
+        PoseLandmark rightAnkle = pose.getPoseLandmark(PoseLandmark.RIGHT_ANKLE);
+
+        // Return the difference in x-position to measure balance
+        return rightAnkle.getPosition().x - leftAnkle.getPosition().x;
     }
 
     private float calculateAngle(PoseLandmark first, PoseLandmark middle, PoseLandmark last) {

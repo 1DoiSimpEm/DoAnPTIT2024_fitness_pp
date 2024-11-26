@@ -44,6 +44,7 @@ fun SetupRoute(
 ) {
     val context = LocalContext.current
     val state by viewModel.eventFlow.collectAsStateWithLifecycle(initialValue = SetupState.Idle)
+    val screenState by viewModel.state.collectAsStateWithLifecycle()
     var isLoading by remember {
         mutableStateOf(false)
     }
@@ -65,19 +66,19 @@ fun SetupRoute(
     }
     LoadingDialog(isLoading)
     SetupScreen(
-        viewModel =viewModel,
+        state = screenState,
+        onEvent = viewModel::onEvent
     )
 }
 
 @Composable
 fun SetupScreen(
-    viewModel: SetupViewModel,
+    state: SetupScreenState,
+    onEvent: (SetupScreenEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-
     BackHandler {
-        viewModel.onEvent(SetupScreenEvent.OnBackPressed)
+        onEvent(SetupScreenEvent.OnBackPressed)
     }
 
     LoadingDialog(isLoading = state.isLoading)
@@ -87,7 +88,7 @@ fun SetupScreen(
         containerColor = FitnessTheme.color.black,
         topBar = {
             SetupTopBar(
-                onBackClick = { viewModel.onEvent(SetupScreenEvent.OnBackPressed) },
+                onBackClick = { onEvent(SetupScreenEvent.OnBackPressed) },
                 showBack = state.currentStep != SetupStep.Weight
             )
         }
@@ -98,28 +99,28 @@ fun SetupScreen(
                     innerPadding = innerPadding,
                     initialWeight = state.weight,
                     onContinueClick = { weight ->
-                        viewModel.onEvent(SetupScreenEvent.OnWeightSelected(weight))
+                        onEvent(SetupScreenEvent.OnWeightSelected(weight))
                     }
                 )
                 SetupStep.Height -> HeightPicker(
                     innerPadding = innerPadding,
                     initialHeight = state.height,
                     onContinueClick = { height ->
-                        viewModel.onEvent(SetupScreenEvent.OnHeightSelected(height))
+                        onEvent(SetupScreenEvent.OnHeightSelected(height))
                     }
                 )
                 SetupStep.Age -> AgePicker(
                     innerPadding = innerPadding,
                     initialAge = state.age,
                     onContinueClick = { age ->
-                        viewModel.onEvent(SetupScreenEvent.OnAgeSelected(age))
+                        onEvent(SetupScreenEvent.OnAgeSelected(age))
                     }
                 )
                 SetupStep.Gender -> GenderSelection(
                     innerPadding = innerPadding,
                     isMale = state.isMale,
                     onContinueClick = { isMale ->
-                        viewModel.onEvent(SetupScreenEvent.OnGenderSelected(isMale))
+                        onEvent(SetupScreenEvent.OnGenderSelected(isMale))
                     }
                 )
             }
@@ -174,6 +175,7 @@ private fun SetupTopBar(
 @Composable
 fun SetupScreenPreview() {
     SetupScreen(
-        viewModel = hiltViewModel()
+        state = SetupScreenState(),
+        onEvent = {}
     )
 }
