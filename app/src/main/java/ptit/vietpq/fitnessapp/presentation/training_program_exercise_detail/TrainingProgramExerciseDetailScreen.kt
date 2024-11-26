@@ -66,7 +66,6 @@ fun TrainingProgramExerciseDetailRoute(
         mutableStateOf(false)
     }
 
-
     LaunchedEffect(uiState.timerState) {
         when(uiState.timerState){
             TimerState.Finished -> {

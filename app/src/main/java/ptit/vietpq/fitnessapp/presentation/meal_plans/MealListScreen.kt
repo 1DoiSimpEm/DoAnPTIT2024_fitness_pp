@@ -60,9 +60,7 @@ fun MealListRoute(
     MealPlanListScreen(
         uiState = uiState,
         onBackPressed = onBackPressed,
-        onMealPlanClick = {
-            onMealPlanClick(it)
-        },
+        onMealPlanClick = onMealPlanClick,
         onMealAddClicked = onMealAddClicked
     )
 }
