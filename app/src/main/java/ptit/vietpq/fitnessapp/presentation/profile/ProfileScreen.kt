@@ -69,7 +69,6 @@ fun ProfileRoute(
 
         ProfileState.Success -> {
             isLoading = false
-            context.toast("Success")
         }
     }
 

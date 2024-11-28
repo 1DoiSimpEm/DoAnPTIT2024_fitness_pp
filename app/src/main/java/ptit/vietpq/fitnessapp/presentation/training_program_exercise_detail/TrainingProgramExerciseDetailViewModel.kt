@@ -10,7 +10,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ptit.vietpq.fitnessapp.data.local.session.Session
 import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramExercise
+import ptit.vietpq.fitnessapp.domain.usecase.PostProgressUseCase
 import ptit.vietpq.fitnessapp.extension.getArg
 import ptit.vietpq.fitnessapp.presentation.exercise_detail.StopWatchState
 import ptit.vietpq.fitnessapp.presentation.exercise_detail.TimerState
@@ -33,7 +35,8 @@ data class TrainingProgramExerciseDetailUiState(
 
 @HiltViewModel
 class TrainingProgramExerciseDetailViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val postProgressUseCase: PostProgressUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
         TrainingProgramExerciseDetailUiState.initial(
@@ -45,6 +48,32 @@ class TrainingProgramExerciseDetailViewModel @Inject constructor(
 
     private var timerJob: Job? = null
     private var stopwatchJob: Job? = null
+
+    init {
+        Session.trainingProgramId = _uiState.value.exercise.trainingProgramId
+        Session.trainingProgramExerciseId = _uiState.value.exercise.id
+        Session.exerciseId  = _uiState.value.exercise.exerciseId
+    }
+
+    fun postProgress(
+        setsCompleted: Int = 0,
+        repsCompleted: Int = 0,
+        weightUsed: Int = 0,
+        duration: Int = 0,
+        status: String = "",
+        notes: String = ""
+    ) {
+        viewModelScope.launch {
+            postProgressUseCase(
+                setsCompleted = setsCompleted,
+                repsCompleted = repsCompleted,
+                weightUsed = weightUsed,
+                duration = duration,
+                status = status,
+                notes = notes
+            )
+        }
+    }
 
     fun startTimer() {
         timerJob?.cancel()

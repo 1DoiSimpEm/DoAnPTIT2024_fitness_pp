@@ -16,3 +16,8 @@ fun Long.formatTimestamp(): String {
 fun String.withUrl() = "$BASE_URL/$this"
 
 fun String.toLocalDate(): LocalDate = LocalDate.parse(this, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+
+fun Date.toCurrentDateString(): String {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    return dateFormat.format(this)
+}

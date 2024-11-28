@@ -915,7 +915,7 @@ private fun ExerciseSelectionListItem(
                 color = Color.White
             )
             Text(
-                text = "${exercise.sets} sets × ${exercise.reps} reps",
+                text = stringResource(R.string.sets_reps, exercise.sets, exercise.reps),
                 style = FitnessTheme.typo.caption,
                 color = Color.White.copy(alpha = 0.7f)
             )

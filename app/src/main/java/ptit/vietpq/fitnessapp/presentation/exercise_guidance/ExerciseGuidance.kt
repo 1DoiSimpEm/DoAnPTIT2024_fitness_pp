@@ -30,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +45,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.google.mlkit.vision.pose.defaults.PoseDetectorOptions
 import ptit.vietpq.fitnessapp.util.GraphicOverlay
+import ptit.vietpq.fitnessapp.util.SpeechHelper
 import ptit.vietpq.fitnessapp.util.posedetector.ExerciseInfo
 import ptit.vietpq.fitnessapp.util.posedetector.PoseDetectorProcessor
 import kotlin.math.roundToInt
@@ -72,6 +74,19 @@ fun PoseDetectionExerciseScreen(
                   ""
             )
         )
+    }
+
+    DisposableEffect(Unit){
+        SpeechHelper.initialize(context)
+        onDispose {
+            SpeechHelper.shutdown()
+        }
+    }
+
+    LaunchedEffect(exerciseInfo.formFeedback) {
+        if (exerciseInfo.formFeedback.isNotEmpty()) {
+            SpeechHelper.speak(exerciseInfo.formFeedback)
+        }
     }
 
     Box(modifier = modifier.fillMaxSize()) {
