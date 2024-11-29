@@ -100,7 +100,6 @@ fun ProfileScreen(
 ) {
     val purple = Color(0xFF9D84FF)
     val darkBackground = Color(0xFF1E1E1E)
-    val lightPurple = Color(0xFFE5E0FF)
     var isUpdatingState by remember { mutableStateOf(false) }
     var fullName by remember { mutableStateOf(uiState.user?.username) }
     var age by remember { mutableIntStateOf(uiState.user?.age ?: 0) }
@@ -236,7 +235,7 @@ fun ProfileScreen(
                             .height(36.dp)
                             .background(Color.White)
                     )
-                    StatItem("${height} CM", stringResource(R.string.height))
+                    StatItem("$height CM", stringResource(R.string.height))
                 }
             }
             if (isUpdatingState) {

@@ -8,5 +8,5 @@ import retrofit2.http.POST
 
 interface ProgressService {
     @POST("/api/user-exercise-progress/")
-    fun postProgress(@Body progress : ProgressRequest) : Response<ProgressResponse>
+    suspend fun postProgress(@Body progress : ProgressRequest) : Response<ProgressResponse>
 }

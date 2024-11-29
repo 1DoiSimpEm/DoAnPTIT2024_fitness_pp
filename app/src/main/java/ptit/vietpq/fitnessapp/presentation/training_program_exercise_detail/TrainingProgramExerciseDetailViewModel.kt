@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ptit.vietpq.fitnessapp.data.local.session.Session
 import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramExercise
+import ptit.vietpq.fitnessapp.domain.model.ProgressData
 import ptit.vietpq.fitnessapp.domain.usecase.PostProgressUseCase
 import ptit.vietpq.fitnessapp.extension.getArg
 import ptit.vietpq.fitnessapp.presentation.exercise_detail.StopWatchState
@@ -22,13 +23,15 @@ import javax.inject.Inject
 data class TrainingProgramExerciseDetailUiState(
     val exercise: TrainingProgramExercise,
     val isFavorite: Boolean,
+    val isLoading: Boolean,
     val timerState: TimerState = TimerState.Idle,
     val stopwatchState: StopWatchState = StopWatchState.Idle,
 ) {
     companion object {
         fun initial(exercise: TrainingProgramExercise) = TrainingProgramExerciseDetailUiState(
             exercise = exercise,
-            isFavorite = false
+            isFavorite = false,
+            isLoading = false
         )
     }
 }
@@ -52,26 +55,32 @@ class TrainingProgramExerciseDetailViewModel @Inject constructor(
     init {
         Session.trainingProgramId = _uiState.value.exercise.trainingProgramId
         Session.trainingProgramExerciseId = _uiState.value.exercise.id
-        Session.exerciseId  = _uiState.value.exercise.exerciseId
+        Session.exerciseId = _uiState.value.exercise.exerciseId
     }
 
-    fun postProgress(
-        setsCompleted: Int = 0,
-        repsCompleted: Int = 0,
-        weightUsed: Int = 0,
-        duration: Int = 0,
-        status: String = "",
-        notes: String = ""
-    ) {
+    fun postProgress(progressData: ProgressData) {
         viewModelScope.launch {
-            postProgressUseCase(
-                setsCompleted = setsCompleted,
-                repsCompleted = repsCompleted,
-                weightUsed = weightUsed,
-                duration = duration,
-                status = status,
-                notes = notes
+            _uiState.update {
+                it.copy(isLoading = true)
+            }
+            val result = postProgressUseCase(
+                setsCompleted = progressData.setsCompleted,
+                repsCompleted = progressData.repsCompleted,
+                weightUsed = progressData.weightUsed,
+                duration = _uiState.value.exercise.duration,
+                status = "Completed",
+                notes = progressData.notes
             )
+            result.onSuccess {
+                _uiState.update {
+                    it.copy(isLoading = false)
+                }
+            }
+            result.onFailure {
+                _uiState.update {
+                    it.copy(isLoading = false)
+                }
+            }
         }
     }
 

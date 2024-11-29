@@ -192,4 +192,9 @@
     <string name="welcome_to_fitness_app">Welcome to Fitness App!</string>
     <string name="time_to_get_fit_and_healthy_let_s_start_by_setting_up_your_profile">Time to get fit and healthy. Let\'s start by setting up your profile.</string>
     <string name="sets_reps">%1$s sets × %2$s reps</string>
+    <string name="log_progress_for">Log Progress for %1$s</string>
+    <string name="sets_completed">Sets Completed</string>
+    <string name="weight_used_kg">Weight Used (Kg)</string>
+    <string name="notes_optional">Notes (Optional)</string>
+    <string name="save_progress">Save Progress</string>
 </resources>

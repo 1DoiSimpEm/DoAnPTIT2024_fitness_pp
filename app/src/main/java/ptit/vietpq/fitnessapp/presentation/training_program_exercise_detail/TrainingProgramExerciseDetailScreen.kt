@@ -8,6 +8,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,20 +18,27 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ChipColors
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
@@ -45,12 +53,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
+import ptit.vietpq.fitnessapp.data.remote.response.TrainingProgramExercise
+import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
+import ptit.vietpq.fitnessapp.domain.model.ProgressData
 import ptit.vietpq.fitnessapp.extension.withUrl
 import ptit.vietpq.fitnessapp.presentation.exercise_detail.TimerState
 import ptit.vietpq.fitnessapp.presentation.exercise_detail.component.Congrats
@@ -66,12 +79,23 @@ fun TrainingProgramExerciseDetailRoute(
     var showCongrats by remember {
         mutableStateOf(false)
     }
+    var showProgressDialog by remember { mutableStateOf(false) }
+    if (showProgressDialog) {
+        ExerciseProgressDialog(
+            exercise = uiState.exercise,
+            onDismiss = { showProgressDialog = false },
+            onSubmit = {
+                viewModel.postProgress(it)
+            }
+        )
+    }
 
     LaunchedEffect(uiState.timerState) {
-        when(uiState.timerState){
+        when (uiState.timerState) {
             TimerState.Finished -> {
                 showCongrats = true
             }
+
             TimerState.Idle -> Unit
             TimerState.Paused -> Unit
             is TimerState.Running -> Unit
@@ -98,6 +122,9 @@ fun TrainingProgramExerciseDetailRoute(
                 onStopwatchStart = viewModel::startStopwatch,
                 onStopwatchPause = viewModel::pauseStopwatch,
                 onStopwatchReset = viewModel::resetStopwatch,
+                onFinishExercise = {
+                    showProgressDialog = true
+                }
             )
         }
 
@@ -115,6 +142,7 @@ fun TrainingProgramExerciseDetailScreen(
     onStopwatchStart: () -> Unit,
     onStopwatchPause: () -> Unit,
     onStopwatchReset: () -> Unit,
+    onFinishExercise: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val chipColor =
@@ -128,6 +156,20 @@ fun TrainingProgramExerciseDetailScreen(
             disabledLeadingIconContentColor = FitnessTheme.color.blackBg,
             disabledTrailingIconContentColor = FitnessTheme.color.blackBg
         )
+
+    if (uiState.isLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                color = FitnessTheme.color.limeGreen
+            )
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -155,7 +197,7 @@ fun TrainingProgramExerciseDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Handle finish exercise */ }) {
+                    IconButton(onClick = onFinishExercise) {
                         Icon(
                             imageVector = Icons.Default.Done,
                             contentDescription = "Profile",
@@ -278,6 +320,215 @@ fun TrainingProgramExerciseDetailScreen(
         }
     }
 }
+
+
+@Composable
+fun ExerciseProgressDialog(
+    exercise: TrainingProgramExercise,
+    onDismiss: () -> Unit,
+    onSubmit: (ProgressData) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var setsCompleted by remember { mutableStateOf("") }
+    var repsCompleted by remember { mutableStateOf("") }
+    var weightUsed by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFF282c34)
+            ),
+            modifier = modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Text(
+                    text = stringResource(R.string.log_progress_for, exercise.exerciseName),
+                    style = FitnessTheme.typo.innerBoldSize20LineHeight28,
+                    color = FitnessTheme.color.limeGreen,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                // Sets Completed TextField
+                OutlinedTextField(
+                    value = setsCompleted,
+                    onValueChange = { setsCompleted = it },
+                    label = {
+                        Text(
+                            stringResource(R.string.sets_completed),
+                            color = Color.White
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = Color.White,
+                        focusedBorderColor = FitnessTheme.color.limeGreen,
+                        focusedLabelColor = FitnessTheme.color.limeGreen,
+                        unfocusedLabelColor = Color.White,
+                        errorBorderColor = Color.White,
+                        disabledBorderColor = Color.White,
+                        unfocusedBorderColor = Color.White
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Reps Completed TextField
+                OutlinedTextField(
+                    value = repsCompleted,
+                    onValueChange = { repsCompleted = it },
+                    label = {
+                        Text(
+                            stringResource(R.string.reps_completed),
+                            color = Color.White
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = Color.White,
+                        focusedBorderColor = FitnessTheme.color.limeGreen,
+                        focusedLabelColor = FitnessTheme.color.limeGreen,
+                        unfocusedLabelColor = Color.White,
+                        errorBorderColor = Color.White,
+                        disabledBorderColor = Color.White,
+                        unfocusedBorderColor = Color.White
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Weight Used TextField
+                OutlinedTextField(
+                    value = weightUsed,
+                    onValueChange = { weightUsed = it },
+                    label = {
+                        Text(
+                            stringResource(R.string.weight_used_kg),
+                            color = Color.White
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = Color.White,
+                        focusedBorderColor = FitnessTheme.color.limeGreen,
+                        focusedLabelColor = FitnessTheme.color.limeGreen,
+                        unfocusedLabelColor = Color.White,
+                        errorBorderColor = Color.White,
+                        disabledBorderColor = Color.White,
+                        unfocusedBorderColor = Color.White
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Notes TextField
+                OutlinedTextField(
+                    value = notes,
+                    onValueChange = { notes = it },
+                    label = {
+                        Text(
+                            stringResource(R.string.notes_optional),
+                            color = Color.White
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = Color.White,
+                        focusedBorderColor = FitnessTheme.color.limeGreen,
+                        focusedLabelColor = FitnessTheme.color.limeGreen,
+                        unfocusedLabelColor = Color.White,
+                        errorBorderColor = Color.White,
+                        disabledBorderColor = Color.White,
+                        unfocusedBorderColor = Color.White
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Action Buttons
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    // Cancel Button
+                    TextButton(
+                        onClick = onDismiss,
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = Color.White,
+                            containerColor = Color.Red
+                        )
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(horizontal = 12.dp),
+                            text = stringResource(R.string.cancel)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    TextButton(
+                        onClick = {
+                            onSubmit(
+                                ProgressData(
+                                    setsCompleted = setsCompleted.toIntOrNull() ?: 0,
+                                    repsCompleted = repsCompleted.toIntOrNull() ?: 0,
+                                    weightUsed = weightUsed.toIntOrNull() ?: 0,
+                                    notes = notes
+                                )
+                            )
+                            onDismiss()
+                        },
+                        enabled = setsCompleted.isNotBlank() && repsCompleted.isNotBlank() && weightUsed.isNotBlank(),
+                        colors = ButtonDefaults.textButtonColors(
+                            containerColor = FitnessTheme.color.limeGreen,
+                            contentColor = FitnessTheme.color.black,
+                            disabledContainerColor = FitnessTheme.color.primaryDisable
+                        )
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(horizontal = 12.dp),
+                            text = stringResource(R.string.save_progress),
+                            color = Color.White
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewProgressDialog() {
+    ExerciseProgressDialog(
+        exercise = TrainingProgramExercise(
+            id = 1,
+            exerciseId = 1,
+            exerciseName = "Bench Press",
+            exerciseDescription = "Bench press is a great exercise for your chest",
+            exerciseImage = "https://via.placeholder.com/150",
+            exerciseVideoUrl = "https://via.placeholder.com/150",
+            duration = 30,
+            trainingProgramId = 1,
+            sets = 1,
+            restTime = 50,
+            order = 1,
+            exerciseMuscleGroupId = 1,
+            reps = 12,
+        ),
+        onDismiss = { },
+        onSubmit = { }
+    )
+}
+
 
 @Composable
 private fun Chip(
