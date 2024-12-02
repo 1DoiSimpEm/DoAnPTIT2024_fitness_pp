@@ -35,8 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import ptit.vietpq.fitnessapp.presentation.exercise_guidance.ExerciseStats;
 import ptit.vietpq.fitnessapp.util.posedetector.ExerciseInfo;
 import timber.log.Timber;
 
@@ -153,56 +151,6 @@ public class PoseClassifierProcessor {
         }
 
         return result;
-    }
-
-    @WorkerThread
-    public ExerciseStats getExerciseStats(Pose pose) {
-        Preconditions.checkState(Looper.myLooper() != Looper.getMainLooper());
-        ClassificationResult classification = poseClassifier.classify(pose);
-        int reps = 0;
-        float confidence = 0f;
-
-        // Update {@link RepetitionCounter}s if {@code isStreamMode}.
-        if (isStreamMode) {
-            classification = emaSmoothing.getSmoothedResult(classification);
-
-            // Return early without updating repCounter if no pose found.
-            if (pose.getAllPoseLandmarks().isEmpty()) {
-                if (!lastRepResult.isEmpty()) {
-                    String[] parts = lastRepResult.split(" : ");
-                    if (parts.length == 2) {
-                        try {
-                            reps = Integer.parseInt(parts[1].split(" ")[0]);
-                        } catch (NumberFormatException e) {
-                            Timber.tag(TAG).e(e, "Error parsing last rep result");
-                        }
-                    }
-                }
-                return new ExerciseStats(reps, confidence);
-            }
-
-            for (RepetitionCounter repCounter : repCounters) {
-                int repsBefore = repCounter.getNumRepeats();
-                int repsAfter = repCounter.addClassificationResult(classification);
-                if (repsAfter > repsBefore) {
-                    // Play a fun beep when rep counter updates.
-                    ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
-                    tg.startTone(ToneGenerator.TONE_PROP_BEEP);
-                    lastRepResult = String.format(
-                            Locale.US, "%s : %d reps", repCounter.getClassName(), repsAfter);
-                    reps = repsAfter;
-                    break;
-                }
-            }
-        }
-
-        // Add maxConfidence class of current frame to result if pose is found.
-        if (!pose.getAllPoseLandmarks().isEmpty()) {
-            String maxConfidenceClass = classification.getMaxConfidenceClass();
-            confidence = (classification.getClassConfidence(maxConfidenceClass) / poseClassifier.confidenceRange()) * 100;
-        }
-
-        return new ExerciseStats(reps, confidence);
     }
 
 

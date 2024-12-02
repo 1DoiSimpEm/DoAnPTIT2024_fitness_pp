@@ -197,4 +197,6 @@
     <string name="weight_used_kg">Weight Used (Kg)</string>
     <string name="notes_optional">Notes (Optional)</string>
     <string name="save_progress">Save Progress</string>
+    <string name="form_accuracy">Form Accuracy</string>
+    <string name="joint_angles">Joint Angles</string>
 </resources>
