@@ -3,6 +3,7 @@ package ptit.vietpq.fitnessapp.extension
 import ptit.vietpq.fitnessapp.data.di.BASE_URL
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
@@ -21,3 +22,5 @@ fun Date.toCurrentDateString(): String {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     return dateFormat.format(this)
 }
+
+fun LocalDate.toEpochMilli(): Long = this.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()

@@ -36,6 +36,18 @@ class NotificationManagerImpl @Inject constructor(
 
     }
 
+    fun notifyPlan(timeStamp : Long){
+        val constraint = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+            .build()
+        val reminderRequest = OneTimeWorkRequestBuilder<ReminderWorker>()
+            .setConstraints(constraint)
+            .addTag(NotificationConstants.REMINDER_WORK)
+            .setInitialDelay(timeStamp, TimeUnit.MILLISECONDS)
+            .build()
+        workManager.enqueue(reminderRequest)
+    }
+
     private fun scheduleReminder() {
         val isRemindersEnabled =
             sharedPreferenceProvider.get(SharePreferenceProvider.REMINDERS, false) ?: false

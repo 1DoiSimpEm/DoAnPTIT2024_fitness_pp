@@ -12,6 +12,8 @@ import ptit.vietpq.fitnessapp.domain.model.WorkoutPlan
 import ptit.vietpq.fitnessapp.domain.usecase.CreateWorkoutPlanUseCase
 import ptit.vietpq.fitnessapp.domain.usecase.GetTrainingProgramExercisesUseCase
 import ptit.vietpq.fitnessapp.domain.usecase.GetWorkoutPlanByDateUseCase
+import ptit.vietpq.fitnessapp.extension.toEpochMilli
+import ptit.vietpq.fitnessapp.service.NotificationManagerImpl
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
@@ -20,6 +22,7 @@ class WorkoutPlanViewModel @Inject constructor(
     private val getWorkoutPlanByDateUseCase: GetWorkoutPlanByDateUseCase,
     private val getTrainingProgramExercisesUseCase: GetTrainingProgramExercisesUseCase,
     private val createWorkoutPlanUseCase: CreateWorkoutPlanUseCase,
+    private val notificationManagerImpl: NotificationManagerImpl,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(WorkoutPlanUiState())
     val uiState = _uiState.asStateFlow()
@@ -54,7 +57,7 @@ class WorkoutPlanViewModel @Inject constructor(
         }
     }
 
-    fun getTrainingProgramExercises() {
+    private fun getTrainingProgramExercises() {
         viewModelScope.launch {
             getTrainingProgramExercisesUseCase().fold(
                 onSuccess = { result ->
@@ -90,6 +93,7 @@ class WorkoutPlanViewModel @Inject constructor(
                         DateTimeFormatter.ofPattern("MM/dd/yyyy")
                     )
                 )
+                notificationManagerImpl.notifyPlan(timeStamp = workoutPlans.scheduledDate.toEpochMilli())
             } catch (e: Exception) {
                 // Handle error
                 _uiState.update {
