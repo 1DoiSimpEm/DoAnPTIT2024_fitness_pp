@@ -1,5 +1,7 @@
 package ptit.vietpq.fitnessapp.presentation.setting
 
+import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -46,6 +49,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
 import ptit.vietpq.fitnessapp.R
+import ptit.vietpq.fitnessapp.extension.changeLocale
+import ptit.vietpq.fitnessapp.extension.restartActivity
 import ptit.vietpq.fitnessapp.presentation.setting.component.LogoutBottomSheet
 
 @Composable
@@ -57,12 +62,15 @@ fun SettingsRoute(
 ) {
 
     val isVietnamese by viewModel.isVietnameseState.collectAsStateWithLifecycle()
-
+    val context = LocalContext.current
     SettingsScreen(
         onBackPressed = onBackPressed,
         onNotificationSettingClicked = onNotificationSettingClicked,
         onPasswordSettingClicked = onPasswordSettingClicked,
-        onLanguageChanged = viewModel::updateLanguage,
+        onLanguageChanged = {
+            viewModel.updateLanguage(it)
+            context.changeLocale(if (it) "vi" else "en")
+        },
         isVietnamese = isVietnamese,
         onDeleteAccountClicked = {
             /*

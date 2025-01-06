@@ -47,7 +47,7 @@
     <string name="help">Help</string>
     <string name="logout">Logout</string>
     <string name="my_profile">My Profile</string>
-    <string name="performing_exercise">Performing Exercise...</string>
+    <string name="performing_exercise">Performing Exercise…</string>
     <string name="switch_camera">Switch Camera</string>
     <string name="reps">reps</string>
     <string name="form">Form: %1$s%</string>
@@ -56,13 +56,13 @@
     <string name="how_many_servings_do_you_need_per_meal">How many servings do you need per meal?</string>
     <string name="number_of_servings">Number Of Servings</string>
     <string name="more_than_30_minutes">More than 30 minutes</string>
-    <string name="_15_30_minutes">15-30 minutes</string>
+    <string name="_15_30_minutes">15–30 minutes</string>
     <string name="less_than_15_minutes">Less than 15 minutes</string>
     <string name="how_much_time_are_you_willing_to_spend_cooking_each_meal">How much time are you willing to spend cooking each meal?</string>
     <string name="cooking_time_preference">Cooking Time Preference</string>
     <string name="not_sure_don_t_have_a_goal">Not sure/Don\'t have a goal</string>
     <string name="more_than_2000_calories">More than 2000 calories</string>
-    <string name="_1500_2000_calories">1500-2000 calories</string>
+    <string name="_1500_2000_calories">1500–2000 calories</string>
     <string name="less_than_1500_calories">Less than 1500 calories</string>
     <string name="what_is_your_daily_caloric_intake_goal">What is your daily caloric intake goal?</string>
     <string name="caloric_goal">Caloric Goal</string>
@@ -88,8 +88,8 @@
     <string name="dietary_preferences">Dietary Preferences</string>
     <string name="create">Create</string>
     <string name="created">Created: %1$s</string>
-    <string name="loading">Loading...</string>
-    <string name="other_dietary_preferences">Other dietary preferences...</string>
+    <string name="loading">Loading…</string>
+    <string name="other_dietary_preferences">Other dietary preferences…</string>
     <string name="other_allergies">Other allergies</string>
     <string name="another_meal_type">Another meal type</string>
     <string name="another_goal">Another goal</string>
@@ -199,4 +199,12 @@
     <string name="save_progress">Save Progress</string>
     <string name="form_accuracy">Form Accuracy</string>
     <string name="joint_angles">Joint Angles</string>
+    <string name="workouts_for">Workouts for %1$s</string>
+    <string name="this_day">this day</string>
+    <string name="no_workouts_scheduled">No workouts scheduled</string>
+    <string name="selected_exercises">Selected Exercises (%1$s)</string>
+    <string name="meal_planning">Meal Planning</string>
+    <string name="workout_calendar">Workout Calendar</string>
+    <string name="create_workout_plan">Create Workout Plan</string>
+    <string name="description">Description</string>
 </resources>

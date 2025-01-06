@@ -164,7 +164,7 @@ public class PoseClassifierProcessor {
         String exerciseType = "";
         Map<String, Float> jointAngles = new HashMap<>();
         String formFeedback = "";
-
+        String language = Locale.getDefault().getLanguage();
         if (isStreamMode) {
             classification = emaSmoothing.getSmoothedResult(classification);
 
@@ -178,10 +178,10 @@ public class PoseClassifierProcessor {
                 // Calculate important joint angles based on exercise type
                 if (maxConfidenceClass.equals(PUSHUPS_CLASS)) {
                     jointAngles = calculatePushupAngles(pose);
-                    formFeedback = generatePushupFeedback(jointAngles);
+                    formFeedback = generatePushupFeedback(jointAngles,language);
                 } else if (maxConfidenceClass.equals(SQUATS_CLASS)) {
                     jointAngles = calculateSquatAngles(pose);
-                    formFeedback = generateSquatFeedback(jointAngles);
+                    formFeedback = generateSquatFeedback(jointAngles,language);
                 }
             }
 
@@ -270,58 +270,86 @@ public class PoseClassifierProcessor {
         return angles;
     }
 
-    private String generatePushupFeedback(Map<String, Float> angles) {
+    private String generatePushupFeedback(Map<String, Float> angles, String language) {
         StringBuilder feedback = new StringBuilder();
+        boolean isVietnamese = "vi".equalsIgnoreCase(language);
+
+        Map<String, String> messages = isVietnamese ?
+                Map.of(
+                        "elbow_deep", "Hãy xuống sâu hơn: Gập khuỷu tay nhiều hơn ở điểm thấp nhất. ",
+                        "elbow_extend", "Duỗi thẳng: Duỗi thẳng tay hoàn toàn ở điểm cao nhất. ",
+                        "back_straight", "Giữ lưng thẳng. Duy trì tư thế plank cứng. ",
+                        "shoulder_level", "Giữ vai ngang bằng. Phân bố trọng lượng đều. ",
+                        "perfect", "Tư thế chống đẩy hoàn hảo!"
+                ) :
+                Map.of(
+                        "elbow_deep", "Go deeper: Bend your elbows more at the bottom of the pushup. ",
+                        "elbow_extend", "Full extension: Straighten your arms completely at the top. ",
+                        "back_straight", "Keep your back straight. Maintain a rigid plank-like position. ",
+                        "shoulder_level", "Level your shoulders. Maintain even weight distribution. ",
+                        "perfect", "Excellent pushup form!"
+                );
 
         float elbowAngle = angles.get("elbow_angle");
         float backAngle = angles.get("back_angle");
         float shoulderAlignment = angles.get("shoulder_alignment");
 
-        // Detailed elbow angle feedback
         if (elbowAngle < 70) {
-            feedback.append("Go deeper: Bend your elbows more at the bottom of the pushup. ");
+            feedback.append(messages.get("elbow_deep"));
         } else if (elbowAngle > 170) {
-            feedback.append("Full extension: Straighten your arms completely at the top. ");
+            feedback.append(messages.get("elbow_extend"));
         }
 
-        // Back alignment feedback
         if (backAngle < 160) {
-            feedback.append("Keep your back straight. Maintain a rigid plank-like position. ");
+            feedback.append(messages.get("back_straight"));
         }
 
-        // Shoulder alignment feedback
         if (Math.abs(shoulderAlignment) > 5) {
-            feedback.append("Level your shoulders. Maintain even weight distribution. ");
+            feedback.append(messages.get("shoulder_level"));
         }
 
-        return feedback.length() > 0 ? feedback.toString() : "Excellent pushup form!";
+        return feedback.length() > 0 ? feedback.toString() : messages.get("perfect");
     }
 
-    private String generateSquatFeedback(Map<String, Float> angles) {
+    private String generateSquatFeedback(Map<String, Float> angles, String language) {
         StringBuilder feedback = new StringBuilder();
+        boolean isVietnamese = "vi".equalsIgnoreCase(language);
+
+        Map<String, String> messages = isVietnamese ?
+                Map.of(
+                        "squat_deeper", "Ngồi xuống sâu hơn: Đùi nên song song với mặt đất. ",
+                        "squat_high", "Đừng xuống quá thấp: Tránh xuống quá sâu để bảo vệ đầu gối. ",
+                        "torso_upright", "Giữ thân trên thẳng đứng hơn. Ngực hướng lên, lưng thẳng. ",
+                        "balance", "Cân bằng trọng lượng. Phân bố đều qua hai chân. ",
+                        "perfect", "Kỹ thuật squat hoàn hảo!"
+                ) :
+                Map.of(
+                        "squat_deeper", "Squat deeper: Aim to get thighs parallel to ground. ",
+                        "squat_high", "Don't overextend: Avoid going too low to prevent knee strain. ",
+                        "torso_upright", "Keep your torso more upright. Chest up, back straight. ",
+                        "balance", "Balance your weight evenly. Distribute weight through both feet. ",
+                        "perfect", "Perfect squat technique!"
+                );
 
         float kneeAngle = angles.get("knee_angle");
         float hipAngle = angles.get("hip_angle");
         float horizontalBalance = angles.get("horizontal_balance");
 
-        // Knee angle progression feedback
         if (kneeAngle > 110) {
-            feedback.append("Squat deeper: Aim to get thighs parallel to ground. ");
+            feedback.append(messages.get("squat_deeper"));
         } else if (kneeAngle < 60) {
-            feedback.append("Don't overextend: Avoid going too low to prevent knee strain. ");
+            feedback.append(messages.get("squat_high"));
         }
 
-        // Hip and back posture feedback
         if (hipAngle < 80) {
-            feedback.append("Keep your torso more upright. Chest up, back straight. ");
+            feedback.append(messages.get("torso_upright"));
         }
 
-        // Balance feedback
         if (Math.abs(horizontalBalance) > 10) {
-            feedback.append("Balance your weight evenly. Distribute weight through both feet. ");
+            feedback.append(messages.get("balance"));
         }
 
-        return feedback.length() > 0 ? feedback.toString() : "Perfect squat technique!";
+        return feedback.length() > 0 ? feedback.toString() : messages.get("perfect");
     }
 
     private float calculateHorizontalAlignment(PoseLandmark left, PoseLandmark right) {

@@ -135,7 +135,7 @@ fun WorkoutCalendarScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Workout Calendar",
+                        text = stringResource(R.string.workout_calendar),
                         color = FitnessTheme.color.primary,
                         style = FitnessTheme.typo.innerBoldSize20LineHeight28
                     )
@@ -371,10 +371,10 @@ private fun WorkoutPlansList(
             .padding(horizontal = 16.dp)
     ) {
         Text(
-            text = "Workouts for ${
-                if (workoutPlans.isEmpty()) "this day"
+            text = stringResource(
+                R.string.workouts_for, if (workoutPlans.isEmpty()) stringResource(R.string.this_day)
                 else workoutPlans.first().scheduledDate.format(DateTimeFormatter.ofPattern("MMMM d"))
-            }",
+            ),
             style = FitnessTheme.typo.innerBoldSize16LineHeight24,
             color = FitnessTheme.color.limeGreen
         )
@@ -403,7 +403,7 @@ private fun WorkoutPlansList(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No workouts scheduled",
+                        text = stringResource(R.string.no_workouts_scheduled),
                         style = FitnessTheme.typo.body,
                         color = Color.White.copy(alpha = 0.7f)
                     )
@@ -498,7 +498,7 @@ private fun CreateWorkoutPlanDialog(
                     .verticalScroll(rememberScrollState())
             ) {
                 Text(
-                    text = "Create Workout Plan",
+                    text = stringResource(R.string.create_workout_plan),
                     style = FitnessTheme.typo.innerBoldSize20LineHeight28,
                     color = FitnessTheme.color.limeGreen
                 )
@@ -526,7 +526,7 @@ private fun CreateWorkoutPlanDialog(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("Description", color = Color.White) },
+                    label = { Text(stringResource(R.string.description), color = Color.White) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         textColor = Color.White,
@@ -625,7 +625,7 @@ private fun CreateWorkoutPlanDialog(
 
                 // Exercise Selection Section
                 Text(
-                    text = "Selected Exercises (${selectedExercises.size})",
+                    text = stringResource(R.string.selected_exercises, selectedExercises.size),
                     style = FitnessTheme.typo.innerBoldSize16LineHeight24,
                     color = Color.White
                 )
@@ -672,7 +672,7 @@ private fun CreateWorkoutPlanDialog(
                         Text(
                             modifier = Modifier.padding(
                                 horizontal = 12.dp
-                            ), text = "Cancel"
+                            ), text = stringResource(R.string.cancel)
                         )
                     }
                     Spacer(modifier = Modifier.width(8.dp))

@@ -110,7 +110,7 @@ fun MealPlanningScreen(
                 title = {
                     Text(
                         modifier = Modifier.padding(start = 16.dp),
-                        text = "Meal Planning",
+                        text = stringResource(R.string.meal_planning),
                         style = FitnessTheme.typo.innerBoldSize20LineHeight28,
                         color = FitnessTheme.color.limeGreen
                     )
@@ -402,21 +402,20 @@ fun MealPlanningScreen(
                                 append(customAllergies)
                             }
                         }
-
                         onCreateButtonClicked(
-                            """
-                            Please create a personalized meal plan based on the following preferences:
-                            
-                            Dietary Preference: $dietaryPref
-                            Allergies: $allergiesList
-                            Meal Types: ${selectedMealTypes.joinToString(", ")}${if (customMealTypes.isNotEmpty()) ", $customMealTypes" else ""}
-                            Caloric Goal: ${customCalorieGoal.ifEmpty { selectedCalorieGoal }}
-                            Cooking Time: ${customCookingTime.ifEmpty { selectedCookingTime }}
-                            Servings: ${customServings.ifEmpty { selectedServings }}
-                            
-                            Please provide a detailed meal plan that takes into account all these preferences and restrictions. 
-                            Include specific recipes, nutritional information, and preparation instructions for each meal.
-                            """.trimIndent()
+                            generateMealPlanPrompt(
+                                dietaryPref,
+                                allergiesList,
+                                selectedMealTypes.toList(),
+                                customMealTypes,
+                                selectedCalorieGoal,
+                                customCalorieGoal,
+                                selectedCookingTime,
+                                customCookingTime,
+                                selectedServings,
+                                customServings,
+                                uiState.languageCode
+                            )
                         )
                     },
                     modifier = Modifier
@@ -433,6 +432,63 @@ fun MealPlanningScreen(
             }
         }
     )
+}
+
+
+private fun generateMealPlanPrompt(
+    dietaryPref: String,
+    allergiesList: String,
+    selectedMealTypes: List<String>,
+    customMealTypes: String,
+    selectedCalorieGoal: String,
+    customCalorieGoal: String,
+    selectedCookingTime: String,
+    customCookingTime: String,
+    selectedServings: String,
+    customServings: String,
+    language: String
+): String {
+    val isVietnamese = language.equals("vi", ignoreCase = true)
+
+    return if (isVietnamese) {
+        """
+    Thực đơn với:
+    
+    - Chế độ ăn: $dietaryPref
+    - Dị ứng: $allergiesList
+    - Bữa ăn: ${selectedMealTypes.joinToString(", ")}${if (customMealTypes.isNotEmpty()) ", $customMealTypes" else ""}
+    - Calo: ${customCalorieGoal.ifEmpty { selectedCalorieGoal }}
+    - Thời gian nấu: ${customCookingTime.ifEmpty { selectedCookingTime }}
+    - Khẩu phần: ${customServings.ifEmpty { selectedServings }}
+    
+    Yêu cầu:
+    1. Sử dụng nguyên liệu Việt Nam
+    2. Chi tiết cách nấu từng món
+    3. Thông tin dinh dưỡng mỗi bữa
+    4. Đảm bảo phù hợp văn hóa ẩm thực Việt
+    5. Trả lời trọng tâm trực tiếp, không cần chào hỏi
+    6. Trả lời các thông tin dựa trên bữa ăn, ngắn gọn nhất có thể.
+    """.trimIndent()
+    } else {
+        """
+    Meal plan for:
+    
+    - Diet: $dietaryPref
+    - Allergies: $allergiesList
+    - Meals: ${selectedMealTypes.joinToString(", ")}${if (customMealTypes.isNotEmpty()) ", $customMealTypes" else ""}
+    - Calories: ${customCalorieGoal.ifEmpty { selectedCalorieGoal }}
+    - Cook time: ${customCookingTime.ifEmpty { selectedCookingTime }}
+    - Servings: ${customServings.ifEmpty { selectedServings }}
+    
+    Requirements:
+    1. Detailed recipe for each meal
+    2. Nutritional information
+    3. Step-by-step cooking instructions
+    4. Common ingredients prioritized
+    5. Generate prompt directly, don't need unnecessary greetings
+    6. Generate prompt based on meal, be concise.
+    """.trimIndent()
+    }
 }
 
 @Composable

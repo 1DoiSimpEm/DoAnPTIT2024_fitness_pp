@@ -42,8 +42,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.jeziellago.compose.markdowntext.MarkdownText
 import ptit.vietpq.fitnessapp.designsystem.FitnessTheme
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import ptit.vietpq.fitnessapp.R
 import ptit.vietpq.fitnessapp.data.remote.response.MealPlanResponse
 import ptit.vietpq.fitnessapp.extension.formatTimestamp
@@ -222,17 +224,9 @@ private fun MealPlanCard(
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFFCCFF00),
-                modifier = Modifier.padding(bottom = 12.dp)
+                modifier = Modifier.padding(bottom = 12.dp),
+                maxLines = 2
             )
-
-            Text(
-                text = mealPlan.description,
-                fontSize = 16.sp,
-                color = Color.White,
-                modifier = Modifier.padding(bottom = 8.dp),
-                maxLines = 3
-            )
-
             Text(
                 text = stringResource(R.string.created, (mealPlan.timeStamp.formatTimestamp())),
                 fontSize = 14.sp,
@@ -266,7 +260,7 @@ private fun PreviewMealPlanList() {
     MealPlanListScreen(
         uiState = MealListUiState(
             false,
-            persistentListOf()
+            sampleMealPlans.toImmutableList(),
         ),
         onMealPlanClick = {},
         onBackPressed = {},

@@ -22,6 +22,7 @@ sealed interface MealPlanningState {
 
 data class MealPlanningUiState(
     val isLoading: Boolean = false,
+    val languageCode : String = "en"
 )
 
 @HiltViewModel
@@ -34,6 +35,12 @@ class MealPlanningViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<MealPlanningUiState> =
         MutableStateFlow(MealPlanningUiState())
     val uiState = _uiState.asStateFlow()
+
+    init {
+        _uiState.update {
+            it.copy(languageCode = sharePreferenceProvider.get(SharePreferenceProvider.LANGUAGE, "en") ?: "en")
+        }
+    }
 
     fun fetchChatResponse(prompt: String) {
         viewModelScope.launch {
